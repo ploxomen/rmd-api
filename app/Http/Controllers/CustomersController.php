@@ -18,7 +18,10 @@ class CustomersController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $customers = Customers::where('customer_status','>',0)->where(function($query)use($search){
+        $customers = Customers::select("customers.id","customer_number_document","customer_name","document_name","contrie")
+        ->join('type_documents','customer_type_document','=','type_documents.id')
+        ->join('contries','customer_contrie','=','contries.id')
+        ->where('customer_status','>',0)->where(function($query)use($search){
             $query->where('customer_name','like','%'.$search.'%')
             ->orWhere('customer_number_document','like','%'.$search.'%');
         });

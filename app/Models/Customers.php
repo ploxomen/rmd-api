@@ -12,9 +12,6 @@ class Customers extends Model
         'customer_contrie',
         'customer_number_document',
         'customer_name',
-        'customer_email',
-        'customer_phone',
-        'customer_cell_phone',
         'customer_address',
         'customer_district',
         'customer_status'
