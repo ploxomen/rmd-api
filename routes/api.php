@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
+    Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
+
     Route::get('quotation/contacts/{customer}',[QuotationsController::class,'getContactsActive']);
     Route::get('product-categorie',[ProductsController::class,'categorie']);
     Route::get('product-subcategorie/{categorie}',[ProductsController::class,'subcategorie']);
