@@ -31,7 +31,7 @@ class QuotationsController extends Controller
             return response('Acceso denegado',403);
         }
         $configuration = Configurations::all();
-        return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream();
+        return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->output();
     }
     public function getUsers() {
         return response()->json([
