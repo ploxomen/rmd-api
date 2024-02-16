@@ -31,12 +31,7 @@ class QuotationsController extends Controller
             return response('Acceso denegado',403);
         }
         $configuration = Configurations::all();
-        $pdfData = Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->output();
-        $nombreArchivo = "assss.pdf";
-        return response()->make($pdfData)
-        ->header('Content-Type', 'application/pdf')
-        ->header('Content-Disposition', 'inline; filename="'.$nombreArchivo.'"');
-        // return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream('assaasassa.pdf');
+        return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->output();
     }
     public function getUsers() {
         return response()->json([
