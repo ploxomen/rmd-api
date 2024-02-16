@@ -50,5 +50,12 @@ class Quotation extends Model
         }
         return $query;
     }
-
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class,'quotation_customer');
+    }
+    public function contact()
+    {
+        return $this->belongsTo(Contacts::class,'quotation_customer_contact');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Models\Categories;
 use App\Models\Products;
 use App\Models\SubCategories;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductsController extends Controller
 {
@@ -26,6 +28,13 @@ class ProductsController extends Controller
             'totalProducts' => $products->count(),
             'data' => $products->skip($skip)->take($show)->get()
         ]);
+    }
+    public function exportProductsExcel(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(!is_null($redirect)){
+            return response('Acceso no autorizado',403);
+        }
+        return Excel::download(new ProductsExport(Categories::where('categorie_status',1)->get(),'reports.products'),'products.xlsx');
     }
     public function categorie() {
         return response()->json([

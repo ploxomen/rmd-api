@@ -41,9 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
     Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
-
+    Route::get('quotation-extra/pdf/{quotation}',[QuotationsController::class,'getReportPdf']);
     Route::get('quotation/contacts/{customer}',[QuotationsController::class,'getContactsActive']);
     Route::get('product-categorie',[ProductsController::class,'categorie']);
+    Route::get('product-export',[ProductsController::class,'exportProductsExcel']);
     Route::get('product-subcategorie/{categorie}',[ProductsController::class,'subcategorie']);
     Route::put('users-reset/{user}',[AuthController::class,'resetPassword']);
     Route::apiResource('customer',CustomersController::class);

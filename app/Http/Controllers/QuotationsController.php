@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configurations;
 use App\Models\Contacts;
 use App\Models\Customers;
 use App\Models\Products;
 use App\Models\Quotation;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class QuotationsController extends Controller
 {
     private $urlModule = '/quotation/new';
+    private $urlModuleAll = '/quotation/all';
     private $idContrieIgv = 173; 
     public function getCustomerActive() {
         return response()->json([
@@ -21,6 +24,19 @@ class QuotationsController extends Controller
             'message' => 'Clientes obtenidos correctamente',
             'data' => Customers::select('id AS value','customer_name AS label')->where('customer_status',1)->get()
         ]);
+    }
+    public function getReportPdf(Request $request,Quotation $quotation) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        if(!is_null($redirect)){
+            return response('Acceso denegado',403);
+        }
+        $configuration = Configurations::all();
+        $pdfData = Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->output();
+        $nombreArchivo = "assss.pdf";
+        return response()->make($pdfData)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'inline; filename="'.$nombreArchivo.'"');
+        // return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream('assaasassa.pdf');
     }
     public function getUsers() {
         return response()->json([
@@ -55,7 +71,7 @@ class QuotationsController extends Controller
             'quotation_type_change' => 'nullable|string|decimal:0,2',
             'quotation_include_igv' => 'required|boolean',
             'quotation_customer' => 'required|numeric',
-            'quotation_contact' => 'nullable|numeric',
+            'quotation_contact' => 'required|numeric',
             'quotation_address' => 'required|string|max:255',
         ]);
         $validator->setAttributeNames([
@@ -120,7 +136,7 @@ class QuotationsController extends Controller
             'quotation_type_change' => 'nullable|string|decimal:0,2',
             'quotation_include_igv' => 'required|boolean',
             'quotation_customer' => 'required|numeric',
-            'quotation_contact' => 'nullable|numeric',
+            'quotation_contact' => 'required|numeric',
             'quotation_address' => 'required|string|max:255',
         ]);
         $validator->setAttributeNames([
@@ -136,6 +152,7 @@ class QuotationsController extends Controller
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
         }
         $quotation = Quotation::find($request->quotation);
+
         $quotation->update([
             'quotation_include_igv' => $request->quotation_include_igv,
             'quotation_customer' => $request->quotation_customer,
@@ -171,7 +188,7 @@ class QuotationsController extends Controller
             'quotation_igv' => $igv,
             'quotation_total' => $total
         ]);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -180,7 +197,7 @@ class QuotationsController extends Controller
     }
     public function show(Request $request) {
         $quotation = Quotation::find($request->quotation,["quotation_customer","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions","quotation_description_products"]);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -193,7 +210,7 @@ class QuotationsController extends Controller
         ]);
     }
     public function index(Request $request) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
@@ -219,7 +236,7 @@ class QuotationsController extends Controller
     }
     public function destroy(Request $request) {
         Quotation::find($request->quotation)->update(['quotation_status' => 0]);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
