@@ -190,8 +190,7 @@
         </tfoot>
     </table>
     <p style="font-size: 14px; margin-bottom: 10px;">
-        Insumos de origen europeo <br>
-        Tiempo de Validez de cotización: <strong>15 DÍAS HABILES</strong>
+        Insumos de origen europeo
     </p>
     @empty(!$quotation->quotation_description_products)
     <div style="margin-bottom: 10px;">
