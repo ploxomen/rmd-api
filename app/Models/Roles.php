@@ -13,7 +13,6 @@ class Roles extends Model
     protected $hidden = [
         'create_at',
         'update_at',
-        'pivot'
     ];
 
     public function modules()
@@ -22,6 +21,6 @@ class Roles extends Model
     }
     public function users()
     {
-        return $this->belongsToMany(User::class,'users_roles','role','user')->withTimestamps();
+        return $this->belongsToMany(User::class,'users_roles','role','user');
     }
 }

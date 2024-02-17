@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('user_last_name',250);
             $table->string('user_email',250)->unique();
             $table->string('password');
+            $table->string('user_avatar')->nullable();
             $table->string('user_phone',20)->nullable();
             $table->string('user_cell_phone',20)->nullable();
             $table->date('user_birthdate')->nullable();

@@ -16,6 +16,10 @@ class Customers extends Model
         'customer_district',
         'customer_status'
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function contacts()
     {
         return $this->hasMany(Contacts::class,'customer_id');

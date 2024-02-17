@@ -12,4 +12,8 @@ class Configurations extends Model
         'description',
         'value'
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
 }

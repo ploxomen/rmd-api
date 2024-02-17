@@ -69,8 +69,10 @@
         }
     </style>
     @php
-        $emails = $configuration->where('description','=','correos')->first()->value;
-        $phones = $configuration->where('description','=','celulares')->first()->value;
+        $emails = $configuration->where('description','=','business_email')->first()->value;
+        $phones = $configuration->where('description','=','business_cell_phone')->first()->value;
+        $pages = $configuration->where('description','=','business_page')->first()->value;
+        $pagesArray = explode('/',$pages);
         $listEmails = implode('<br>',explode('/',$emails));
         $listPhones = implode(' / CEL: ',explode('/',$phones));
         $money = $quotation->quotation_type_money == 'PEN' ? 'S/' : '$';
@@ -80,9 +82,9 @@
         <tr>
             <td style="width: 420px;">
                 <img src={{public_path('img/rmd-header.jpg')}} alt="imagen" width="300px">
-                <h1 class="title">{{$configuration->where('description','=','razon_social_largo')->first()->value}}</h1>
-                <strong class="title">RUC: {{$configuration->where('description','=','ruc')->first()->value}}</strong>
-                <p class="parragraph-small">{{$configuration->where('description','=','direccion')->first()->value}}</´p>
+                <h1 class="title">{{$configuration->where('description','=','business_name')->first()->value}}</h1>
+                <strong class="title">RUC: {{$configuration->where('description','=','business_ruc')->first()->value}}</strong>
+                <p class="parragraph-small">{{$configuration->where('description','=','business_address')->first()->value}}</´p>
                 <p class="parragraph-small">
                     CEL: {!! $listPhones !!}
                 </p>
@@ -193,17 +195,39 @@
     </p>
     @empty(!$quotation->quotation_description_products)
     <div style="margin-bottom: 10px;">
-        <h2 style="font-size: 16px; margin-bottom: 0;">Descripción del los productos</h2>
+        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Descripción del los productos</h2>
         {!! $quotation->quotation_description_products !!}
     </div>
     @endempty
     <div>
-        <h2 style="font-size: 16px; margin-bottom: 0;">Observaciones</h2>
+        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Observaciones</h2>
         {!! $quotation->quotation_observations !!}
     </div>
     <div>
-        <h2 style="font-size: 16px; margin-bottom: 0;">Condiciones</h2>
+        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Condiciones</h2>
         {!! $quotation->quotation_conditions !!}
     </div>
+    <table>
+        <tr>
+            <td style="vertical-align: top; width: 380px;">
+                <strong style="font-size: 14px;">DATOS BANCARIOS</strong><br>
+                {!! $configuration->where('description','=','business_bank')->first()->value !!}
+            </td>
+            <td style="vertical-align: top;">
+                <p style="line-height: 2;font-size: 13px;">
+                    <strong>Firma de Aceptación Presopuesto y Orden Compra:</strong><br>
+                    <span>Nombre:</span><br>
+                    <span>DNI:</span><br>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            @foreach ($pagesArray as $pag)
+                <td style="text-align: center; font-size: 12px;">
+                    {{$pag}}
+                </td>
+            @endforeach
+        </tr>
+    </table>
 </body>
 </html>

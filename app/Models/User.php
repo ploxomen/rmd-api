@@ -31,6 +31,7 @@ class User extends Authenticatable
         'user_birthdate',
         'user_status',
         'user_gender',
+        'user_avatar',
         'user_address'
     ];
 
@@ -41,6 +42,8 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'created_at',
+        'updated_at'
     ];
     
     public function roles()

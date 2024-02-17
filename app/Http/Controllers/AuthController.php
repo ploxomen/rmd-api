@@ -14,10 +14,14 @@ class AuthController extends Controller
     public function userRestrict($user,$url) {
         $role = $user->roles()->where('active',1)->first();
         $redirectRestrict = '/intranet/home';
-        if(empty($role)){
+        $redirectUserNew = '/intranet/user-reset';
+        if(empty($role) && !in_array($url,["/home","/my-account","/user-reset"])){
             return $redirectRestrict;
         }
-        if(empty($role->modules()->where('module_url',$url)->first())){
+        if($user->user_status === 2){
+            return $redirectUserNew;
+        }
+        if(empty($role->modules()->where('module_url',$url)->first()) && !in_array($url,["/home","/my-account","/user-reset"])){
             return $redirectRestrict;
         }
         return null;
@@ -30,8 +34,7 @@ class AuthController extends Controller
         return response()->json([
             'redirect' => '/intranet/home',
             'error' => false,
-            'message' => 'Usuario autenticado', 
-            
+            'message' => 'Rol cambiado',
         ]);
     }
     public function login(Request $request)
@@ -80,7 +83,13 @@ class AuthController extends Controller
             'user_status' => 1
         ]);
         $token = $user->createToken('auth_token',['*'],now()->addDays(3))->plainTextToken;
-        return response()->json(['error' => false, 'message' => 'Usuario creado correctamente', 'data' => $user, 'access_token' => $token, 'token_type' => 'Berer']);
+        return response()->json([
+            'error' => false, 
+            'message' => 'Usuario creado correctamente', 
+            'data' => $user, 
+            'access_token' => $token, 
+            'token_type' => 'Berer'
+        ]);
     }
     public function resetPassword(Request $request) {
         $validator = Validator::make($request->all(),[
@@ -97,12 +106,33 @@ class AuthController extends Controller
             'message' => 'Se cambió la contraseña del usuario'
         ]);
     }
-    public function logout() {
-        auth()->user()->tokens()->delete();
+    public function changePassword(Request $request) {
+        $user = $request->user();
+        if($user->user_status != 2){
+            return response()->json([
+                'error' => true,
+                'redirect' => '/intranet/home',
+                'message' => 'El usuario no está autorizado para actualizar su contraseña'
+            ]);
+        }
+        $user->update(['user_status' => 1,'password' => Hash::make($request->password_1)]);
+        $token = User::find($user->id)->createToken('auth_token',['*'],now()->addDays(3))->plainTextToken;
+        return response()->json([
+            'error' => false,
+            'message' => 'Contraseña actualizada correctamente',
+            'redirect' => '/intranet/home',
+            'data' => [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user
+            ]
+        ]);
+    }
+    public function logout(Request $request) {
+        $request->user()->tokens()->delete();
         return response()->json([
             'error' => false,
             'message' => 'Se cerró la sesión correctamente'
         ]);
     }
-    
 }

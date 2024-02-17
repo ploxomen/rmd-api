@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configurations;
 use App\Models\Contries;
 use App\Models\Departaments;
 use App\Models\Districts;
@@ -10,14 +11,86 @@ use App\Models\Roles;
 use App\Models\TypeDocument;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     private $urlModule = '/users';
+    private $urlConfiguration = '/configurations';
     private $listColumnsUser = ["user_name","user_last_name","user_cell_phone","user_status","user_email","users.id"];
-
+    public function updateBusiness(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlConfiguration);
+        if(!is_null($redirect)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => false, 
+            ]);
+        }
+        $data = $request->all();
+        foreach ($data as $key => $data) {
+            Configurations::where('description',$key)->update(['value' => $data]);
+        }
+        return response()->json([
+            'redirect' => null,
+            'error' => false, 
+            'message' => 'Datos actualizados correctamente',
+        ]);
+    }
+    public function getBusiness(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlConfiguration);
+        if(!is_null($redirect)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => false, 
+            ]);
+        }
+        $configurations = Configurations::all();
+        return response()->json([
+            'redirect' => null,
+            'error' => false, 
+            'message' => 'Datos obtenidos correctamente',
+            'data' => $configurations 
+        ]);
+    }
+    public function updateInfoUser(Request $request) {
+        $data = $request->except("_method","avatar","delete_img");
+        $validator = Validator::make($data,[
+            'user_name' => 'required|string|max:250',
+            'user_last_name' => 'required|string|max:250',
+            'user_birthdate' => 'nullable|date',
+            'user_gender' => 'nullable|string',
+            'user_cell_phone' => 'nullable|string',
+        ]);
+        $validator->setAttributeNames([
+            'user_name' => 'nombre',
+            'user_last_name' => 'apellidos',
+            'user_birthdate' => 'fecha de nacimiento',
+            'user_gender' => 'género',
+            'user_cell_phone' => 'celular',
+        ]);
+        if($validator->fails()){
+            return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all()]);
+        }
+        $user = User::find($request->user()->id);
+        if($request->has('delete_img') && File::exists($user->user_avatar)){
+            File::delete($user->user_avatar);
+            $data['user_avatar'] = null;
+        }
+        if($request->has('avatar')){
+            $file = $request->file('avatar');
+            $fileName = time() . "_" . $file->getClientOriginalName();
+            $filePath = $file->storeAs('users',$fileName,'public');
+            $data['user_avatar'] = 'storage/'.$filePath;
+        }
+        $user->update($data);
+        return response()->json([
+            'redirect' => null,
+            'error' => false, 
+            'message' => 'Datos actualizado correctamente', 
+        ]);
+    }
     public function index(Request $request) {
         $users = new User();
         $show = $request->show;
@@ -41,6 +114,15 @@ class UserController extends Controller
             'data' => $users->select($this->listColumnsUser)->skip($skip)->take($show)->get()
         ]);
     }
+    public function getInfoUser(Request $request) {
+        $user = User::find($request->user()->id,["user_type_document","user_number_document","user_name","user_last_name","user_email","user_cell_phone","user_birthdate","user_gender","user_avatar"]);
+        return response()->json([
+            'redirect' => null,
+            'error' => false,
+            'message' => 'Datos del usuario obtenidos correctamente',
+            'data' => $user
+        ]);
+    }
     public function getContries() {
         return response()->json([
             'redirect' => null,
@@ -51,13 +133,19 @@ class UserController extends Controller
     }
     public function userModules(Request $request) {
         $user = $request->user();
-        if(!$user->roles()->where('active',1)->count()){
+        if(!$user->roles()->where('users_roles.active',1)->count()){
             $role = $user->roles()->first();
-            $user->roles()->where('rol', $role->id)->update(['active' => 1]);
+            $user->roles()->where('role','=',$role->id)->update(['active' => 1]);
         }else{
             $role = $user->roles()->where('active',1)->first();
         }
-        return response()->json(['error' => false,'redirect' => (new AuthController)->userRestrict($user,$request->url),'modules' => Roles::find($role->id)->modules()->where('module_status',1)->orderBy("module_status")->get(),'roles' => $user->roles()->get()]);
+        return response()->json([
+            'error' => false,
+            'redirect' => (new AuthController)->userRestrict($user,$request->url),
+            'modules' => Roles::find($role->id)->modules()->where('module_status',1)->orderBy("module_order")->get(),
+            'roles' => $user->roles()->get(),
+            'user' => User::find($request->user()->id,["user_name","user_last_name","user_avatar"])
+        ]);
     }
     public function getDepartamentsUbigeo() {
         return response()->json([
@@ -121,7 +209,7 @@ class UserController extends Controller
             'user_birthdate' => $request->user_birthdate,
             'user_gender' => $request->user_gender,
             'user_address' => $request->user_address,
-            'user_status' => 1
+            'user_status' => 2
         ]);
         $user->roles()->attach($request->role);
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);

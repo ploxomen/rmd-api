@@ -25,9 +25,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('register',[AuthController::class,'register']);
     Route::prefix('user')->group(function () {
+        Route::delete('logout',[AuthController::class,'logout']);
+        Route::put('change-password',[AuthController::class,'changePassword']);
         Route::get('modules-roles',[UserController::class,'userModules']);
+        Route::get('change-role/{role}',[AuthController::class,'changeRole']);
     });
     Route::get('role-module/{role}',[RolesController::class,'getModules']);
+    Route::get('my-business',[UserController::class,'getBusiness']);
+    Route::put('my-business',[UserController::class,'updateBusiness']);
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::apiResource('role',RolesController::class);
@@ -35,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
     Route::get('type-documents',[UserController::class,'getTypeDocuments']);
+    Route::get('my-info',[UserController::class,'getInfoUser']);
+    Route::put('my-account',[UserController::class,'updateInfoUser']);
     Route::apiResource('users',UserController::class);
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('quotation',QuotationsController::class);
@@ -56,5 +63,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('districts/{province}',[UserController::class,'getDistrictsUbigeo']);
     Route::get('contries',[UserController::class,'getContries']);
 });
-
 Route::get('login',[AuthController::class,'login']);
