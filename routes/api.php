@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ModulesController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RolesController;
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::apiResource('role',RolesController::class);
+    Route::apiResource('order',OrdersController::class);
     Route::apiResource('module',ModulesController::class);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
@@ -46,7 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
+    Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
+    Route::get('order-extra/quotations',[OrdersController::class,'getQuotations']);
     Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
     Route::get('quotation-extra/pdf/{quotation}',[QuotationsController::class,'getReportPdf']);
     Route::get('quotation/contacts/{customer}',[QuotationsController::class,'getContactsActive']);

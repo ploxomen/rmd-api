@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\QuotationsExport;
 use App\Models\Configurations;
 use App\Models\Contacts;
 use App\Models\Customers;
@@ -11,11 +12,13 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class QuotationsController extends Controller
 {
     private $urlModule = '/quotation/new';
     private $urlModuleAll = '/quotation/all';
+    private $urlModuleExcel = '/quotation/report';
     private $idContrieIgv = 173; 
     public function getCustomerActive() {
         return response()->json([
@@ -25,11 +28,38 @@ class QuotationsController extends Controller
             'data' => Customers::select('id AS value','customer_name AS label')->where('customer_status',1)->get()
         ]);
     }
+    public function getDataExport(Request $request){
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleExcel);
+        if(!is_null($redirect)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => true,
+                'message' => 'Acceso denegado'
+            ]);
+        }
+        switch ($request->typeInformation) {
+            case 'excel':
+                return Excel::download(new QuotationsExport(Quotation::getQuotationsReport($request->startDate,$request->finalDate)->get(),'reports.quotation'),'cotizizaciones.xlsx');
+            break;
+            default:
+                $show = $request->show;
+                $skip = ($request->page - 1) * $show;
+                $quotations = Quotation::getQuotationsReport($request->startDate,$request->finalDate);
+                return response()->json([
+                    'redirect' => null,
+                    'error' => false,
+                    'message' => 'Datos obtenidos correctamente',
+                    'data' => $quotations->skip($skip)->take($show)->get(),
+                    'totalQuotations' => $quotations->count()
+                ]);
+            break;
+        }
+    }
     public function getReportPdf(Request $request,Quotation $quotation) {
-        // $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
-        // if(!is_null($redirect)){
-        //     return response('Acceso denegado',403);
-        // }
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        if(!is_null($redirect)){
+            return response('Acceso denegado',403);
+        }
         $configuration = Configurations::all();
         return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream("asas.pdf");
     }

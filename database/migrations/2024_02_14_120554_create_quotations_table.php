@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('quotation_customer')->unsigned();
             $table->foreign('quotation_customer')->references('id')->on('customers');
+            $table->bigInteger('order_id')->unsigned();
+            $table->foreign('order_id')->references('id')->on('orders');
             $table->bigInteger('quotation_customer_contact')->unsigned()->nullable();
             $table->foreign('quotation_customer_contact')->references('id')->on('contacts');
             $table->date('quotation_date_issue');

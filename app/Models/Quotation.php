@@ -9,6 +9,7 @@ class Quotation extends Model
 {
     protected $table = 'quotations';
     protected $fillable = [
+        'order_id',
         'quotation_customer',
         'quotation_customer_contact',
         'quotation_date_issue',
@@ -57,5 +58,19 @@ class Quotation extends Model
     public function contact()
     {
         return $this->belongsTo(Contacts::class,'quotation_customer_contact');
+    }
+    public static function getQuotationsForOrders($typeMoney,$includeIgv,$customer) {
+        return Quotation::select('id','quotation_total')
+        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue, 1 AS checked")
+        ->where(['quotation_status' => 1, 'quotation_type_money' => $typeMoney,'quotation_include_igv' => $includeIgv, 'quotation_customer' => $customer])->whereNull('order_id')->get();
+    }
+    public static function getQuotationsReport($startDate,$finalDate) {
+        return Quotation::select("quotations.id","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
+        ->join('users','users.id','=','quotation_quoter')
+        ->join('customers','customers.id','=','quotation_customer')
+        ->join('contries','contries.id','=','customer_contrie')
+        ->leftJoin('districts','districts.id','=','customer_district')
+        ->leftJoin('departaments','departaments.id','=','district_departament')
+        ->whereBetween('quotation_date_issue',[$startDate,$finalDate]);
     }
 }
