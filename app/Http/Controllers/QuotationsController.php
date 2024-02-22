@@ -56,10 +56,11 @@ class QuotationsController extends Controller
         }
     }
     public function getReportPdf(Request $request,Quotation $quotation) {
-        // $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
-        // if(!is_null($redirect)){
-        //     return response('Acceso denegado',403);
-        // }
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(!is_null($redirect) && !is_null($redirect2)){
+            return response('Acceso denegado',403);
+        }
         $configuration = Configurations::all();
         return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream("asas.pdf");
     }
@@ -151,7 +152,8 @@ class QuotationsController extends Controller
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
-            'message' => 'Cotización generada correctamente', 
+            'message' => 'Cotización generada correctamente',
+            'id' => $quotation->id
         ]);
     }
     public function update(Request $request){
