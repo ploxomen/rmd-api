@@ -12,7 +12,7 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
 {
     private $view;
     private $data;
-    private $rowEnd = 5;
+    private $rowEnd = 4;
     private $rowInitial = 4;
     function __construct($data,$view){
         $this->data = $data;
