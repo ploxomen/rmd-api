@@ -12,7 +12,7 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
 {
     private $view;
     private $data;
-    private $rowEnd = 4;
+    private $rowEnd = 5;
     private $rowInitial = 4;
     function __construct($data,$view){
         $this->data = $data;
@@ -29,7 +29,7 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
         foreach ($this->data as $categorie) {
             $this->rowEnd++;
             foreach ($categorie->subcategories()->where(['sub_categorie_status'=>1])->get() as $subcategorie) {
-                $this->rowEnd++;
+                $this->rowEnd+=2;
                 $countProducts = $subcategorie->products()->where(['product_status'=>1])->count();
                 $this->rowEnd += $countProducts;            
             }
