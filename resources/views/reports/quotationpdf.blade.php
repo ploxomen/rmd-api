@@ -155,11 +155,13 @@
             @foreach ($quotation->products as $key => $detail)
             @php
                 $price = $detail->pivot->detail_price_unit + $detail->pivot->detail_price_additional;
+                $urlImage = empty($producto->producto->urlImagen) || !\File::exists($path) ? 'img/no-picture-taking.png' : $detail->product_img;
             @endphp
                 <tr>
                     <td style="text-align: center;">{{$key + 1}}</td>
                     <td style="text-align: center; padding: 5px;">
-                        <img src="{{public_path($detail->product_img)}}" alt="Imagen de productos" width="90px" height="90px">
+                        
+                        <img src="{{public_path($urlImage)}}" alt="Imagen de productos" width="90px" height="90px">
                     </td>
                     <td>{{$detail->product_name}}</td>
                     <td style="text-align: center;">{{$detail->pivot->detail_quantity}}</td>
