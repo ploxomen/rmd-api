@@ -28,9 +28,9 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
     {
         foreach ($this->data as $categorie) {
             $this->rowEnd++;
-            foreach ($categorie->subcategories()->where('sub_categorie_status',1)->get() as $subcategorie) {
+            foreach ($categorie->subcategories()->where(['sub_categorie_status'=>1])->get() as $subcategorie) {
                 $this->rowEnd++;
-                $countProducts = $subcategorie->products()->where('product_status',1)->count();
+                $countProducts = $subcategorie->products()->where(['product_status'=>1])->count();
                 $this->rowEnd += $countProducts;            
             }
         }

@@ -10,7 +10,7 @@
             <td></td>
             <td colspan="4">{{$categorie->categorie_name}}</td>
         </tr>
-        @foreach ($categorie->subcategories()->where('sub_categorie_status',1)->get() as $subcategorie)
+        @foreach ($categorie->subcategories()->where(['sub_categorie_status'=>1])->get() as $subcategorie)
             <tr>
                 <td></td>
                 <td colspan="4">{{$subcategorie->sub_categorie_name}}</td>
@@ -22,7 +22,7 @@
                 <th>P. PRODUCCIÓN</th>
                 <th>P. VENTA</th>
             </tr>
-            @foreach ($subcategorie->products()->where('product_status',1)->get() as $product)
+            @foreach ($subcategorie->products()->where(['product_status'=>1])->get() as $product)
                 <tr>
                     <td></td>
                     <td>{{$product->product_name}}</td>
