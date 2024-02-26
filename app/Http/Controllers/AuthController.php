@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customers;
+use App\Models\Quotation;
 use App\Models\Roles;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,6 +27,58 @@ class AuthController extends Controller
             return $redirectRestrict;
         }
         return null;
+    }
+    public function dataHome(){
+        $customers = Customers::where('customer_status','=',1)->count();
+        $quotations = Quotation::count();
+        $quotationsCheck = Quotation::where('quotation_status','>',1)->count();
+        $users = User::where('user_status','>=',1)->count();
+        $year = date('Y');
+        $month = date('n');
+        $months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic'];
+        $customersBar = Customers::selectRaw("COUNT(*) AS customers,MONTH(created_at) AS mes")->whereYear('created_at',$year)->where('customer_status','=',1)->whereRaw('MONTH(created_at) <= ?',[$month])->groupByRaw('MONTH(created_at)')->get();
+        $quotationsCheckBar = Quotation::selectRaw("COUNT(*) AS quotations,MONTH(quotation_date_issue) AS mes")->whereYear('quotation_date_issue',$year)->where('quotation_status','>',1)->whereRaw('MONTH(quotation_date_issue) <= ?',[$month])->groupByRaw('MONTH(quotation_date_issue)')->get();
+        $quotationsBar = Quotation::selectRaw("COUNT(*) AS quotations,MONTH(quotation_date_issue) AS mes")->whereYear('quotation_date_issue',$year)->whereRaw('MONTH(quotation_date_issue) <= ?',[$month])->groupByRaw('MONTH(quotation_date_issue)')->get();
+        $resultQuotationsBar = [];
+        $resultCustomerBar = [];
+        $resultQuotationsCheckBar = [];
+        $productsSales = [];
+        for ($i=0; $i < $month; $i++) {
+            $data = !empty($customersBar) && !empty($customersBar->where('mes',$i + 1)->first()) ? $customersBar->where('mes',$i + 1)->first()->customers : 0;
+            $resultCustomerBar[] = [
+                'labels' => $months[$i],
+                'data' => $data
+            ];
+            $data = !empty($quotationsBar) && !empty($quotationsBar->where('mes',$i + 1)->first()) ? $quotationsBar->where('mes',$i + 1)->first()->quotations : 0;
+            $resultQuotationsBar[] = [
+                'labels' => $months[$i],
+                'data' => $data
+            ];
+            $data = !empty($quotationsCheckBar) && !empty($quotationsCheckBar->where('mes',$i + 1)->first()) ? $quotationsCheckBar->where('mes',$i + 1)->first()->quotations : 0;
+            $resultQuotationsCheckBar[] = [
+                'labels' => $months[$i],
+                'data' => $data
+            ];
+        }
+        $productsSales = Quotation::selectRaw("SUM(detail_quantity) AS data,product_name AS label")
+            ->join('quotations_details','quotations.id','=','quotations_details.quotation_id')
+            ->join('products','products.id','=','quotations_details.product_id')
+            ->where('quotation_status','>',1)->groupBy('products.id')->limit(5)->get();
+        return response()->json([
+            'result' => [
+                'customersCount' => $customers,
+                'quotationsCount' => $quotations,
+                'quotationsCheckCount' => $quotationsCheck,
+                'usersCount' => $users
+            ],
+            'grafics' => [
+                'customersBar' => $resultCustomerBar,
+                'quotationsBar' => $resultQuotationsBar,
+                'quotationsCheckBar' => $resultQuotationsCheckBar,
+                'productsSale' => $productsSales
+            ]
+        ]);
+
     }
     public function changeRole(Request $request) {
         $idUser = $request->user()->id;

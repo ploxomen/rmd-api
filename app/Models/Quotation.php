@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Quotation extends Model
 {
+    protected $primaryKey = 'id';
     protected $table = 'quotations';
     protected $fillable = [
         'order_id',
+        'quotation_number',
+        'quotation_code',
         'quotation_customer',
         'quotation_customer_contact',
         'quotation_date_issue',
@@ -24,7 +27,6 @@ class Quotation extends Model
         'quotation_quoter',
         'quotation_observations',
         'quotation_conditions',
-        'quotation_description_products',
         'quotation_status'
     ];
     protected $hidden = [
@@ -34,12 +36,12 @@ class Quotation extends Model
     public function products()
     {
         return $this->belongsToMany(Products::class,'quotations_details','quotation_id','product_id')
-        ->withPivot('detail_quantity','detail_price_unit','detail_price_buy','detail_price_additional','detail_total','detail_status')
+        ->withPivot('detail_quantity','detail_price_unit','detail_price_buy','detail_price_additional','detail_total','detail_status','quotation_description')
         ->withTimestamps();
     }
     public static function getQuotations($search,$filters = []) {
-        $query = Quotation::select("quotations.id","quotation_total","quotation_type_money","quotation_status","customer_name")
-        ->selectRaw("LPAD(quotations.id,5,'0') AS nro_quotation,DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter")
+        $query = Quotation::select("quotations.id","quotation_code","quotation_total","quotation_type_money","quotation_status","customer_name")
+        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter")
         ->join('customers','quotation_customer','=','customers.id')
         ->join('users','quotation_quoter','=','users.id')
         ->where(function($query)use($search){

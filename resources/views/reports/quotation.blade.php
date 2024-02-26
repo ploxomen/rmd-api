@@ -31,7 +31,7 @@
             }
         @endphp
         <tr>
-            <td>{{str_pad($quotation->id,5,'0',STR_PAD_LEFT)}}</td>
+            <td>{{$quotation->quotation_code}}</td>
             <td>{{$quotation->quotation_date_issue}}</td>
             <td>{{$quotation->user_name . ' ' . $quotation->user_last_name}}</td>
             <td>{{$quotation->customer_name}}</td>

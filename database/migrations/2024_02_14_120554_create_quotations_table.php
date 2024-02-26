@@ -34,7 +34,6 @@ return new class extends Migration
             $table->foreign('quotation_quoter')->references('id')->on('users');
             $table->longText('quotation_observations')->nullable();
             $table->longText('quotation_conditions')->nullable();
-            $table->longText('quotation_description_products')->nullable();
             $table->tinyInteger('quotation_status');
             $table->timestamps();
         });

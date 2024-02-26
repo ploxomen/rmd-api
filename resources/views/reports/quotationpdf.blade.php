@@ -106,7 +106,7 @@
                                 </tr>
                                 <tr>
                                     <th class="text-column">N° de presupuesto</th>
-                                    <td style="font-size: 12px;">{{str_pad($quotation->id,5,'0',STR_PAD_LEFT)}}</td>
+                                    <td style="font-size: 12px;">{{$quotation->quotation_code}}</td>
                                 </tr>
                             </table>
                             <h3 style="margin: 0;color:#a8a8a8;font-style: italic; font-size: 13px;">FACTURAR A:</h3>
@@ -155,20 +155,31 @@
             @foreach ($quotation->products as $key => $detail)
             @php
                 $price = $detail->pivot->detail_price_unit + $detail->pivot->detail_price_additional;
-                $urlImage = empty($producto->producto->urlImagen) || !\File::exists($path) ? 'img/no-picture-taking.png' : $detail->product_img;
+                $pathImg = $detail->product_img;
+                $urlImage = empty($pathImg) || !\File::exists($pathImg) ? null : $pathImg;
+                $rowFinal = ($key + 1) === $totalDetails ? 2 : 1; 
             @endphp
                 <tr>
                     <td style="text-align: center;">{{$key + 1}}</td>
                     <td style="text-align: center; padding: 5px;">
-                        
+                        @empty(!$urlImage)
                         <img src="{{public_path($urlImage)}}" alt="Imagen de productos" width="90px" height="90px">
+                        @endempty
                     </td>
-                    <td>{{$detail->product_name}}</td>
-                    <td style="text-align: center;">{{$detail->pivot->detail_quantity}}</td>
-                    <td style="text-align: center;">{{$money.number_format($price,2)}}</td>
-                    <td style="text-align: center;">{{$money.number_format($detail->pivot->detail_total,2)}}</td>
+                    <td>
+                        {{$detail->product_name}}
+                        @empty(!$detail->pivot->quotation_description)
+                        <br>{!!$detail->pivot->quotation_description!!}
+                        @endempty
+                    </td>
+                    <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail->pivot->detail_quantity}}</td>
+                    <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($price,2)}}</td>
+                    <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($detail->pivot->detail_total,2)}}</td>
                 </tr>
             @endforeach
+            <tr>
+                <td colspan="3" style="background-color: rgb(72, 179, 255); color: #fff; font-size: 14px; font-weight:bold;border-top: 1px solid black;">Insumos de origen europeo</td>
+            </tr>
         </tbody>
         <tfoot>
             <tr>
@@ -191,30 +202,17 @@
             </tr>
         </tfoot>
     </table>
-    <p style="font-size: 14px; margin-bottom: 10px;">
-        Insumos de origen europeo
-    </p>
-    @empty(!$quotation->quotation_description_products)
-    <div style="margin-bottom: 10px;">
-        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Descripción del los productos</h2>
-        {!! $quotation->quotation_description_products !!}
-    </div>
-    @endempty
-    <div>
-        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Observaciones</h2>
+    <div style="background-color: #F2F2F2;">
         {!! $quotation->quotation_observations !!}
-    </div>
-    <div>
-        <h2 style="font-size: 16px; margin-bottom: 0; margin-top: 0;">Condiciones</h2>
         {!! $quotation->quotation_conditions !!}
     </div>
     <table>
         <tr>
-            <td style="vertical-align: top; width: 380px;">
-                <strong style="font-size: 14px;">DATOS BANCARIOS</strong><br>
+            <td style="vertical-align: top; width: 360px; padding-right: 20px;">
+                <span style="font-size: 14px; padding: 5px; background-color: #BFBFBF; display: block;">DATOS BANCARIOS</span>
                 {!! $configuration->where('description','=','business_bank')->first()->value !!}
             </td>
-            <td style="vertical-align: top;">
+            <td style="vertical-align: top; background-color: #F2F2F2; padding: 0 10px;">
                 <p style="line-height: 2;font-size: 13px;">
                     <strong>Firma de Aceptación Presopuesto y Orden Compra:</strong><br>
                     <span>Nombre:</span><br>

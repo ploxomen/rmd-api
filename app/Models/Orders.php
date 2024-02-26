@@ -22,14 +22,12 @@ class Orders extends Model
         'created_at',
         'updated_at'
     ];
-
     public function quotations()
     {
         return $this->hasMany(Quotation::class,'order_id');
     }
     public static function getOrder($id) {
-        return  Orders::select("orders.id","order_igv","order_money","order_status","customer_name AS order_customer","order_details")
-        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS order_date_issue')
+        return  Orders::select("orders.id","order_date_issue","order_igv","order_money","order_status","customer_name AS order_customer","order_details")
         ->join('customers','customers.id','=','customer_id')
         ->where(['orders.id' => $id])->first();
     }

@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('customer_cell_phone',250)->nullable();
             $table->bigInteger('customer_district')->unsigned()->nullable();
             $table->foreign('customer_district')->references('id')->on('districts');
+            $table->bigInteger('user_create')->unsigned()->nullable();
+            $table->foreign('user_create')->references('id')->on('users');
             $table->string('customer_address',500)->nullable();
             $table->tinyInteger('customer_status');
             $table->timestamps();

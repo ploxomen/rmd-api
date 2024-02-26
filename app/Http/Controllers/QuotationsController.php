@@ -25,7 +25,7 @@ class QuotationsController extends Controller
             'redirect' => null,
             'error' => false,
             'message' => 'Clientes obtenidos correctamente',
-            'data' => Customers::select('id AS value','customer_name AS label')->where('customer_status',1)->get()
+            'data' => Customers::select('id AS value','customer_name AS label')->where('customer_status',1)->orderBy('customer_name','asc')->get()
         ]);
     }
     public function getDataExport(Request $request){
@@ -69,7 +69,7 @@ class QuotationsController extends Controller
             'redirect' => null,
             'error' => false,
             'message' => 'Usuarios obtenidos correctamente',
-            'data' => User::select('id','user_name','user_last_name')->where('user_status','!=',0)->get()
+            'data' => User::select('id','user_name','user_last_name')->where('user_status','!=',0)->orderBy('user_name','asc')->orderBy('user_last_name','asc')->get()
         ]);
     }
     public function getContactsActive($customer) {
@@ -81,14 +81,38 @@ class QuotationsController extends Controller
             'data' => ['contacts' => Contacts::select('id','contact_name')->where(['contact_status'=> 1,'customer_id' => $customer])->get(),'address' => $customerModule->customer_address,'disabledIgv' => $customerModule->customer_contrie == $this->idContrieIgv]
         ]);
     }
+    public function getProductDescription(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        if(!is_null($redirect) && !is_null($redirect2)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => true,
+                'message' => 'Acceso denegado'
+            ]);
+        }
+        return response()->json([
+            'redirect' => null,
+            'error' => false,
+            'message' => 'Descripción obtenida correctamente',
+            'data' => Products::find($request->product)->product_description
+        ]);
+    }
     public function getProductsActive(Request $request) {
         $search = $request->has('search') ? $request->search : '';
         return response()->json([
             'redirect' => null,
             'error' => false,
             'message' => 'Clientes obtenidos correctamente',
-            'data' => Products::select('id AS value','product_name AS label','product_sale')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->get()
+            'data' => Products::select('id AS value','product_name AS label','product_sale')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->orderBy('product_name','asc')->get()
         ]);
+    }
+    public function getCodeQuotation() {
+        $year = date('Y');
+        $selectNumber = Quotation::select("quotation_number")->whereYear('quotation_date_issue',$year)->first();
+        $number = empty($selectNumber) ? 0 : $selectNumber->number_quotation;
+        $number++;
+        return ['number' => $number,'code' => str_pad($number,3,'0',STR_PAD_LEFT) . '/'.substr($year,-2)];
     }
     public function store(Request $request) {        
         $validator = Validator::make($request->all(),[
@@ -112,10 +136,13 @@ class QuotationsController extends Controller
         if($validator->fails()){
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
         }
+        $quotationCode = $this->getCodeQuotation();
         $quotation = Quotation::create([
             'quotation_include_igv' => $request->quotation_include_igv,
             'quotation_customer' => $request->quotation_customer,
             'quotation_customer_contact' => $request->quotation_contact,
+            'quotation_number' => $quotationCode['number'],
+            'quotation_code' => $quotationCode['code'],
             'quotation_date_issue' => $request->quotation_date_issue,
             'quotation_type_money' => $request->quotation_type_money,
             'quotation_change_money' => $request->quotation_type_change,
@@ -123,7 +150,6 @@ class QuotationsController extends Controller
             'quotation_quoter' => $request->user()->id,
             'quotation_observations' => $request->quotation_observations,
             'quotation_conditions' => $request->quotation_conditions,
-            'quotation_description_products' => $request->quotation_description_products,
             'quotation_status' => 1
         ]);
         $amount = 0;
@@ -136,7 +162,8 @@ class QuotationsController extends Controller
                 'detail_price_unit' => $detail['price_unit'],
                 'detail_price_additional' => $detail['price_aditional'],
                 'detail_total' => $calcAmount,
-                'detail_status' => 1
+                'detail_status' => 1,
+                'quotation_description' => $detail['details']
             ]);
         }
         $subtotal = $amount - $request->quotation_discount;
@@ -190,7 +217,6 @@ class QuotationsController extends Controller
             'quotation_customer_address' => $request->quotation_address,
             'quotation_observations' => $request->quotation_observations,
             'quotation_conditions' => $request->quotation_conditions,
-            'quotation_description_products' => $request->quotation_description_products,
         ]);
         $details = [];
         $amount = 0;
@@ -202,6 +228,7 @@ class QuotationsController extends Controller
                     'detail_price_unit' => $detail['price_unit'],
                     'detail_price_additional' => $detail['price_aditional'],
                     'detail_status' => 1,
+                    'quotation_description' => $detail['details'],
                     'detail_total' => $calcAmount
             ];
         }
@@ -223,7 +250,7 @@ class QuotationsController extends Controller
         ]);
     }
     public function show(Request $request) {
-        $quotation = Quotation::find($request->quotation,["quotation_customer","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions","quotation_description_products"]);
+        $quotation = Quotation::find($request->quotation,["quotation_customer","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions"]);
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,
@@ -232,7 +259,7 @@ class QuotationsController extends Controller
             'data' => [
                 'quotation' => $quotation,
                 'contacs' => Contacts::select("id","contact_name")->where("contact_status",1)->get(),
-                'products' => $quotation->products()->select("products.id","products.product_name AS description","quotations_details.detail_quantity AS quantity","quotations_details.detail_price_unit AS price_unit","quotations_details.detail_price_additional AS price_aditional")->get()
+                'products' => $quotation->products()->select("quotation_description AS details","products.id","products.product_name AS description","quotations_details.detail_quantity AS quantity","quotations_details.detail_price_unit AS price_unit","quotations_details.detail_price_additional AS price_aditional")->get()
             ]
         ]);
     }
@@ -262,7 +289,14 @@ class QuotationsController extends Controller
         ]);
     }
     public function destroy(Request $request) {
-        Quotation::find($request->quotation)->update(['quotation_status' => 0]);
+        $quotation = Quotation::find($request->quotation);
+        if(!empty($quotation->order_id)){
+            return response()->json([
+                'error' => true,
+                'redirect' => null,
+                'message' => 'No se puede eliminar la cotización porque pertenece al pedido N° ' . str_pad($quotation->order_id,5,'0',STR_PAD_LEFT)
+            ]);
+        }
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,

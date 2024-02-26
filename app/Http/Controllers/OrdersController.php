@@ -40,6 +40,7 @@ class OrdersController extends Controller
             ]);
         }
         $order = Orders::create([
+            'order_date_issue' => date('Y-m-d'),
             'customer_id' => $request->customer,
             'order_details' => $request->orderDetails,
             'order_igv' => $request->includeIgv,

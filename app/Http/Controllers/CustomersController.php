@@ -19,8 +19,10 @@ class CustomersController extends Controller
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
         $customers = Customers::select("customers.id","customer_number_document","customer_name","document_name","contrie")
+        ->selectRaw("CONCAT(users.user_name,' ',users.user_last_name) AS user_creator")
         ->join('type_documents','customer_type_document','=','type_documents.id')
         ->join('contries','customer_contrie','=','contries.id')
+        ->leftJoin('users','users.id','=','user_create')
         ->where('customer_status','>',0)->where(function($query)use($search){
             $query->where('customer_name','like','%'.$search.'%')
             ->orWhere('customer_number_document','like','%'.$search.'%');
@@ -99,6 +101,7 @@ class CustomersController extends Controller
             'customer_phone' => $request->customer_phone,
             'customer_cell_phone' => $request->customer_cell_phone,
             'customer_address' => $request->customer_address,
+            'user_create' => $request->user()->id,
             'customer_district' => $request->customer_district,
             'customer_status' => 1
         ]);

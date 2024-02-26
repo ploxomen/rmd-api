@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('product_id')->unsigned();
             $table->foreign('product_id')->references('id')->on('products');
             $table->decimal('detail_price_buy')->nullable();
+            $table->longText('quotation_description')->nullable();
             $table->integer('detail_quantity');
             $table->decimal('detail_price_unit');
             $table->decimal('detail_price_additional');

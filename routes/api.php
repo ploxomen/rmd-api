@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('register',[AuthController::class,'register']);
+    Route::get('home/info',[AuthController::class,'dataHome']);
     Route::prefix('user')->group(function () {
         Route::delete('logout',[AuthController::class,'logout']);
         Route::put('change-password',[AuthController::class,'changePassword']);
@@ -48,7 +50,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
+    Route::get('quotation-extra/products-details/{product}',[QuotationsController::class,'getProductDescription']);
     Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
+    Route::get('quotation-extra/download/{quotation}',[QuotationsController::class,'getReportPdf']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
     Route::get('order-extra/quotations',[OrdersController::class,'getQuotations']);
     Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
