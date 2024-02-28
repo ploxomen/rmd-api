@@ -142,7 +142,7 @@
     </table>
     <table style="font-size: 13px; margin-bottom: 10px;" class="table-details">
         <thead>
-            <tr style="background-color: #cdcdcd;">
+            <tr style="background-color: #018000;color: #fff;">
                 <th style="width: 40px;">Item</th>
                 <th style="width: 80px;">Imagen</th>
                 <th>Descripción</th>
@@ -178,7 +178,9 @@
                 </tr>
             @endforeach
             <tr>
-                <td colspan="3" style="background-color: rgb(72, 179, 255); color: #fff; font-size: 14px; font-weight:bold;border-top: 1px solid black;">Insumos de origen europeo</td>
+                <td colspan="3" style="background-color: #018000; color: #fff; font-size: 14px; font-weight:bold;border-top: 1px solid black;">
+                    <span style="text-decoration: underline;">"INSUMOS DE ORIGEN EUROPEOS"</span>
+                </td>
             </tr>
         </tbody>
         <tfoot>
@@ -214,7 +216,7 @@
             </td>
             <td style="vertical-align: top; background-color: #F2F2F2; padding: 0 10px;">
                 <p style="line-height: 2;font-size: 13px;">
-                    <strong>Firma de Aceptación Presopuesto y Orden Compra:</strong><br>
+                    <strong>Firma de Aceptación Presupuesto y Orden Compra:</strong><br>
                     <span>Nombre:</span><br>
                     <span>DNI:</span><br>
                 </p>

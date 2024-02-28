@@ -110,7 +110,7 @@ class QuotationsController extends Controller
     public function getCodeQuotation() {
         $year = date('Y');
         $selectNumber = Quotation::select("quotation_number")->whereYear('quotation_date_issue',$year)->first();
-        $number = empty($selectNumber) ? 0 : $selectNumber->number_quotation;
+        $number = empty($selectNumber) ? 0 : $selectNumber->quotation_number;
         $number++;
         return ['number' => $number,'code' => str_pad($number,3,'0',STR_PAD_LEFT) . '/'.substr($year,-2)];
     }
