@@ -180,7 +180,8 @@ class QuotationsController extends Controller
             'redirect' => $redirect,
             'error' => false, 
             'message' => 'Cotización generada correctamente',
-            'id' => $quotation->id
+            'id' => $quotation->id,
+            'fileName' => 'FP_' . str_replace('/','_',$quotation->quotation_code) . '_' . str_replace(' ','_',$quotation->customer->customer_name) . '.pdf'
         ]);
     }
     public function update(Request $request){
