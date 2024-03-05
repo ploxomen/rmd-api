@@ -59,4 +59,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('contries',[UserController::class,'getContries']);
 });
 Route::get('login',[AuthController::class,'login']);
-Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);
