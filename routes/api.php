@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\CustomersController;
@@ -9,21 +8,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
-use App\Models\Products;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('register',[AuthController::class,'register']);
     Route::get('home/info',[AuthController::class,'dataHome']);
@@ -52,7 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('quotation-extra/products-details/{product}',[QuotationsController::class,'getProductDescription']);
     Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
+    Route::get('quotation-extra/config',[QuotationsController::class,'getInformationConfig']);
     Route::get('quotation-extra/download/{quotation}',[QuotationsController::class,'getReportPdf']);
+    Route::post('quotation-extra/preview',[QuotationsController::class,'getPreview']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
     Route::get('order-extra/quotations',[OrdersController::class,'getQuotations']);
     Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
@@ -72,3 +59,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('contries',[UserController::class,'getContries']);
 });
 Route::get('login',[AuthController::class,'login']);
+Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);

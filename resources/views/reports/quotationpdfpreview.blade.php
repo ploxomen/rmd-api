@@ -67,6 +67,19 @@
             border-left: 1px solid black;
             border-right: 1px solid black;
         }
+        .anulado{
+            position: fixed;
+            top: 50%;
+            z-index: 5;
+            left: 50%;
+            font-size: 80px;
+            font-weight: bold;
+            transform: translate(-50%,-50%) rotate(-45deg);
+            text-align: center;
+            width: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            color: rgba(255, 0, 0, 0.234);
+        }rgba(255, 84, 84, 0.359)
     </style>
     @php
         $emails = $configuration->where('description','=','business_email')->first()->value;
@@ -75,8 +88,14 @@
         $pagesArray = explode('/',$pages);
         $listEmails = implode('<br>',explode('/',$emails));
         $listPhones = implode(' / CEL: ',explode('/',$phones));
-        $money = $quotation->quotation_type_money == 'PEN' ? 'S/' : '$';
+        $money = $quotation['quotation_type_money'] == 'PEN' ? 'S/' : '$';
+        $customer = App\Models\Customers::find($quotation['quotation_customer']);
+        $contact = App\Models\Contacts::find($quotation['quotation_contact']);
+        $subtotal = 0;
     @endphp
+    <div class="anulado">
+        <span>VISTA PREVIA</span>
+    </div>
     <table style="margin-bottom: 20px;">
         <tr>
             <td style="width: 420px;">
@@ -101,11 +120,11 @@
                             <table>
                                 <tr>
                                     <th class="text-column" style="width: 105px;">FECHA:</th>
-                                    <td style="font-size: 12px;">{{date('d/m/Y',strtotime($quotation->quotation_date_issue))}}</td>
+                                    <td style="font-size: 12px;">{{date('d/m/Y',strtotime($quotation['quotation_date_issue']))}}</td>
                                 </tr>
                                 <tr>
                                     <th class="text-column">N° de presupuesto</th>
-                                    <td style="font-size: 12px;">{{$quotation->quotation_code}}</td>
+                                    <td style="font-size: 12px;"></td>
                                 </tr>
                             </table>
                             <h3 style="margin: 0;color:#a8a8a8;font-style: italic; font-size: 13px;">FACTURAR A:</h3>
@@ -113,27 +132,27 @@
                     </tr>
                     <tr>
                         <th class="text-column" style="width: 50px;">Nombre</th>
-                        <td style="text-align: center;font-size: 12px; border-top: 2px solid black;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation->customer->customer_name}}</td>
+                        <td style="text-align: center;font-size: 12px; border-top: 2px solid black;border-left: 2px solid black;border-right: 2px solid black;">{{$customer ? $customer->customer_name : ''}}</td>
                     </tr>
                     <tr>
                         <th class="text-column">Dirección</th>
-                        <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation->quotation_customer_address}}</td>
+                        <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation['quotation_address']}}</td>
                     </tr>
                     <tr>
                         <th class="text-column">RUC</th>
-                        <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation->customer->customer_number_document}}</td>
+                        <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$customer ? $customer->customer_number_document : ''}}</td>
                     </tr>
                     <tr>
                         <th class="text-column">Contacto</th>
-                        <td style="font-size: 12px; font-weight: 500;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation->contact->contact_name}}</td>
+                        <td style="font-size: 12px; font-weight: 500;border-left: 2px solid black;border-right: 2px solid black;">{{$contact ? $contact->contact_name : ''}}</td>
                     </tr>
                     <tr>
                         <th class="text-column">Email</th>
-                        <td style="font-size: 12px;text-decoration: underline;color:#5c5cff;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation->contact->contact_email}}</td>
+                        <td style="font-size: 12px;text-decoration: underline;color:#5c5cff;border-left: 2px solid black;border-right: 2px solid black;">{{$contact ? $contact->contact_email : ''}}</td>
                     </tr>
                     <tr>
                         <th class="text-column">Tlfno</th>
-                        <td style="font-size: 12px;text-decoration: underline;color:#5c5cff;border-left: 2px solid black;border-right: 2px solid black; border-bottom: 2px solid black;">{{$quotation->contact->contact_number}}</td>
+                        <td style="font-size: 12px;text-decoration: underline;color:#5c5cff;border-left: 2px solid black;border-right: 2px solid black; border-bottom: 2px solid black;">{{$contact ? $contact->contact_number : ''}}</td>
                     </tr>
                 </table>
             </td>
@@ -160,10 +179,13 @@
                     </tr>
                     @foreach ($subcategories['products'] as $key => $detail)
                         @php
-                            $price = $detail->pivot->detail_price_unit + $detail->pivot->detail_price_additional;
-                            $pathImg = $detail->product_img;
+                            $product = App\Models\Products::find($detail['id']);
+                            $price = $detail['price_unit'] + $detail['price_aditional'];
+                            $pathImg = $product->product_img;
                             $urlImage = empty($pathImg) || !\File::exists($pathImg) ? null : $pathImg;
-                            $rowFinal = ($keyCategories + 1) === count($detailsQuotation) && ($keySubCategorie + 1) === count($quotationDetail['subcategories']) && ($key + 1) === count($subcategories['products']) ? 2 : 1; 
+                            $rowFinal = ($keyCategories + 1) === count($detailsQuotation) && ($keySubCategorie + 1) === count($quotationDetail['subcategories']) && ($key + 1) === count($subcategories['products']) ? 2 : 1;
+                            $totalDetail = $price * $detail['quantity'];
+                            $subtotal += $totalDetail;
                         @endphp
                          <tr>
                             <td style="text-align: center;">{{$key + 1}}</td>
@@ -173,14 +195,14 @@
                                 @endempty
                             </td>
                             <td>
-                                {{$detail->product_name}}
-                                @empty(!$detail->pivot->quotation_description)
-                                <br>{!!$detail->pivot->quotation_description!!}
+                                {{$detail['description']}}
+                                @empty(!$detail['details'])
+                                <br>{!!$detail['details']!!}
                                 @endempty
                             </td>
-                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail->pivot->detail_quantity}}</td>
+                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail['quantity']}}</td>
                             <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($price,2)}}</td>
-                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($detail->pivot->detail_total,2)}}</td>
+                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($totalDetail,2)}}</td>
                         </tr>
                     @endforeach
                 @endforeach
@@ -191,32 +213,37 @@
                 </td>
             </tr>
         </tbody>
+        @php
+            $importe = $subtotal - $quotation['quotation_discount'];
+            $igv = $quotation['quotation_include_igv'] === true ? $importe * 0.18 : 0;
+            $total = $importe + $igv;
+        @endphp
         <tfoot>
             <tr>
                 <th colspan="5">SUBTOTAL</th>
-                <td>{{$money.number_format($quotation->quotation_amount,2)}}</td>
+                <td>{{$money.number_format($subtotal,2)}}</td>
             </tr>
-            @if ($quotation->quotation_discount > 0)
+            @if ($quotation['quotation_discount'] > 0)
             <tr>
                 <th colspan="5">DESCUENTO</th>
-                <td>{{$money.number_format($quotation->quotation_discount,2)}}</td>
+                <td>{{$money.number_format($quotation['quotation_discount'],2)}}</td>
             </tr>
             @endif
-            @if ($quotation->quotation_igv > 0)
+            @if ($igv > 0)
             <tr>
                 <th colspan="5">IGV 18%</th>
-                <td>{{$money.number_format($quotation->quotation_igv,2)}}</td>
+                <td>{{$money.number_format($igv,2)}}</td>
             </tr>
             @endif
             <tr>
                 <th colspan="5">TOTAL</th>
-                <td>{{$money.number_format($quotation->quotation_total,2)}}</td>
+                <td>{{$money.number_format($total,2)}}</td>
             </tr>
         </tfoot>
     </table>
     <div style="background-color: #F2F2F2;">
-        {!! $quotation->quotation_observations !!}
-        {!! $quotation->quotation_conditions !!}
+        {!! $quotation['quotation_observations'] !!}
+        {!! $quotation['quotation_conditions'] !!}
     </div>
     <table>
         <tr>

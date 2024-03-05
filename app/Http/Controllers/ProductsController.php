@@ -58,7 +58,7 @@ class ProductsController extends Controller
             ],
             'product_description' => 'nullable|string|max:2000',
             'product_buy' => 'nullable|decimal:0,2|min:0',
-            'product_sale' => 'required|decimal:0,2|min:0',
+            'product_sale' => 'nullable|decimal:0,2|min:0',
             'sub_categorie' => 'required|numeric',
             'product_img' => 'nullable|image'
         ]);
@@ -74,13 +74,19 @@ class ProductsController extends Controller
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
         }
         try {
-            $dataProduct = $request->all();
+            $dataProduct = $request->except('is_service');
             
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
                 $filePath = $file->storeAs('products',$fileName,'public');
                 $dataProduct['product_img'] = 'storage/'.$filePath;
+            }
+            $dataProduct['product_service'] = 0;
+            if($request->is_service == true){
+                $dataProduct['product_service'] = 1;
+                $dataProduct['product_buy'] = 0;
+                $dataProduct['product_sale'] = 0;
             }
             $dataProduct['product_status'] = 1;
             $product = Products::create($dataProduct);

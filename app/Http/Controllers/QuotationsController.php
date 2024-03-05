@@ -8,6 +8,7 @@ use App\Models\Contacts;
 use App\Models\Customers;
 use App\Models\Products;
 use App\Models\Quotation;
+use App\Models\SubCategories;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -55,14 +56,108 @@ class QuotationsController extends Controller
             break;
         }
     }
-    public function getReportPdf(Request $request,Quotation $quotation) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
-        $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        if(!is_null($redirect) && !is_null($redirect2)){
-            return response('Acceso denegado',403);
+    public function getInformationConfig() {
+        $configurations = Configurations::select("description","value")->whereIn('description',['quotation_conditions','quotation_observations'])->get();
+        return response()->json([
+            'redirect' => null,
+            'error' => false, 
+            'message' => 'Datos obtenidos correctamente',
+            'data' => $configurations 
+        ]);
+    }
+    public function getPreview(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(!is_null($redirect)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => true,
+                'message' => 'Acceso denegado'
+            ],403);
         }
+        $detailsQuotation = [];
+        foreach ($request->products as $detail) {
+            $product = Products::find($detail['id']);
+            $subCategorie = SubCategories::with('categorie')->find($product->sub_categorie)->toArray();
+            $filterCategorie = array_filter($detailsQuotation,function($value)use($subCategorie){
+                return $value['categorie_id'] === $subCategorie['categorie_id'];
+            });
+            if(empty($filterCategorie)){
+             $detailsQuotation[] = [
+                'categorie_id' => $subCategorie['categorie_id'],
+                'categorie_name' => $subCategorie['categorie']['categorie_name'],
+                'subcategories' => [
+                    [
+                        'subcategorie_id' => $subCategorie['id'],
+                        'subcategorie_name' => $subCategorie['sub_categorie_name'],
+                        'products' => [$detail]
+                    ]
+                ]
+             ];
+            }else{
+                $filterSubCategorie = array_filter($detailsQuotation[key($filterCategorie)]['subcategories'],function($value)use($subCategorie){
+                    return $value['subcategorie_id'] === $subCategorie['id'];
+                });
+                if(empty($filterSubCategorie)){
+                    $detailsQuotation[key($filterCategorie)]['subcategories'][] = [
+                        'subcategorie_id' => $subCategorie['id'],
+                        'subcategorie_name' => $subCategorie['sub_categorie_name'],
+                        'products' => [$detail]
+                    ];
+                }else{
+                    $detailsQuotation[key($filterCategorie)]['subcategories'][key($filterSubCategorie)]['products'][] = $detail;
+                }
+            }
+        }
+        $quotation = $request->all();
+        $nameCategorie = array_column($detailsQuotation, 'categorie_name');
+        array_multisort($nameCategorie, SORT_ASC, $detailsQuotation);
         $configuration = Configurations::all();
-        return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration'))->stream("asas.pdf");
+        return Pdf::loadView('reports.quotationpdfpreview',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
+    }
+    public function getReportPdf(Request $request,Quotation $quotation) {
+        // $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        // $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        // if(!is_null($redirect) && !is_null($redirect2)){
+        //     return response('Acceso denegado',403);
+        // }
+        $detailsQuotation = [];
+        // dd($quotation->products);
+        foreach ($quotation->products as $detail) {
+            $subCategorie = SubCategories::with('categorie')->find($detail->sub_categorie)->toArray();
+            $filterCategorie = array_filter($detailsQuotation,function($value)use($subCategorie){
+                return $value['categorie_id'] === $subCategorie['categorie_id'];
+            });
+            if(empty($filterCategorie)){
+             $detailsQuotation[] = [
+                'categorie_id' => $subCategorie['categorie_id'],
+                'categorie_name' => $subCategorie['categorie']['categorie_name'],
+                'subcategories' => [
+                    [
+                        'subcategorie_id' => $subCategorie['id'],
+                        'subcategorie_name' => $subCategorie['sub_categorie_name'],
+                        'products' => [$detail]
+                    ]
+                ]
+             ];
+            }else{
+                $filterSubCategorie = array_filter($detailsQuotation[key($filterCategorie)]['subcategories'],function($value)use($subCategorie){
+                    return $value['subcategorie_id'] === $subCategorie['id'];
+                });
+                if(empty($filterSubCategorie)){
+                    $detailsQuotation[key($filterCategorie)]['subcategories'][] = [
+                        'subcategorie_id' => $subCategorie['id'],
+                        'subcategorie_name' => $subCategorie['sub_categorie_name'],
+                        'products' => [$detail]
+                    ];
+                }else{
+                    $detailsQuotation[key($filterCategorie)]['subcategories'][key($filterSubCategorie)]['products'][] = $detail;
+                }
+            }
+        }
+        $nameCategorie = array_column($detailsQuotation, 'categorie_name');
+        array_multisort($nameCategorie, SORT_ASC, $detailsQuotation);
+        $configuration = Configurations::all();
+        return Pdf::loadView('reports.quotationpdf',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
     }
     public function getUsers() {
         return response()->json([
