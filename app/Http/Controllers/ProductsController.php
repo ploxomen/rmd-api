@@ -136,6 +136,12 @@ class ProductsController extends Controller
                 File::delete($product->product_img);
                 $dataProduct['product_img'] = null;
             }
+            $dataProduct['product_service'] = 0;
+            if($request->product_service == "true"){
+                $dataProduct['product_service'] = 1;
+                $dataProduct['product_buy'] = 0;
+                $dataProduct['product_sale'] = 0;
+            }
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
