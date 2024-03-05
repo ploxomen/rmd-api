@@ -74,7 +74,7 @@ class ProductsController extends Controller
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
         }
         try {
-            $dataProduct = $request->except('is_service');
+            $dataProduct = $request->except('product_service');
             
             if($request->has('product_img')){
                 $file = $request->file('product_img');
@@ -83,7 +83,7 @@ class ProductsController extends Controller
                 $dataProduct['product_img'] = 'storage/'.$filePath;
             }
             $dataProduct['product_service'] = 0;
-            if($request->is_service == true){
+            if($request->product_service == "true"){
                 $dataProduct['product_service'] = 1;
                 $dataProduct['product_buy'] = 0;
                 $dataProduct['product_sale'] = 0;

@@ -115,13 +115,12 @@ class QuotationsController extends Controller
         return Pdf::loadView('reports.quotationpdfpreview',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
     }
     public function getReportPdf(Request $request,Quotation $quotation) {
-        // $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
-        // $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        // if(!is_null($redirect) && !is_null($redirect2)){
-        //     return response('Acceso denegado',403);
-        // }
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(!is_null($redirect) && !is_null($redirect2)){
+            return response('Acceso denegado',403);
+        }
         $detailsQuotation = [];
-        // dd($quotation->products);
         foreach ($quotation->products as $detail) {
             $subCategorie = SubCategories::with('categorie')->find($detail->sub_categorie)->toArray();
             $filterCategorie = array_filter($detailsQuotation,function($value)use($subCategorie){
