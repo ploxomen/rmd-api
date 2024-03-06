@@ -198,7 +198,7 @@ class QuotationsController extends Controller
             'redirect' => null,
             'error' => false,
             'message' => 'Clientes obtenidos correctamente',
-            'data' => Products::select('id AS value','product_name AS label','product_sale')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->orderBy('product_name','asc')->get()
+            'data' => Products::select('id AS value','product_name AS label','product_sale','product_service')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->orderBy('product_name','asc')->get()
         ]);
     }
     public function getCodeQuotation() {
@@ -354,7 +354,7 @@ class QuotationsController extends Controller
             'data' => [
                 'quotation' => $quotation,
                 'contacs' => Contacts::select("id","contact_name")->where("contact_status",1)->get(),
-                'products' => $quotation->products()->select("quotation_description AS details","products.id","products.product_name AS description","quotations_details.detail_quantity AS quantity","quotations_details.detail_price_unit AS price_unit","quotations_details.detail_price_additional AS price_aditional")->get()
+                'products' => $quotation->products()->select("quotation_description AS details","products.id","products.product_service AS is_service","products.product_name AS description","quotations_details.detail_quantity AS quantity","quotations_details.detail_price_unit AS price_unit","quotations_details.detail_price_additional AS price_aditional")->get()
             ]
         ]);
     }
