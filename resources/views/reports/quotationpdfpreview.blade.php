@@ -26,7 +26,7 @@
         .parragraph-small{
             margin: 0;
             margin-bottom: 15px;
-            font-size: 13px;
+            font-size: 12px;
         }
         .text-column{
             font-size: 12px;
@@ -92,6 +92,7 @@
         $customer = App\Models\Customers::find($quotation['quotation_customer']);
         $contact = App\Models\Contacts::find($quotation['quotation_contact']);
         $subtotal = 0;
+        $numberProduct = 0;
     @endphp
     <div class="anulado">
         <span>VISTA PREVIA</span>
@@ -106,7 +107,7 @@
                 <p class="parragraph-small">
                     CEL: {!! $listPhones !!}
                 </p>
-                <p style="margin-top:0; text-decoration: underline; color:#5c5cff;">
+                <p style="margin-top:0; font-size:12px; text-decoration: underline; color:#5c5cff;">
                     {!! $listEmails !!}
                 </p>
                 <img src={{public_path('img/rmd-list-description.png')}} alt="imagen" width="400px">
@@ -158,17 +159,17 @@
             </td>
         </tr>
     </table>
-    <table style="font-size: 13px; margin-bottom: 10px;" class="table-details">
+    <table style="font-size: 11px;margin-bottom: 10px;" class="table-details">
         <thead>
-            <tr style="background-color: #F2F2F2; text-align: center;">
-                <td style="width: 40px;border-top:1px solid black;border-right:1px solid black;border-left:1px solid black">Item</td>
-                <td style="width: 80px;border-top:1px solid black;border-right:1px solid black;">Imagen</td>
-                <td style="border-top:1px solid black;border-right:1px solid black;">Descripción</td>
-                <td style="width: 80px;border-top:1px solid black;border-right:1px solid black;">Cantidad</td>
-                <td style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Precio</td>
-                <td style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Importe</td>
+            <tr style="font-size: 11px; background-color: #F2F2F2; text-align: center;">
+                <th style="width: 40px;border-top:1px solid black;border-right:1px solid black;border-left:1px solid black">Item</th>
+                <th style="width: 70px;border-top:1px solid black;border-right:1px solid black;">Imagen</th>
+                <th style="border-top:1px solid black;border-right:1px solid black;">Descripción</th>
+                <th style="width: 80px;border-top:1px solid black;border-right:1px solid black;">Cantidad</th>
+                <th style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Precio</th>
+                <th style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Importe</th>
             </tr>
-        </thead>
+        </thead>    
         <tbody>
             @foreach ($detailsQuotation as $keyCategories => $quotationDetail)
                 @foreach ($quotationDetail['subcategories'] as $keySubCategorie => $subcategories)
@@ -179,6 +180,7 @@
                     </tr>
                     @foreach ($subcategories['products'] as $key => $detail)
                         @php
+                            $numberProduct++;
                             $product = App\Models\Products::find($detail['id']);
                             $price = $detail['price_unit'] + $detail['price_aditional'];
                             $pathImg = $product->product_img;
@@ -188,13 +190,13 @@
                             $subtotal += $totalDetail;
                         @endphp
                          <tr>
-                            <td style="text-align: center;">{{$key + 1}}</td>
+                            <td style="text-align: center;">{{$numberProduct}}</td>
                             <td style="text-align: center; padding: 5px;">
                                 @empty(!$urlImage)
-                                <img src="{{public_path($urlImage)}}" alt="Imagen de productos" width="90px" height="90px">
+                                <img src="{{public_path($urlImage)}}" alt="Imagen de productos" width="60px" height="60px">
                                 @endempty
                             </td>
-                            <td>
+                            <td style="padding-left: 5px; line-height:0.8;">
                                 {{$detail['description']}}
                                 @empty(!$detail['details'])
                                 <br>{!!$detail['details']!!}
@@ -208,8 +210,8 @@
                 @endforeach
             @endforeach
             <tr>
-                <td colspan="3" style="background-color: #C6E0B3; padding-left: 5px; font-size: 14px; font-weight:bold;border-top: 1px solid black;">
-                    <span style="text-decoration: underline;">INSUMOS DE ORIGEN EUROPEOS</span>
+                <td colspan="3" style="background-color: #C6E0B3; padding-left: 5px; font-weight:bold;border-top: 1px solid black;">
+                    <span style="text-decoration: underline;">INSUMOS DE ORIGEN EUROPEO</span>
                 </td>
             </tr>
         </tbody>
