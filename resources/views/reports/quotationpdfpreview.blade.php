@@ -160,22 +160,22 @@
     </table>
     <table style="font-size: 13px; margin-bottom: 10px;" class="table-details">
         <thead>
-            <tr style="background-color: #018000;color: #fff;">
-                <th style="width: 40px; height: 40px;">Item</th>
-                <th style="width: 80px;">Imagen</th>
-                <th>Descripción</th>
-                <th style="width: 80px;">Cantidad</th>
-                <th style="width: 100px;">Precio</th>
-                <th style="width: 100px;">Importe</th>
+            <tr style="background-color: #F2F2F2; text-align: center;">
+                <td style="width: 40px;border-top:1px solid black;border-right:1px solid black;border-left:1px solid black">Item</td>
+                <td style="width: 80px;border-top:1px solid black;border-right:1px solid black;">Imagen</td>
+                <td style="border-top:1px solid black;border-right:1px solid black;">Descripción</td>
+                <td style="width: 80px;border-top:1px solid black;border-right:1px solid black;">Cantidad</td>
+                <td style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Precio</td>
+                <td style="width: 100px;border-top:1px solid black;border-right:1px solid black;">Importe</td>
             </tr>
         </thead>
         <tbody>
             @foreach ($detailsQuotation as $keyCategories => $quotationDetail)
                 @foreach ($quotationDetail['subcategories'] as $keySubCategorie => $subcategories)
-                    <tr style="background-color: #00d100;color: #fff;border:1px solid black;">
-                        <th colspan="6" style="text-align: center; height: 30px;">
+                    <tr style="background-color: #C6E0B3;border:1px solid black;">
+                        <td colspan="6" style="text-align: center;">
                             {{$quotationDetail['categorie_name'] . ' - ' . $subcategories['subcategorie_name']}}
-                        </th>
+                        </td>
                     </tr>
                     @foreach ($subcategories['products'] as $key => $detail)
                         @php
@@ -208,8 +208,8 @@
                 @endforeach
             @endforeach
             <tr>
-                <td colspan="3" style="background-color: #018000; color: #fff; font-size: 14px; font-weight:bold;border-top: 1px solid black;">
-                    <span style="text-decoration: underline;">"INSUMOS DE ORIGEN EUROPEOS"</span>
+                <td colspan="3" style="background-color: #C6E0B3; padding-left: 5px; font-size: 14px; font-weight:bold;border-top: 1px solid black;">
+                    <span style="text-decoration: underline;">INSUMOS DE ORIGEN EUROPEOS</span>
                 </td>
             </tr>
         </tbody>
