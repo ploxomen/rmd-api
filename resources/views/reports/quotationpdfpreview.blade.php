@@ -136,6 +136,10 @@
                         <td style="text-align: center;font-size: 12px; border-top: 2px solid black;border-left: 2px solid black;border-right: 2px solid black;">{{$customer ? $customer->customer_name : ''}}</td>
                     </tr>
                     <tr>
+                        <th class="text-column">Proyecto</th>
+                        <td style="font-size: 12px; text-align: center; border-left: 2px solid black;border-right: 2px solid black;">{{$quotation['quotation_project']}}</td>
+                    </tr>
+                    <tr>
                         <th class="text-column">Dirección</th>
                         <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation['quotation_address']}}</td>
                     </tr>

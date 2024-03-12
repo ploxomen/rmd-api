@@ -14,6 +14,7 @@ class Quotation extends Model
         'quotation_number',
         'quotation_code',
         'quotation_customer',
+        'quotation_project',
         'quotation_customer_contact',
         'quotation_date_issue',
         'quotation_include_igv',
@@ -46,7 +47,7 @@ class Quotation extends Model
         ->join('users','quotation_quoter','=','users.id')
         ->where(function($query)use($search){
             $query->where('customer_name','LIKE','%'.$search.'%')
-            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR LPAD(quotations.id,5,'0') LIKE CONCAT('%',?,'%')",[$search,$search]);
+            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR quotation_code LIKE CONCAT('%',?,'%')",[$search,$search]);
         });
         foreach ($filters as $filter) {
             $query = $query->where($filter['column'],$filter['sign'],$filter['value']);
@@ -67,7 +68,7 @@ class Quotation extends Model
         ->where(['quotation_status' => 1, 'quotation_type_money' => $typeMoney,'quotation_include_igv' => $includeIgv, 'quotation_customer' => $customer])->whereNull('order_id')->get();
     }
     public static function getQuotationsReport($startDate,$finalDate) {
-        return Quotation::select("quotations.id","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
+        return Quotation::select("quotation_code","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
         ->join('users','users.id','=','quotation_quoter')
         ->join('customers','customers.id','=','quotation_customer')
         ->join('contries','contries.id','=','customer_contrie')

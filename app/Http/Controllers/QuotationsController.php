@@ -214,6 +214,7 @@ class QuotationsController extends Controller
             'quotation_type_money' => 'required|string|max:5',
             'quotation_type_change' => 'nullable|string|decimal:0,2',
             'quotation_include_igv' => 'required|boolean',
+            'quotation_project' => 'required|string',
             'quotation_customer' => 'required|numeric',
             'quotation_contact' => 'required|numeric',
             'quotation_address' => 'required|string|max:255',
@@ -222,6 +223,7 @@ class QuotationsController extends Controller
             'quotation_date_issue' => 'fecha de emisión',
             'quotation_type_money' => 'tipo de moneda',
             'quotation_type_change' => 'tipo de cambio',
+            'quotation_project' => 'proyecto',
             'quotation_include_igv' => 'incluir IGV',
             'quotation_customer' => 'cliente',
             'quotation_contact' => 'contacto',
@@ -235,6 +237,7 @@ class QuotationsController extends Controller
             'quotation_include_igv' => $request->quotation_include_igv,
             'quotation_customer' => $request->quotation_customer,
             'quotation_customer_contact' => $request->quotation_contact,
+            'quotation_project' => $request->quotation_project,
             'quotation_number' => $quotationCode['number'],
             'quotation_code' => $quotationCode['code'],
             'quotation_date_issue' => $request->quotation_date_issue,
@@ -345,7 +348,7 @@ class QuotationsController extends Controller
         ]);
     }
     public function show(Request $request) {
-        $quotation = Quotation::find($request->quotation,["quotation_customer","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions"]);
+        $quotation = Quotation::find($request->quotation,["quotation_customer","quotation_project","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions"]);
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,

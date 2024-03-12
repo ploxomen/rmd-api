@@ -22,6 +22,7 @@ return new class extends Migration
             $table->bigInteger('quotation_customer_contact')->unsigned()->nullable();
             $table->foreign('quotation_customer_contact')->references('id')->on('contacts');
             $table->date('quotation_date_issue');
+            $table->string('quotation_project');
             $table->string('quotation_type_money',5);
             $table->decimal('quotation_change_money')->nullable();
             $table->tinyInteger('quotation_include_igv');

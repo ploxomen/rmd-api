@@ -17,11 +17,15 @@ class AuthController extends Controller
         $role = $user->roles()->where('active',1)->first();
         $redirectRestrict = '/intranet/home';
         $redirectUserNew = '/intranet/user-reset';
+        $redirectLogin = '/intranet/logout';
         if(empty($role) && !in_array($url,["/home","/my-account","/user-reset"])){
             return $redirectRestrict;
         }
         if($user->user_status === 2){
             return $redirectUserNew;
+        }
+        if($user->user_status === 0){
+            return $redirectLogin;
         }
         if(empty($role->modules()->where('module_url',$url)->first()) && !in_array($url,["/home","/my-account","/user-reset"])){
             return $redirectRestrict;
@@ -100,7 +104,14 @@ class AuthController extends Controller
                 'message' => 'El usuario y/o la contraseña son incorrectos'
             ]);
         }
-        $user = User::select('id','user_name','user_last_name')->where('user_email',$request->username)->firstOrFail();
+        $user = User::select('id','user_name','user_last_name')->where('user_email',$request->username)->where('user_status','!=',0)->first();
+        if(empty($user)){
+            return response()->json([
+                'authenticate' => false,
+                'error' => false,
+                'message' => 'El usuario y/o la contraseña son incorrectos'
+            ]);
+        }
          $token = $user->createToken('auth_token',['*'],now()->addDays($request->has('rememberme') ? 7 : 3))->plainTextToken;
         return response()->json([
             'authenticate' => true,
