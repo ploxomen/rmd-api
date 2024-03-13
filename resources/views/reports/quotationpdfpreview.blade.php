@@ -140,10 +140,6 @@
                         <td style="font-size: 12px; text-align: center; border-left: 2px solid black;border-right: 2px solid black;">{{$quotation['quotation_project']}}</td>
                     </tr>
                     <tr>
-                        <th class="text-column">Dirección</th>
-                        <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$quotation['quotation_address']}}</td>
-                    </tr>
-                    <tr>
                         <th class="text-column">RUC</th>
                         <td style="font-size: 12px;border-left: 2px solid black;border-right: 2px solid black;">{{$customer ? $customer->customer_number_document : ''}}</td>
                     </tr>
