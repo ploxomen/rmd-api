@@ -262,10 +262,10 @@
             </td>
         </tr>
     </table>
-    <table>
+    <table style="font-size: 10px;">
         <tr>
             @foreach ($pagesArray as $pag)
-                <td style="text-align: center;">{pag}</td>
+                <td style="text-align: center;">{{$pag}}</td>
             @endforeach
         </tr>
     </table>
