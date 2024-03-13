@@ -262,5 +262,12 @@
             </td>
         </tr>
     </table>
+    <table>
+        <tr>
+            @foreach ($pagesArray as $pag)
+                <td style="text-align: center;">{pag}</td>
+            @endforeach
+        </tr>
+    </table>
 </body>
 </html>
