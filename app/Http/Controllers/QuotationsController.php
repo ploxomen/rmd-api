@@ -217,7 +217,6 @@ class QuotationsController extends Controller
             'quotation_project' => 'required|string',
             'quotation_customer' => 'required|numeric',
             'quotation_contact' => 'required|numeric',
-            'quotation_address' => 'required|string|max:255',
         ]);
         $validator->setAttributeNames([
             'quotation_date_issue' => 'fecha de emisión',
@@ -227,7 +226,6 @@ class QuotationsController extends Controller
             'quotation_include_igv' => 'incluir IGV',
             'quotation_customer' => 'cliente',
             'quotation_contact' => 'contacto',
-            'quotation_address' => 'direccion',
         ]);
         if($validator->fails()){
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
@@ -289,7 +287,6 @@ class QuotationsController extends Controller
             'quotation_include_igv' => 'required|boolean',
             'quotation_customer' => 'required|numeric',
             'quotation_contact' => 'required|numeric',
-            'quotation_address' => 'required|string|max:255',
         ]);
         $validator->setAttributeNames([
             'quotation_date_issue' => 'fecha de emisión',
@@ -298,7 +295,6 @@ class QuotationsController extends Controller
             'quotation_include_igv' => 'incluir IGV',
             'quotation_customer' => 'cliente',
             'quotation_contact' => 'contacto',
-            'quotation_address' => 'direccion',
         ]);
         if($validator->fails()){
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
@@ -356,7 +352,7 @@ class QuotationsController extends Controller
             'message' => 'Cotizaciones obtenida correctamente',
             'data' => [
                 'quotation' => $quotation,
-                'contacs' => Contacts::select("id","contact_name")->where("contact_status",1)->get(),
+                'contacs' => Contacts::select("id","contact_name")->where(["contact_status" => 1,'customer_id' => $quotation->quotation_customer])->get(),
                 'products' => $quotation->products()->select("quotation_description AS details","products.id","products.product_service AS is_service","products.product_name AS description","quotations_details.detail_quantity AS quantity","quotations_details.detail_price_unit AS price_unit","quotations_details.detail_price_additional AS price_aditional")->get()
             ]
         ]);
