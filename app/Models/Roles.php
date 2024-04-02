@@ -9,6 +9,7 @@ class Roles extends Model
 {
     protected $fillable = [
         'rol_name',
+        'rol_status'
     ];
     protected $hidden = [
         'create_at',

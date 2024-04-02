@@ -120,7 +120,7 @@ class OrdersController extends Controller
             'message' => 'Pedidos obtenidos correctamente',
             'data' => [
                 'order' => $order,
-                'quotations' => Quotation::select("id","quotation_total")->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,0 AS close")->where(['order_id' => $request->order,'quotation_status' => 2])->get()
+                'quotations' => Quotation::select("id","quotation_total","quotation_code")->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,0 AS close")->where(['order_id' => $request->order,'quotation_status' => 2])->get()
             ]
         ]);
     }

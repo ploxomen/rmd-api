@@ -263,7 +263,7 @@ class UserController extends Controller
             'redirect' => null,
             'error' => false,
             'message' => 'Tipo de documentos obtenidos correctamnente',
-            'data' => TypeDocument::select("id","document_name","document_length")->where('document_status',1)->get()
+            'data' => TypeDocument::select("id","document_name","document_length","document_minimun")->where('document_status',1)->get()
         ]);
     }
     public function destroy(Request $request) {

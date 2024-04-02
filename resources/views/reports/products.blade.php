@@ -26,7 +26,7 @@
                 <tr>
                     <td></td>
                     <td>{{$product->product_name}}</td>
-                    <td>{{$product->product_description}}</td>
+                    <td>{{strip_tags($product->product_description)}}</td>
                     <td>{{$product->product_buy}}</td>
                     <td>{{$product->product_sale}}</td>
                 </tr>

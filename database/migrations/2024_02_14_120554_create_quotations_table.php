@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('quotation_type_money',5);
             $table->decimal('quotation_change_money')->nullable();
             $table->tinyInteger('quotation_include_igv');
-            $table->string('quotation_customer_address');
+            $table->string('quotation_customer_address')->nullable();
             $table->decimal('quotation_amount')->nullable();
             $table->decimal('quotation_discount')->nullable();
             $table->decimal('quotation_igv')->nullable();

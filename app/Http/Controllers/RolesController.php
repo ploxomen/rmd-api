@@ -16,7 +16,7 @@ class RolesController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'Roles obtenidos', 
-            'data' => Roles::select('id','rol_name')->get()
+            'data' => Roles::select('id','rol_name')->where('rol_status','!=',0)->get()
         ]);
     }
     public function update(Request $request) {
@@ -84,12 +84,12 @@ class RolesController extends Controller
             'error' => false,
             'message' => 'Role eliminado correctamente'   
         ];
-        if($role->users()->count() > 0){
+        if($role->users()->where('user_status',0)->count() !== $role->users()->count()){
             $response['error'] = true;
             $response['message'] = 'Para eliminar el rol debes de eliminar los usuarios asociados a ellos';
         }else{
             $role->modules()->detach();
-            $role->delete();
+            $role->update(['rol_status' => 0]);
         }
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $response['redirect'] = $redirect;

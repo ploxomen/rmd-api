@@ -79,8 +79,8 @@ class ProductsController extends Controller
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
-                $filePath = $file->storeAs('products',$fileName,'public');
-                $dataProduct['product_img'] = 'storage/'.$filePath;
+                $filePath = $file->move(public_path('storage/products'),$fileName);
+                $dataProduct['product_img'] = 'storage/products/'.$fileName;
             }
             $dataProduct['product_service'] = 0;
             if($request->product_service == "true"){
@@ -145,8 +145,8 @@ class ProductsController extends Controller
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
-                $filePath = $file->storeAs('products',$fileName,'public');
-                $dataProduct['product_img'] = 'storage/'.$filePath;
+                $filePath = $file->move(public_path('storage/products'),$fileName);
+                $dataProduct['product_img'] = 'storage/products/'.$fileName;
             }
             $product->update($dataProduct);
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);

@@ -392,6 +392,7 @@ class QuotationsController extends Controller
             ]);
         }
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        $quotation->update(['quotation_status' => 0]);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
