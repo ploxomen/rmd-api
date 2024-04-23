@@ -81,8 +81,8 @@ class UserController extends Controller
         if($request->has('avatar')){
             $file = $request->file('avatar');
             $fileName = time() . "_" . $file->getClientOriginalName();
-            $filePath = $file->storeAs('users',$fileName,'public');
-            $data['user_avatar'] = 'storage/'.$filePath;
+            $file->move(public_path('storage/users'),$fileName);
+            $data['user_avatar'] = 'storage/users/'.$fileName;
         }
         $user->update($data);
         return response()->json([

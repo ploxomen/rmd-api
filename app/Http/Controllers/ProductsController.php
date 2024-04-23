@@ -145,7 +145,7 @@ class ProductsController extends Controller
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
-                $filePath = $file->move(public_path('storage/products'),$fileName);
+                $file->move(public_path('storage/products'),$fileName);
                 $dataProduct['product_img'] = 'storage/products/'.$fileName;
             }
             $product->update($dataProduct);
