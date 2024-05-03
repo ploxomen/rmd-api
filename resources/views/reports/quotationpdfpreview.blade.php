@@ -199,7 +199,9 @@
                             <td style="padding-left: 5px; line-height:0.8;">
                                 {{$detail['description']}}
                                 @empty(!$detail['details'])
-                                <br>{!!$detail['details']!!}
+                                <div style="font-family:Helvetica,Arial,sans-serif; font-size:8pt;">
+                                    {!!$detail['details']!!}
+                                </div>
                                 @endempty
                             </td>
                             <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail['quantity']}}</td>
@@ -244,14 +246,20 @@
         </tfoot>
     </table>
     <div style="background-color: #F2F2F2;">
-        {!! $quotation['quotation_observations'] !!}
-        {!! $quotation['quotation_conditions'] !!}
+        <div style="font-family:Helvetica,Arial,sans-serif; font-size:8pt;">
+            {!! $quotation['quotation_observations'] !!}
+        </div>
+        <div style="font-family:Helvetica,Arial,sans-serif; font-size:8pt;">
+            {!! $quotation['quotation_conditions'] !!}
+        </div>
     </div>
     <table>
         <tr>
             <td style="vertical-align: top; width: 360px; padding-right: 20px;">
                 <span style="font-size: 14px; padding: 5px; background-color: #BFBFBF; display: block;">DATOS BANCARIOS</span>
+                <div style="font-family:Helvetica,Arial,sans-serif; font-size:8pt;">
                 {!! $configuration->where('description','=','business_bank')->first()->value !!}
+                </div>
             </td>
             <td style="vertical-align: top; background-color: #F2F2F2; padding: 0 10px;">
                 <p style="line-height: 2;font-size: 13px;">
