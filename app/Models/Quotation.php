@@ -14,6 +14,7 @@ class Quotation extends Model
         'quotation_number',
         'quotation_code',
         'quotation_customer',
+        'quotation_way_to_pay',
         'quotation_project',
         'quotation_customer_contact',
         'quotation_date_issue',
@@ -25,6 +26,7 @@ class Quotation extends Model
         'quotation_discount',
         'quotation_igv',
         'quotation_total',
+        'quotation_warranty',
         'quotation_quoter',
         'quotation_observations',
         'quotation_conditions',
@@ -57,6 +59,10 @@ class Quotation extends Model
     public function customer()
     {
         return $this->belongsTo(Customers::class,'quotation_customer');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class,'quotation_quoter');
     }
     public function contact()
     {

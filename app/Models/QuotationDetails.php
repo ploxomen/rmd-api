@@ -15,6 +15,7 @@ class QuotationDetails extends Model
         'detail_quantity',
         'detail_price_unit',
         'detail_price_additional',
+        'detail_type_price',
         'detail_total',
         'detail_status'
     ];

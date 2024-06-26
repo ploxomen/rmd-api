@@ -79,7 +79,7 @@
             width: 100%;
             font-family: Arial, Helvetica, sans-serif;
             color: rgba(255, 0, 0, 0.234);
-        }rgba(255, 84, 84, 0.359)
+        }
     </style>
     @php
         $emails = $configuration->where('description','=','business_email')->first()->value;

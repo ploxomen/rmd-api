@@ -58,7 +58,8 @@ class ProductsController extends Controller
             ],
             'product_description' => 'nullable|string|max:2000',
             'product_buy' => 'nullable|decimal:0,2|min:0',
-            'product_sale' => 'nullable|decimal:0,2|min:0',
+            'product_public_customer' => 'nullable|decimal:0,2|min:0',
+            'product_distributor' => 'nullable|decimal:0,2|min:0',
             'sub_categorie' => 'required|numeric',
             'product_img' => 'nullable|image'
         ]);
@@ -66,7 +67,8 @@ class ProductsController extends Controller
             'product_name' => 'nombre del producto',
             'product_description' => 'descripción del producto',
             'product_buy' => 'precio de producción',
-            'product_sale' => 'precio de venta',
+            'product_public_customer' => 'precio publico del cliente',
+            'product_distributor' => 'precio del distribuidor',
             'sub_categorie' => 'subcategoría',
             'product_img' => 'imagen del producto'
         ]);
@@ -86,7 +88,8 @@ class ProductsController extends Controller
             if($request->product_service == "true"){
                 $dataProduct['product_service'] = 1;
                 $dataProduct['product_buy'] = 0;
-                $dataProduct['product_sale'] = 0;
+                $dataProduct['product_public_customer'] = 0;
+                $dataProduct['product_distributor'] = 0;
             }
             $dataProduct['product_status'] = 1;
             $product = Products::create($dataProduct);
@@ -115,7 +118,8 @@ class ProductsController extends Controller
             ],
             'product_description' => 'nullable|string|max:2000',
             'product_buy' => 'nullable|decimal:0,2|min:0',
-            'product_sale' => 'required|decimal:0,2|min:0',
+            'product_public_customer' => 'required|decimal:0,2|min:0',
+            'product_distributor' => 'nullable|decimal:0,2|min:0',
             'sub_categorie' => 'required|numeric',
             'product_img' => 'nullable|image'
         ]);
@@ -123,7 +127,8 @@ class ProductsController extends Controller
             'product_name' => 'nombre del producto',
             'product_description' => 'descripción del producto',
             'product_buy' => 'precio de producción',
-            'product_sale' => 'precio de venta',
+            'product_public_customer' => 'precio de venta',
+            'product_distributor' => 'precio del distribuidor',
             'sub_categorie' => 'subcategoría',
             'product_img' => 'imagen del producto'
         ]);
@@ -140,7 +145,8 @@ class ProductsController extends Controller
             if($request->product_service == "true"){
                 $dataProduct['product_service'] = 1;
                 $dataProduct['product_buy'] = 0;
-                $dataProduct['product_sale'] = 0;
+                $dataProduct['product_public_customer'] = 0;
+                $dataProduct['product_distributor'] = 0;
             }
             if($request->has('product_img')){
                 $file = $request->file('product_img');

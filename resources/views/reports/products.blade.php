@@ -28,7 +28,7 @@
                     <td>{{$product->product_name}}</td>
                     <td>{{strip_tags($product->product_description)}}</td>
                     <td>{{$product->product_buy}}</td>
-                    <td>{{$product->product_sale}}</td>
+                    <td>{{$product->product_public_customer}}</td>
                 </tr>
             @endforeach
         @endforeach
