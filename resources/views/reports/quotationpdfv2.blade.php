@@ -113,6 +113,7 @@
         }
         .table-extra{
             margin-bottom: 8px;
+            page-break-inside: avoid;
         }
         .title-extra{
             font-size: 12px;
@@ -316,7 +317,7 @@
                 <td class="parragraph-conditions">
                     <p style="white-space: pre-wrap; font-size: 11px;">{{$quotation->quotation_warranty}}</p>
                 </td>
-                <td style="font-size: 11px;">{{$quotation->quotation_way_to_pay}}</td>
+                <td class="parragraph-conditions" style="font-size: 11px;">{{$quotation->quotation_way_to_pay}}</td>
             </tr>
         </tbody>
     </table>
