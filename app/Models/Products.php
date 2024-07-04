@@ -20,7 +20,7 @@ class Products extends Model
     ];
 
     public static function getProducts($search){
-        return Products::select("products.id","product_buy","product_public_customer","sub_categorie_name","categorie_name","product_name")
+        return Products::select("products.id","product_buy","product_public_customer","product_distributor","sub_categorie_name","categorie_name","product_name")
         ->join('sub_categories','products.sub_categorie','=','sub_categories.id')
         ->join('categories','sub_categories.categorie_id','=','categories.id')
         ->where('product_status','>',0)->where(function($query)use($search){
