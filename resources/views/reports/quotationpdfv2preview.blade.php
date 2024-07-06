@@ -191,21 +191,6 @@
     <table class="table-extra">
         <thead>
             <tr>
-                <th style="width: 50%" class="color-primary-title title-extra">CONDICIONES</th>
-                <th class="color-secondary-title title-extra"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="2" class="parragraph-conditions">
-                    {!! $quotation['quotation_conditions'] !!}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table-extra">
-        <thead>
-            <tr>
                 <th style="width: 50%" class="title-extra color-primary-title">GARANTÍA</th>
                 <th class="color-secondary-title title-extra">FORMA DE PAGO</th>
             </tr>
@@ -216,6 +201,21 @@
                     <p style="white-space: pre-wrap; font-size: 11px;">{{$quotation['quotation_warranty']}}</p>
                 </td>
                 <td class="parragraph-conditions" style="font-size: 11px;">{{$quotation['quotation_way_to_pay']}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table-extra">
+        <thead>
+            <tr>
+                <th style="width: 50%" class="color-primary-title title-extra">CONDICIONES</th>
+                <th class="color-secondary-title title-extra"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="2" class="parragraph-conditions">
+                    {!! $quotation['quotation_conditions'] !!}
+                </td>
             </tr>
         </tbody>
     </table>
