@@ -34,4 +34,21 @@ class Products extends Model
     {
         return $this->belongsTo(SubCategories::class,'sub_categorie');
     }
+    public static function reportExcel()
+    {
+        return Products::with(['subcategorie.categorie'])
+        ->get()
+        ->sortBy(function($product){
+            return $product->subcategorie->categorie->categorie_name . ' ' . $product->subcategorie->sub_categorie_name;
+        })->map(function($product){
+            return [
+                'product_name' => $product->product_name,
+                'category_name' => $product->subcategorie->categorie->categorie_name,
+                'subcategory_name' => $product->subcategorie->sub_categorie_name,
+                'product_buy' => $product->product_buy,
+                'product_public_customer' => $product->product_public_customer,
+                'product_distributor' => $product->product_distributor,
+            ];
+        });
+    }
 }

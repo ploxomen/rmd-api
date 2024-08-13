@@ -34,7 +34,8 @@ class ProductsController extends Controller
         if(!is_null($redirect)){
             return response('Acceso no autorizado',403);
         }
-        return Excel::download(new ProductsExport(Categories::where('categorie_status',1)->get(),'reports.products'),'products.xlsx');
+        $products = Products::reportExcel();
+        return Excel::download(new ProductsExport($products,'reports.productsv2'),'products.xlsx');
     }
     public function categorie() {
         return response()->json([
