@@ -2,16 +2,16 @@ StartFontMetrics 4.1
 Notice Converted by PHP-font-lib
 Comment https://github.com/dompdf/php-font-lib
 EncodingScheme FontSpecific
-Copyright Copyright 2022 The Inter Project Authors (https://github.com/rsms/inter-tight)
-FontName Inter Tight ExtraLight
-FontSubfamily Regular
-UniqueID 3.004;RSMS;InterTight-ExtraLight
-FullName Inter Tight ExtraLight
-Version Version 3.004
-PostScriptName InterTight-ExtraLight
-LicenseURL https://scripts.sil.org/OFL
-PreferredFamily Inter Tight
-PreferredSubfamily ExtraLight
+Copyright 䌀漀瀀礀爀椀最栀琀 ㈀　㈀㈀ 吀栀攀 䤀渀琀攀爀 倀爀漀樀攀挀琀 䄀甀琀栀漀爀猀 ⠀栀琀琀瀀猀㨀⼀⼀最椀琀栀甀戀⸀挀漀洀⼀爀猀洀猀⼀椀渀琀攀爀ⴀ琀椀最栀琀⤀
+FontName 䤀渀琀攀爀 吀椀最栀琀 䔀砀琀爀愀䰀椀最栀琀
+FontSubfamily 刀攀最甀氀愀爀
+UniqueID ㌀⸀　　㐀㬀刀匀䴀匀㬀䤀渀琀攀爀吀椀最栀琀ⴀ䔀砀琀爀愀䰀椀最栀琀
+FullName 䤀渀琀攀爀 吀椀最栀琀 䔀砀琀爀愀䰀椀最栀琀
+Version 嘀攀爀猀椀漀渀 ㌀⸀　　㐀
+PostScriptName 䤀渀琀攀爀吀椀最栀琀ⴀ䔀砀琀爀愀䰀椀最栀琀
+LicenseURL 栀琀琀瀀猀㨀⼀⼀猀挀爀椀瀀琀猀⸀猀椀氀⸀漀爀最⼀伀䘀䰀
+PreferredFamily 䤀渀琀攀爀 吀椀最栀琀
+PreferredSubfamily 䔀砀琀爀愀䰀椀最栀琀
 Weight Medium
 ItalicAngle 0
 IsFixedPitch false

@@ -899,10 +899,17 @@
     },
     "isUnicode": true,
     "EncodingScheme": "FontSpecific",
+<<<<<<< HEAD
+    "FontName": "\u5200\u6f00\u6200\u6f00\u7400\u6f00",
+    "FullName": "\u5200\u6f00\u6200\u6f00\u7400\u6f00\u2000\u4200\u6f00\u6c00\u6400",
+    "Version": "\u5600\u6500\u7200\u7300\u6900\u6f00\u6e00\u2000\u3200\u2e00\u3100\u3300\u3700\u3b00\u2000\u3200\u3000\u3100\u3700",
+    "PostScriptName": "\u5200\u6f00\u6200\u6f00\u7400\u6f00\u2d00\u4200\u6f00\u6c00\u6400",
+=======
     "FontName": "Roboto",
     "FullName": "Roboto Bold",
     "Version": "Version 2.137; 2017",
     "PostScriptName": "Roboto-Bold",
+>>>>>>> 6be0d9c072ad1b2e52f4bfb56ba111c1815bee2d
     "Weight": "Bold",
     "ItalicAngle": "0",
     "IsFixedPitch": "false",

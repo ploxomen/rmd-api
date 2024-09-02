@@ -2,6 +2,16 @@ StartFontMetrics 4.1
 Notice Converted by PHP-font-lib
 Comment https://github.com/dompdf/php-font-lib
 EncodingScheme FontSpecific
+<<<<<<< HEAD
+Copyright 䌀漀瀀礀爀椀最栀琀 ㈀　㄀㄀ 䜀漀漀最氀攀 䤀渀挀⸀ 䄀氀氀 刀椀最栀琀猀 刀攀猀攀爀瘀攀搀⸀
+FontName 刀漀戀漀琀漀 䈀氀愀挀欀
+FontSubfamily 䤀琀愀氀椀挀
+UniqueID 刀漀戀漀琀漀 䈀氀愀挀欀 䤀琀愀氀椀挀
+FullName 刀漀戀漀琀漀 䈀氀愀挀欀 䤀琀愀氀椀挀
+Version 嘀攀爀猀椀漀渀 ㈀⸀㄀㌀㜀㬀 ㈀　㄀㜀
+PostScriptName 刀漀戀漀琀漀ⴀ䈀氀愀挀欀䤀琀愀氀椀挀
+LicenseURL 栀琀琀瀀㨀⼀⼀眀眀眀⸀愀瀀愀挀栀攀⸀漀爀最⼀氀椀挀攀渀猀攀猀⼀䰀䤀䌀䔀一匀䔀ⴀ㈀⸀　
+=======
 Copyright Copyright 2011 Google Inc. All Rights Reserved.
 FontName Roboto Black
 FontSubfamily Italic
@@ -10,6 +20,7 @@ FullName Roboto Black Italic
 Version Version 2.137; 2017
 PostScriptName Roboto-BlackItalic
 LicenseURL http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> 6be0d9c072ad1b2e52f4bfb56ba111c1815bee2d
 Weight Bold
 ItalicAngle -12
 IsFixedPitch false
