@@ -6,6 +6,7 @@ use App\Exports\QuotationsExport;
 use App\Models\Configurations;
 use App\Models\Contacts;
 use App\Models\Customers;
+use App\Models\Orders;
 use App\Models\Products;
 use App\Models\Quotation;
 use App\Models\SubCategories;
@@ -115,11 +116,11 @@ class QuotationsController extends Controller
         return Pdf::loadView('reports.quotationpdfv2preview',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
     }
     public function getReportPdf(Request $request,Quotation $quotation) {
-        // $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
-        // $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        // if(!is_null($redirect) && !is_null($redirect2)){
-        //     return response('Acceso denegado',403);
-        // }
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
+        $redirect2 = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(!is_null($redirect) && !is_null($redirect2)){
+            return response('Acceso denegado',403);
+        }
         $detailsQuotation = [];
         foreach ($quotation->products as $detail) {
             $subCategorie = SubCategories::with('categorie')->find($detail->sub_categorie)->toArray();
@@ -345,6 +346,11 @@ class QuotationsController extends Controller
             'quotation_igv' => $igv,
             'quotation_total' => $total
         ]);
+        if(!is_null($quotation->order_id)){
+            $controllerOrder = new OrdersController();
+            $totalOrder = $controllerOrder->calculateMount($quotation->order_id);
+            Orders::find($quotation->order_id)->update($totalOrder);
+        }
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,
@@ -353,7 +359,7 @@ class QuotationsController extends Controller
         ]);
     }
     public function show(Request $request) {
-        $quotation = Quotation::find($request->quotation,["quotation_customer","quotation_project","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money",'quotation_warranty',"quotation_way_to_pay","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions"]);
+        $quotation = Quotation::find($request->quotation,["quotation_customer","quotation_project","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money",'quotation_warranty',"quotation_way_to_pay","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions","order_id"]);
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,

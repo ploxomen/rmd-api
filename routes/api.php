@@ -39,11 +39,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
     Route::get('quotation-extra/config',[QuotationsController::class,'getInformationConfig']);
     Route::get('quotation-extra/download/{quotation}',[QuotationsController::class,'getReportPdf']);
+    Route::get('order-extra/download/{order}',[OrdersController::class,'getReportPdf']);
+    Route::get('order-extra/download-os/{order}',[OrdersController::class,'downloadOS']);
     Route::post('quotation-extra/preview',[QuotationsController::class,'getPreview']);
     Route::get('quotation-extra/customers',[QuotationsController::class,'getCustomerActive']);
     Route::get('order-extra/quotations',[OrdersController::class,'getQuotations']);
+    Route::put('order-extra/add-quotation/{quotation}',[OrdersController::class,'addQuotation']);
+    Route::put('order-extra/delete-quotation/{quotation}',[OrdersController::class,'deleteQuotation']);
+    Route::get('order-extra/reload-quotations',[OrdersController::class,'reloadQuotations']);
+
     Route::get('quotation-extra/users',[QuotationsController::class,'getUsers']);
     Route::get('quotation-extra/pdf/{quotation}',[QuotationsController::class,'getReportPdf']);
+    Route::get('order-extra/pdf/{order}',[OrdersController::class,'getReportPdf']);
+
     Route::get('quotation/contacts/{customer}',[QuotationsController::class,'getContactsActive']);
     Route::get('product-categorie',[ProductsController::class,'categorie']);
     Route::get('product-export',[ProductsController::class,'exportProductsExcel']);

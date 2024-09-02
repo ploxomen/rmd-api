@@ -71,8 +71,9 @@ class Quotation extends Model
         return $this->belongsTo(Contacts::class,'quotation_customer_contact');
     }
     public static function getQuotationsForOrders($typeMoney,$includeIgv,$customer) {
-        return Quotation::select('id','quotation_total','quotation_code')
+        return Quotation::select('quotations.id','quotation_total','quotation_code','quotation_project','contact_name','contact_email','contact_number')
         ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue, 1 AS checked")
+        ->leftJoin('contacts','quotation_customer_contact','=','contacts.id')
         ->where(['quotation_status' => 1, 'quotation_type_money' => $typeMoney,'quotation_include_igv' => $includeIgv, 'quotation_customer' => $customer])->whereNull('order_id')->get();
     }
     public static function getQuotationsReport($startDate,$finalDate) {
