@@ -388,7 +388,7 @@ class QuotationsController extends Controller
             'error' => false,
             'message' => 'Cotizaciones obtenidas correctamente',
             'totalQuotations' => $quotations->count(),
-            'data' => $quotations->skip($skip)->take($show)->orderBy("id","desc")->get()
+            'data' => $quotations->skip($skip)->take($show)->orderBy("id","desc")->groupBy("id")->get()
         ]);
     }
     public function destroy(Request $request) {

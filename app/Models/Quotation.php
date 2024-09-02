@@ -44,12 +44,14 @@ class Quotation extends Model
     }
     public static function getQuotations($search,$filters = []) {
         $query = Quotation::select("quotations.id","quotation_code","quotation_total","quotation_type_money","quotation_status","customer_name")
-        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter")
+        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter,(SELECT sub_categorie_name FROM quotations_details INNER JOIN products ON products.id = product_id INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie WHERE quotation_id = quotations.id ORDER BY detail_total DESC LIMIT 1) AS sub_categorie_name")
         ->join('customers','quotation_customer','=','customers.id')
         ->join('users','quotation_quoter','=','users.id')
         ->where(function($query)use($search){
             $query->where('customer_name','LIKE','%'.$search.'%')
-            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR quotation_code LIKE CONCAT('%',?,'%')",[$search,$search]);
+            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR quotation_code LIKE CONCAT('%',?,'%')",[$search,$search])
+            ->orWhereRaw("(SELECT sub_categorie_name FROM quotations_details INNER JOIN products ON products.id = product_id INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie WHERE quotation_id = quotations.id ORDER BY detail_total DESC LIMIT 1) LIKE CONCAT('%',?,'%')",[$search]);
+
         });
         foreach ($filters as $filter) {
             $query = $query->where($filter['column'],$filter['sign'],$filter['value']);

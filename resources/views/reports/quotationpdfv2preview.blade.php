@@ -6,131 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <title>Cotización</title>
 </head>
 <body>
-    <style>
-        html{
-            font-family: "Roboto", sans-serif;
-        }
-        .d-flex{
-            display: flex;
-        }
-        .imagen{
-            display: block;
-        }
-        .title {
-            display: block;
-            padding: 6px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            text-align: center;
-        }
-        .color-primary-title{
-            background:#424242;
-            color: #ffff;
-        }
-        .color-secondary-title{
-            background:#008A32;
-            color: #ffff;
-        }
-        .color-terciario-title{
-            background:#008a3356;
-        }
-        .parragraph-small{
-            margin: 0;
-            margin-bottom: 15px;
-            font-size: 12px;
-        }
-        .text-column{
-            font-size: 12px;
-            text-align: left;
-            color:#a8a8a8;
-            font-style:italic;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            vertical-align: middle;
-        }
-        table tfoot td,
-        table tfoot th{
-            text-align: right;
-        }
-        p{
-            margin-top: 0;
-        }
-        .table-general{
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        .table-details thead th{
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-            border-top: 1px solid black;
-            border-bottom: 1px solid black;
-        }
-        .table-details tbody td{
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-        }
-        .table-details tfoot{
-            border-top: 1px solid black;
-        }
-        .table-details tfoot th{
-            padding-right: 10px;
-        }
-        .table-details tfoot td{
-            border-bottom: 1px solid black;
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-        }
-        .table-borders td{
-            border-left: 1px solid #000000;
-            border-bottom: 1px solid #000000;
-            border-right: 1px solid #000000;
-            border-top: 1px solid #000000;
-        }
-        .td-wdata{
-            width: 150px;
-            padding-left: 12px;
-        }
-        .td-wdata-client{
-            font-weight: 500;
-            padding-left: 12px;
-        }
-        .parragraph-conditions p{
-            margin-bottom: 2px;
-        }
-        .table-extra{
-            margin-bottom: 8px;
-            page-break-inside:avoid;
-        }
-        .title-extra{
-            font-size: 13px;
-            text-align: left;
-            font-weight: 500;
-            padding: 4px 4px 4px 8px;
-        }
-        .text-email{
-            color: #008A32;
-        }
-        .anulado{
-            position: fixed;
-            top: 50%;
-            z-index: 5;
-            left: 50%;
-            font-size: 80px;
-            font-weight: bold;
-            transform: translate(-50%,-50%) rotate(-45deg);
-            text-align: center;
-            width: 100%;
-            font-family: Arial, Helvetica, sans-serif;
-            color: rgba(255, 0, 0, 0.234);
-        }
-    </style>
+    @include('styles.pdfv2Style')
     @php
         $emails = $configuration->where('description','=','business_email')->first()->value;
         $phones = $configuration->where('description','=','business_cell_phone')->first()->value;
@@ -160,12 +40,12 @@
                     <span>N°: --</span>
                 </p>
             </td>
-            <td>
-                <img src={{public_path('img/logo.jpg')}} alt="imagen" width="120px">
+            <td style="vertical-align: top;">
+                <img src={{public_path('img/logo-rmd.png')}} alt="imagen" width="182px">
             </td>
             <td style="vertical-align: top; text-align: right;">
-                <img src={{public_path('img/rmd-list-description.png')}} style="margin-bottom: 12px;" width="300px">
-                <img src={{public_path('img/rmd-header.jpg')}} alt="imagen" width="150px">
+                <img src={{public_path('img/rmd-list-description.png')}} width="245px">
+                <img src={{public_path('img/rmd-header.jpg')}} alt="imagen" width="165px">
             </td>
         </tr>
     </table>
@@ -225,11 +105,14 @@
                     </tr>
                     @foreach ($subcategories['products'] as $key => $detail)
                         @php
-                            $price = $detail->pivot->detail_price_unit + $detail->pivot->detail_price_additional;
-                            $pathImg = $detail->product_img;
+                            $numberProduct++;
+                            $product = App\Models\Products::find($detail['id']);
+                            $price = $detail['price_unit'] +  $detail['price_aditional'];
+                            $pathImg = $product->product_img;
                             $urlImage = empty($pathImg) || !\File::exists($pathImg) ? null : $pathImg;
                             $rowFinal = ($keyCategories + 1) === count($detailsQuotation) && ($keySubCategorie + 1) === count($quotationDetail['subcategories']) && ($key + 1) === count($subcategories['products']) ? 2 : 1;
-                            $numberProduct++;
+                            $totalDetail = $price * $detail['quantity'];
+                            $subtotal += $totalDetail;
                         @endphp
                          <tr>
                             <td style="text-align: center;">{{$numberProduct}}</td>
@@ -239,14 +122,16 @@
                                 @endempty
                             </td>
                             <td style="padding-left: 5px; line-height:0.8;">
-                                {{$detail->product_name}}
-                                @empty(!$detail->pivot->quotation_description)
-                                <br>{!!$detail->pivot->quotation_description!!}
+                                {{$detail['description']}}
+                                @empty(!$detail['details'])
+                                <div style="font-family:Helvetica,Arial,sans-serif; font-size:8pt;">
+                                    {!!$detail['details']!!}
+                                </div>
                                 @endempty
                             </td>
-                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail->pivot->detail_quantity}}</td>
+                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$detail['quantity']}}</td>
                             <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($price,2)}}</td>
-                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($detail->pivot->detail_total,2)}}</td>
+                            <td style="text-align: center;" rowspan="{{$rowFinal}}">{{$money.number_format($totalDetail,2)}}</td>
                         </tr>
                     @endforeach
                 @endforeach
@@ -306,21 +191,6 @@
     <table class="table-extra">
         <thead>
             <tr>
-                <th style="width: 50%" class="color-primary-title title-extra">CONDICIONES</th>
-                <th class="color-secondary-title title-extra"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="2" class="parragraph-conditions">
-                    {!! $quotation['quotation_conditions'] !!}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table-extra">
-        <thead>
-            <tr>
                 <th style="width: 50%" class="title-extra color-primary-title">GARANTÍA</th>
                 <th class="color-secondary-title title-extra">FORMA DE PAGO</th>
             </tr>
@@ -330,7 +200,22 @@
                 <td class="parragraph-conditions">
                     <p style="white-space: pre-wrap; font-size: 11px;">{{$quotation['quotation_warranty']}}</p>
                 </td>
-                <td style="font-size: 11px; vertical-align: top;">{{$quotation['quotation_way_to_pay']}}</td>
+                <td class="parragraph-conditions" style="font-size: 11px;">{{$quotation['quotation_way_to_pay']}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table-extra">
+        <thead>
+            <tr>
+                <th style="width: 50%" class="color-primary-title title-extra">CONDICIONES</th>
+                <th class="color-secondary-title title-extra"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="2" class="parragraph-conditions">
+                    {!! $quotation['quotation_conditions'] !!}
+                </td>
             </tr>
         </tbody>
     </table>

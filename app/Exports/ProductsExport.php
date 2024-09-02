@@ -21,20 +21,13 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
     public function view(): View
     {
         return view($this->view, [
-            'categories' => $this->data,
+            'products' => $this->data,
         ]); 
     }
     public function styles(Worksheet $sheet)
     {
-        foreach ($this->data as $categorie) {
-            $this->rowEnd++;
-            foreach ($categorie->subcategories()->where(['sub_categorie_status'=>1])->get() as $subcategorie) {
-                $this->rowEnd+=2;
-                $countProducts = $subcategorie->products()->where(['product_status'=>1])->count();
-                $this->rowEnd += $countProducts;            
-            }
-        }
-        $rango = "B" . $this->rowInitial . ":E" . $this->rowEnd;
+        $this->rowEnd += count($this->data);
+        $rango = "B" . $this->rowInitial . ":G" . $this->rowEnd;
         $title = $sheet->getStyle('B2');
         $title->getFont()->setBold(true);
         $title->getFont()->setUnderline(true);
