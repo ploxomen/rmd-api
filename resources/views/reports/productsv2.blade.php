@@ -2,7 +2,7 @@
     <tr></tr>
     <tr>
         <td></td>
-        <td colspan="3">LISTA DE PRODUCTOS</td>
+        <td colspan="6">LISTA DE PRODUCTOS</td>
     </tr>
     <tr></tr>
     <tr>
