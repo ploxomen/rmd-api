@@ -17,7 +17,7 @@
     <style>
         @page {
             margin: 20px;
-            margin-bottom: 100px;
+            margin-bottom: 60px;
         }
 
         .bg-primary {
@@ -58,6 +58,7 @@
             font-size: 10px;
             line-height: 1;
             font-weight: 700;
+            border: 1px solid black;
             padding: 4px;
         }
 
@@ -117,8 +118,7 @@
             left: 35%;
             right: 0px;
             height: 150px;
-            bottom: 0px;
-            margin-bottom: -160px
+            bottom: -140px;
         }
     </style>
     <header>
@@ -140,7 +140,7 @@
         </table>
     </header>
     <footer>
-        <img src="{{ public_path('img/logo-footer.png') }}" alt="Logo" width="260px">
+        <img src="{{ public_path('img/logo-footer.png') }}" alt="Logo" width="200px">
     </footer>
     <div class="bg-primary mb"
         style="font-size: 28px; padding: 4px; text-align: center; font-weight: 700; line-height: 1">
@@ -163,33 +163,27 @@
             <th style="width: 100px;">
                 NOMBRE
             </th>
-            <td>{{ $order->customer->customer_name }}</td>
-        </tr>
-        <tr>
-            <th>
-                RUC
-            </th>
-            <td>{{ $order->customer->customer_number_document }}</td>
-        </tr>
-        <tr>
-            <th>
-                PROYECTO
-            </th>
-            <td>{{ $order->order_project }}</td>
-        </tr>
-        <tr>
-            <th>
+            <td style="width: 300px;">{{ $order->customer->customer_name }}</td>
+            <th style="width: 100px;">
                 CONTACTO
             </th>
             <td>{{ $order->order_contact_name }}</td>
         </tr>
         <tr>
             <th>
+                RUC
+            </th>
+            <td>{{ $order->customer->customer_number_document }}</td>
+            <th>
                 EMAIL
             </th>
             <td>{{ $order->order_contact_email }}</td>
         </tr>
         <tr>
+            <th>
+                PROYECTO
+            </th>
+            <td>{{ $order->order_project }}</td>
             <th>
                 TELEFONO
             </th>
