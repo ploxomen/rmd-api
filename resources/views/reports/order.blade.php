@@ -39,7 +39,9 @@
         }
 
         .table-cliente {
-            font-size: 10px;
+            font-size: 12px;
+            line-height: 1;
+            font-weight: 500;
         }
 
         .table-cliente th {
@@ -71,9 +73,9 @@
         .table-quotations tfoot td {
             font-size: 12px;
             line-height: 1;
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
-            padding: 12px;
+            padding: 4px 12px;
             border: 1px solid black;
         }
 
@@ -99,12 +101,16 @@
         }
 
         .table-user {
-            text-align: center;
+            font-size: 12px;
             font-weight: 400;
+            line-height: 1;
+            text-align: center;
+            width: 290px;
+            margin-left: auto;
         }
 
         .title-user {
-            font-size: 16px;
+            font-size: 14px;
         }
         /* header{
             position: fixed;
@@ -142,6 +148,11 @@
     <footer>
         <img src="{{ public_path('img/logo-footer.png') }}" alt="Logo" width="200px">
     </footer>
+    @if ($order->order_status === 0)
+        <div class="anulado">
+            <span>ANULADO</span>
+        </div>
+    @endif
     <div class="bg-primary mb"
         style="font-size: 28px; padding: 4px; text-align: center; font-weight: 700; line-height: 1">
         <span>PEDIDO - {{ $order->order_code }}</span>
@@ -301,32 +312,9 @@
         </tr>
         <tr>
             <th>DEPARTAMENTO</th>
-            <td style="width: 180px;">{{ $order->district->departament->departament_name }}</td>
-            <td style="width: 80px; border:none;"></td>
-            <td rowspan="3" style="border:none; padding-right: 0; padding-bottom: 0;">
-                <table class="table-user">
-                    <tr>
-                        <td>
-                            <span>Asesor comercial</span><br>
-                            <span
-                                class="title-user">{{ $order->user->user_name . ' ' . $order->user->user_last_name }}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>CEL: {{ $order->user->user_cell_phone }}</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @foreach ($listEmails as $key => $email)
-                                <a class="text-email">{{ $email }}</a>
-                                @if ($key + 1 < count($listEmails))
-                                    <span style="padding: 2px 0;" class="text-email"> | </span>
-                                @endif
-                            @endforeach
-                        </td>
-                    </tr>
-                </table>
-            </td>
+            <td style="width: 200px;">{{ $order->district->departament->departament_name }}</td>
+            <td style="width: 90px; border:none;"></td>
+            <td rowspan="3" style="border:none; padding-right: 0; padding-bottom: 0;"></td>
         </tr>
         <tr>
             <th>PROVINCIA</th>
@@ -339,7 +327,28 @@
             <td style="border:none;"></td>
         </tr>
     </table>
-    
+    <table class="table-user" border="1">
+        <tr>
+            <td>
+                <span>Asesor comercial</span><br>
+                <span
+                    class="title-user">{{ $order->user->user_name . ' ' . $order->user->user_last_name }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>CEL: {{ $order->user->user_cell_phone }}</td>
+        </tr>
+        <tr>
+            <td>
+                @foreach ($listEmails as $key => $email)
+                    <a class="text-email">{{ $email }}</a>
+                    @if ($key + 1 < count($listEmails))
+                        <span style="padding: 2px 0;" class="text-email"> | </span>
+                    @endif
+                @endforeach
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>
