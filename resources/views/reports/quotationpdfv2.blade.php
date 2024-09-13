@@ -21,6 +21,11 @@
         $numberProduct = 0;
         $money = $quotation->quotation_type_money == 'PEN' ? 'S/' : '$';
     @endphp
+    @if ($quotation->quotation_status === 0)
+        <div class="anulado">
+            <span>ANULADO</span>
+        </div>
+    @endif
     <table style="margin-bottom: 20px;">
         <tr>
             <td style="width: 252px; vertical-align: top;">

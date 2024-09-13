@@ -69,7 +69,7 @@ class Orders extends Model
     }
     public static function getOrders($search,$filters){
         $query = Orders::select("orders.id","order_code","order_igv","order_money","order_status","order_mount","order_mount_igv","order_total","customer_name","order_file_name")
-        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,(SELECT sub_categorie_name FROM 
+        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,DATE_FORMAT(orders.created_at,"%d/%m/%Y") AS date_created,(SELECT sub_categorie_name FROM 
         quotations
         INNER JOIN quotations_details ON quotations_details.quotation_id = quotations.id
         INNER JOIN products ON products.id = product_id 

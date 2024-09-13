@@ -65,7 +65,7 @@ class OrdersController extends Controller
         }
         $orderCode = $this->getCodeOrder();
         $order = Orders::create([
-            'order_date_issue' => date('Y-m-d'),
+            'order_date_issue' => $request->order_date_issue,
             'order_district' => $request->order_district,
             'customer_id' => $request->customer_id,
             'order_conditions_pay' => $request->order_conditions_pay,
@@ -192,12 +192,8 @@ class OrdersController extends Controller
                 'alert' => true
             ]);
         }
-        $quotation->update([
-            'order_id' => $request->id,
-            'quotation_status' => 2
-        ]);
         return response()->json([
-            'message' => 'Cotización agregada correctamente',
+            'message' => 'Cotización agregada',
             'data' => [
                 'id' => $quotation->id,
                 'quotation_total' => $quotation->quotation_total,
@@ -216,12 +212,8 @@ class OrdersController extends Controller
                 'message' => 'Acceso denegado'
             ],403);
         }
-        $quotation->update([
-            'order_id' => null,
-            'quotation_status' => 1
-        ]);
         return response()->json([
-            'message' => 'Cotización deliminada correctamente',
+            'message' => 'Cotización eliminada',
             'data' => [
                 'value' => $quotation->id,
                 'label' => $quotation->quotation_code
@@ -308,6 +300,10 @@ class OrdersController extends Controller
                 'order_file_url' => $filePath,
                 'order_file_name'=>$fileName
             ]);
+        }
+        $order->quotations()->update(['quotation_status' => 1, 'order_id' => null]);
+        foreach (json_decode($request->quotations) as $quotation) {
+            Quotation::find($quotation->id)->update(['quotation_status' => 2, 'order_id' => $order->id]);
         }
         $order->update($this->calculateMount($order->id));
         return response()->json([
