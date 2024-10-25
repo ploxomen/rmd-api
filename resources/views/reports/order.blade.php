@@ -171,7 +171,13 @@
     </table>
     <table class="table-cliente mb">
         <tr>
-            <th style="width: 100px;">
+            <th style="width: 150px;">
+                EMPRESA RETENEDORA
+            </th>
+            <td colspan="3">{{ $order->order_retaining_customer }}</td>
+        </tr>
+        <tr>
+            <th>
                 NOMBRE
             </th>
             <td style="width: 300px;">{{ $order->customer->customer_name }}</td>

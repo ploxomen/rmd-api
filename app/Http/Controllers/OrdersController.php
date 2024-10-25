@@ -80,8 +80,10 @@ class OrdersController extends Controller
             'order_contact_telephone' => $request->order_contact_telephone,
             'order_contact_name' => $request->order_contact_name,
             'order_status' => 1,
+            'order_retaining_customer' => $request->order_retaining_customer,
             'user_id' => $request->user()->id
         ]);
+        Customers::find($request->customer_id)->update(['customer_retaining' => $request->order_retaining_customer]);
         list($filePath,$fileName) = [null,null];
         if($request->has('order_os')){
             $file = $request->file("order_os");
@@ -286,7 +288,8 @@ class OrdersController extends Controller
             'order_project' => $request->order_project,
             'order_contact_email' => $request->order_contact_email,
             'order_contact_telephone' => $request->order_contact_telephone,
-            'order_contact_name' => $request->order_contact_name
+            'order_contact_name' => $request->order_contact_name,
+            'order_retaining_customer' => $request->order_retaining_customer
         ]);
         if($request->has('order_file_update')){
             if (Storage::exists($order->order_file_url)) {

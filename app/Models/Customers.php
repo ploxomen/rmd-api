@@ -15,7 +15,8 @@ class Customers extends Model
         'customer_address',
         'customer_district',
         'user_create',
-        'customer_status'
+        'customer_status',
+        'customer_retaining'
     ];
     protected $hidden = [
         'created_at',

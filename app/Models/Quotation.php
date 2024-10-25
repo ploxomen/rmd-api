@@ -30,7 +30,10 @@ class Quotation extends Model
         'quotation_quoter',
         'quotation_observations',
         'quotation_conditions',
-        'quotation_status'
+        'quotation_status',
+        'quotation_warranty_1',
+        'quotation_warranty_2',
+        'quotation_view_pdf'
     ];
     protected $hidden = [
         'created_at',
@@ -78,11 +81,13 @@ class Quotation extends Model
     }
     public static function getQuotationsReport($startDate,$finalDate) {
         return Quotation::select("quotations.id","quotation_code","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
+        ->selectRaw("DATE_FORMAT(orders.created_at, '%Y-%m-%d') AS order_create")
         ->join('users','users.id','=','quotation_quoter')
         ->join('customers','customers.id','=','quotation_customer')
         ->join('contries','contries.id','=','customer_contrie')
         ->leftJoin('districts','districts.id','=','customer_district')
         ->leftJoin('departaments','departaments.id','=','district_departament')
+        ->leftJoin('orders','order_id','=','orders.id')
         ->whereBetween('quotation_date_issue',[$startDate,$finalDate]);
     }
 }

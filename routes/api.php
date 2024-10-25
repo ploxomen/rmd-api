@@ -37,6 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('quotation-extra/products-details/{product}',[QuotationsController::class,'getProductDescription']);
     Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
+    Route::get('user/password/admin',[UserController::class,'getPasswordAdmin']);
+    Route::put('user/password/admin',[UserController::class,'changePasswordAdmin']);
+
     Route::get('quotation-extra/config',[QuotationsController::class,'getInformationConfig']);
     Route::get('quotation-extra/download/{quotation}',[QuotationsController::class,'getReportPdf']);
     Route::get('order-extra/download/{order}',[OrdersController::class,'getReportPdf']);
