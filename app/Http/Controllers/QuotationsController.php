@@ -58,7 +58,7 @@ class QuotationsController extends Controller
         }
     }
     public function getInformationConfig() {
-        $configurations = Configurations::select("description","value")->whereIn('description',['quotation_conditions','quotation_observations'])->get();
+        $configurations = Configurations::select("description","value")->whereIn('description',['quotation_conditions','quotation_observations','quotation_warranty_1','quotation_warranty_2'])->get();
         return response()->json([
             'redirect' => null,
             'error' => false, 
@@ -113,7 +113,7 @@ class QuotationsController extends Controller
         $nameCategorie = array_column($detailsQuotation, 'categorie_name');
         array_multisort($nameCategorie, SORT_ASC, $detailsQuotation);
         $configuration = Configurations::all();
-        return Pdf::loadView('reports.quotationpdfv2preview',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
+        return Pdf::loadView('reports.quotationpdfv3preview',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
     }
     public function getReportPdf(Request $request,Quotation $quotation) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
@@ -157,7 +157,7 @@ class QuotationsController extends Controller
         $nameCategorie = array_column($detailsQuotation, 'categorie_name');
         array_multisort($nameCategorie, SORT_ASC, $detailsQuotation);
         $configuration = Configurations::all();
-        return Pdf::loadView('reports.quotationpdfv2',compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
+        return Pdf::loadView('reports.' . $quotation->quotation_view_pdf ,compact('quotation','configuration','detailsQuotation'))->stream("asas.pdf");
     }
     public function getUsers() {
         return response()->json([
@@ -250,7 +250,9 @@ class QuotationsController extends Controller
             'quotation_conditions' => $request->quotation_conditions,
             'quotation_status' => 1,
             'quotation_way_to_pay' => $request->quotation_way_to_pay,
-            'quotation_warranty' => $request->quotation_warranty
+            'quotation_warranty_1' => $request->quotation_warranty_1,
+            'quotation_warranty_2' => $request->quotation_warranty_2,
+            'quotation_view_pdf' => 'quotationpdfv3'
         ]);
         $amount = 0;
         foreach ($request->products as $detail) {
@@ -315,11 +317,14 @@ class QuotationsController extends Controller
             'quotation_customer_contact' => $request->quotation_contact,
             'quotation_date_issue' => $request->quotation_date_issue,
             'quotation_type_money' => $request->quotation_type_money,
+            'quotation_project' => $request->quotation_project,
             'quotation_change_money' => $request->quotation_type_change,
             'quotation_customer_address' => $request->quotation_address,
             'quotation_observations' => $request->quotation_observations,
             'quotation_conditions' => $request->quotation_conditions,
-            'quotation_way_to_pay' => $request->quotation_way_to_pay
+            'quotation_way_to_pay' => $request->quotation_way_to_pay,
+            'quotation_warranty_1' => $request->quotation_warranty_1,
+            'quotation_warranty_2' => $request->quotation_warranty_2,
         ]);
         $details = [];
         $amount = 0;
@@ -359,7 +364,7 @@ class QuotationsController extends Controller
         ]);
     }
     public function show(Request $request) {
-        $quotation = Quotation::find($request->quotation,["quotation_customer","quotation_project","quotations.id","quotation_include_igv","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money",'quotation_warranty',"quotation_way_to_pay","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions","order_id"]);
+        $quotation = Quotation::find($request->quotation,["quotation_customer","quotation_project","quotations.id","quotation_include_igv","quotation_warranty_1","quotation_warranty_2","quotation_discount","quotation_customer_contact AS quotation_contact","quotation_date_issue","quotation_type_money",'quotation_warranty',"quotation_way_to_pay","quotation_change_money AS quotation_type_change","quotation_customer_address AS quotation_address","quotation_observations","quotation_conditions","order_id"]);
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModuleAll);
         return response()->json([
             'redirect' => $redirect,

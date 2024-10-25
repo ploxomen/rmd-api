@@ -211,7 +211,13 @@ class UserController extends Controller
             'user_address' => $request->user_address,
             'user_status' => 2
         ]);
-        $user->roles()->attach($request->role);
+        if($request->has('user_avatar')){
+            $file = $request->file('user_avatar');
+            $fileName = time() . "_" . $file->getClientOriginalName();
+            $file->move(public_path('storage/users'),$fileName);
+            $user->update(['user_avatar' => 'storage/users/'. $fileName ]);
+        }
+        $user->roles()->attach(json_decode($request->roles,true));
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
             'redirect' => $redirect,
@@ -237,6 +243,16 @@ class UserController extends Controller
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()]);
         }
         $user = User::find($request->user);
+        if($request->has('delete_img') && File::exists($user->user_avatar)){
+            File::delete($user->user_avatar);
+            $user->update(['user_avatar' => null ]);
+        }
+        if($request->has('user_avatar')){
+            $file = $request->file('user_avatar');
+            $fileName = time() . "_" . $file->getClientOriginalName();
+            $file->move(public_path('storage/users'),$fileName);
+            $user->update(['user_avatar' => 'storage/users/'. $fileName ]);
+        }
         $user->update([
             'user_type_document' => $request->user_type_document,
             'user_number_document' => $request->user_number_document,
@@ -249,13 +265,37 @@ class UserController extends Controller
             'user_gender' => $request->user_gender,
             'user_address' => $request->user_address,
         ]);
-        $user->roles()->sync($request->role);
+        $user->roles()->sync(json_decode($request->roles));
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
             'message' => 'Usuario modificado correctamente', 
             'data' => User::select($this->listColumnsUser)->find($request->user),
+        ]);
+    }
+    public function getPasswordAdmin(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'data' => Configurations::select('value')->where(['description'=>'password_admin_text'])->first()
+        ]);
+    }
+    public function changePasswordAdmin(Request $request) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if(empty($redirect)){
+            Configurations::where(['description'=>'password_admin_encrypt'])->update([
+                'value' => Hash::make($request->password)
+            ]);
+            Configurations::where(['description'=>'password_admin_text'])->update([
+                'value' => $request->password
+            ]);
+        }
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'message' => 'Usuario eliminado correctamente',
         ]);
     }
     public function getTypeDocuments() {
@@ -277,6 +317,7 @@ class UserController extends Controller
     }
     public function show(Request $request) {
         $user = User::find($request->user);
+        $user->user_avatar = $user->user_avatar ? $request->root() . '/' . $user->user_avatar : null;
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
             'redirect' => $redirect,

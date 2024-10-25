@@ -27,7 +27,7 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
     public function styles(Worksheet $sheet)
     {
         $this->rowEnd += count($this->data);
-        $rango = "B" . $this->rowInitial . ":G" . $this->rowEnd;
+        $rango = "B" . $this->rowInitial . ":H" . $this->rowEnd;
         $title = $sheet->getStyle('B2');
         $title->getFont()->setBold(true);
         $title->getFont()->setUnderline(true);

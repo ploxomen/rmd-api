@@ -93,6 +93,7 @@ class ProductsController extends Controller
                 $dataProduct['product_distributor'] = 0;
             }
             $dataProduct['product_status'] = 1;
+            $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
             return response()->json([
@@ -117,6 +118,10 @@ class ProductsController extends Controller
                 $query->where('product_status','!=',0)->where('id','!=',$product);   
                })
             ],
+            'product_code' => ['required','integer',Rule::unique('products')->where(function($query)use($product){
+                $query->where('product_status','!=',0)->where('id','!=',$product);   
+               })
+            ],
             'product_description' => 'nullable|string|max:2000',
             'product_buy' => 'nullable|decimal:0,2|min:0',
             'product_public_customer' => 'required|decimal:0,2|min:0',
@@ -131,7 +136,8 @@ class ProductsController extends Controller
             'product_public_customer' => 'precio de venta',
             'product_distributor' => 'precio del distribuidor',
             'sub_categorie' => 'subcategoría',
-            'product_img' => 'imagen del producto'
+            'product_img' => 'imagen del producto',
+            'product_code' => 'código del producto'
         ]);
         if($validator->fails()){
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);

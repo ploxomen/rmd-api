@@ -7,6 +7,7 @@
     <tr></tr>
     <tr>
         <td></td>
+        <td>CODIGO PRODUCTO</td>
         <th>NOMBRE PRODUCTO</th>
         <th>CATEGORÍA</th>
         <th>SUBCATEGORIA</th>
@@ -17,6 +18,7 @@
     @foreach ($products as $product)
         <tr>
             <td></td>
+            <td>{{ str_pad($product['product_code'],3,'0',STR_PAD_LEFT)}}</td>
             <td>{{$product['product_name']}}</td>
             <td>{{$product['category_name']}}</td>
             <td>{{$product['subcategory_name']}}</td>

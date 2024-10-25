@@ -26,7 +26,7 @@ class QuotationsExport implements FromView,ShouldAutoSize,WithStyles
     }
     public function styles(Worksheet $sheet)
     {
-        $rango = "A" . $this->rowInitial . ":L" . $this->rowInitial;
+        $rango = "A" . $this->rowInitial . ":M" . $this->rowInitial;
         // $title = $sheet->getStyle('B2');
         // $title->getFont()->setBold(true);
         // $title->getFont()->setUnderline(true);

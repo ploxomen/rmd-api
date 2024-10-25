@@ -105,7 +105,8 @@ class CustomersController extends Controller
             'customer_address' => $request->customer_address,
             'user_create' => $request->user()->id,
             'customer_district' => $request->customer_district,
-            'customer_status' => 1
+            'customer_status' => 1,
+            'customer_retaining' => $request->customer_retaining
         ]);
         $contacts = [];
         foreach ($request->contacts as $contact) {
@@ -155,6 +156,7 @@ class CustomersController extends Controller
             'customer_cell_phone' => $request->customer_cell_phone,
             'customer_address' => $request->customer_address,
             'customer_district' => $request->customer_district,
+            'customer_retaining' => $request->customer_retaining
         ]);
         $contactsCreate = [];
         foreach ($request->contacts as $contact) {
