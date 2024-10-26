@@ -310,7 +310,6 @@ class QuotationsController extends Controller
             return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()->all(),'redirect' => null]);
         }
         $quotation = Quotation::find($request->quotation);
-
         $quotation->update([
             'quotation_include_igv' => $request->quotation_include_igv,
             'quotation_customer' => $request->quotation_customer,

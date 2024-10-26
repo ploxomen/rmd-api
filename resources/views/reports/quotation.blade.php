@@ -1,8 +1,9 @@
 <table>
     <tr>
-        <th>N° COTIZACIÓN</th>
-        <th>FECHA</th>
+        <th>CÓDIGO COTIZACIÓN</th>
+        <th>FECHA COTIZACIÓN</th>
         <th>FECHA PEDIDO</th>
+        <th>CÓDIGO PEDIDO</th>
         <th>VENDEDOR</th>
         <th>RAZON SOCIAL</th>
         <th>PAIS</th>
@@ -35,6 +36,7 @@
             <td>{{$quotation->quotation_code}}</td>
             <td>{{$quotation->quotation_date_issue}}</td>
             <td>{{$quotation->order_create}}</td>
+            <td>{{$quotation->order_code}}</td>
             <td>{{$quotation->user_name . ' ' . $quotation->user_last_name}}</td>
             <td>{{$quotation->customer_name}}</td>
             <td>{{$quotation->contrie}}</td>
@@ -49,7 +51,7 @@
                 @if ($key !== 0)
                     </tr>
                     <tr>
-                    @for ($i = 0; $i < 8; $i++)
+                    @for ($i = 0; $i < 9; $i++)
                         <td></td>
                     @endfor
                 @endif
