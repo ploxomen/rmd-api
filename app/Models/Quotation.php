@@ -79,8 +79,8 @@ class Quotation extends Model
         ->leftJoin('contacts','quotation_customer_contact','=','contacts.id')
         ->where(['quotation_status' => 1, 'quotation_type_money' => $typeMoney,'quotation_include_igv' => $includeIgv, 'quotation_customer' => $customer])->whereNull('order_id')->get();
     }
-    public static function getQuotationsReport($startDate,$finalDate) {
-        return Quotation::select("quotations.id","quotation_code","order_code","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
+    public static function getQuotationsReport($startDate,$finalDate,$order = '0') {
+        $quotationsQuery = Quotation::select("quotations.id","quotation_code","order_code","quotation_date_issue","customer_name","user_name","user_last_name","contrie","departament_name","quotation_status","quotation_type_money","quotation_change_money")
         ->selectRaw("DATE_FORMAT(orders.created_at, '%Y-%m-%d') AS order_create")
         ->join('users','users.id','=','quotation_quoter')
         ->join('customers','customers.id','=','quotation_customer')
@@ -89,5 +89,11 @@ class Quotation extends Model
         ->leftJoin('departaments','departaments.id','=','district_departament')
         ->leftJoin('orders','order_id','=','orders.id')
         ->whereBetween('quotation_date_issue',[$startDate,$finalDate]);
+        if($order === '1') {
+            return $quotationsQuery->whereNotNull('order_id');
+        }else if($order === '2'){
+            return $quotationsQuery->whereNull('order_id');
+        }
+        return $quotationsQuery;
     }
 }

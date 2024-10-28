@@ -41,12 +41,12 @@ class QuotationsController extends Controller
         }
         switch ($request->typeInformation) {
             case 'excel':
-                return Excel::download(new QuotationsExport(Quotation::getQuotationsReport($request->startDate,$request->finalDate)->get(),'reports.quotation'),'cotizizaciones.xlsx');
+                return Excel::download(new QuotationsExport(Quotation::getQuotationsReport($request->startDate,$request->finalDate,$request->order)->get(),'reports.quotation'),'cotizizaciones.xlsx');
             break;
             default:
                 $show = $request->show;
                 $skip = ($request->page - 1) * $show;
-                $quotations = Quotation::getQuotationsReport($request->startDate,$request->finalDate);
+                $quotations = Quotation::getQuotationsReport($request->startDate,$request->finalDate,$request->order);
                 return response()->json([
                     'redirect' => null,
                     'error' => false,
