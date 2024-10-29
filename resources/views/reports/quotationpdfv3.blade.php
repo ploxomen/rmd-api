@@ -180,28 +180,6 @@
     <table class="table-extra">
         <thead>
             <tr>
-                <th style="width: 100%" colspan="2" class="title-extra color-primary-title">GARANTÍA</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="parragraph-conditions" style="width: 50%;">
-                    {!! $quotation->quotation_warranty_1 !!}
-                </td>
-                <td class="parragraph-conditions" style="width: 50%;">
-                    {!! $quotation->quotation_warranty_2 !!}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="font-size: 12px; font-weight: bold;">
-                    * Cualquier condición accesoria o complementaria que aplique a la garantía será especificada de manera expresa en la correspondiente carta de garantía emitida para cada caso particular.
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table-extra">
-        <thead>
-            <tr>
                 <th class="title-extra color-primary-title">FORMA DE PAGO</th>
             </tr>
         </thead>
@@ -222,6 +200,23 @@
             <tr>
                 <td colspan="2" class="parragraph-conditions">
                     {!! $quotation->quotation_conditions !!}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table-extra">
+        <thead>
+            <tr>
+                <th style="width: 100%" colspan="2" class="title-extra color-primary-title">GARANTÍA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="parragraph-conditions" style="width: 50%;">
+                    {!! $quotation->quotation_warranty_1 !!}
+                </td>
+                <td class="parragraph-conditions" style="width: 50%;">
+                    {!! $quotation->quotation_warranty_2 !!}
                 </td>
             </tr>
         </tbody>
