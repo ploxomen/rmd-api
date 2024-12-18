@@ -13,4 +13,8 @@ class Modules extends Model
     {
         return $this->belongsToMany(Roles::class,'roles_modules','module','role')->withTimestamps();
     }
+    public function moduleGroup()
+    {
+        return $this->belongsTo(ModuleGroup::class,'id_module_group');
+    }
 }

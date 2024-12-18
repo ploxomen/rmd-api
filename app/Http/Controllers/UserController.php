@@ -133,16 +133,44 @@ class UserController extends Controller
     }
     public function userModules(Request $request) {
         $user = $request->user();
+        // $user = User::find('1');
         if(!$user->roles()->where('users_roles.active',1)->count()){
             $role = $user->roles()->first();
             $user->roles()->where('role','=',$role->id)->update(['active' => 1]);
         }else{
             $role = $user->roles()->where('active',1)->first();
         }
+        $modulesDb =  Roles::find($role->id)->modules()->with('moduleGroup:id,module_group_title,module_group_icon')->where('module_status',1)->orderBy("module_order")->get();
+        $modulesReturn = [];
+        foreach ($modulesDb as $moduleDb) {
+            $arrayModule = [
+                'id_module_group' => null,
+                'module_title' => $moduleDb->module_title,
+                'module_icon' => $moduleDb->module_icon,
+                'module_url' => $moduleDb->module_url,
+            ];
+            if($moduleDb->moduleGroup){
+                $findGroup = array_filter($modulesReturn,function ($module) use ($moduleDb) {
+                     return $module['id_module_group'] === $moduleDb->moduleGroup->id;
+                });
+                if(empty($findGroup)){
+                    $modulesReturn[] = [
+                        'id_module_group' => $moduleDb->moduleGroup->id,
+                        'module_group_title' => $moduleDb->moduleGroup->module_group_title,
+                        'module_group_icon' => $moduleDb->moduleGroup->module_group_icon,
+                        'module_list' => [$arrayModule]
+                    ];
+                    continue;
+                }
+                $modulesReturn[key($findGroup)]['module_list'][] = $arrayModule;
+                continue;
+            }
+            $modulesReturn[] = $arrayModule;
+        }
         return response()->json([
             'error' => false,
             'redirect' => (new AuthController)->userRestrict($user,$request->url),
-            'modules' => Roles::find($role->id)->modules()->where('module_status',1)->orderBy("module_order")->get(),
+            'modules' => $modulesReturn,
             'roles' => $user->roles()->get(),
             'user' => User::find($request->user()->id,["user_name","user_last_name","user_avatar"])
         ]);
