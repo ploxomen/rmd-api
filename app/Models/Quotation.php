@@ -47,7 +47,12 @@ class Quotation extends Model
     }
     public static function getQuotations($search,$filters = []) {
         $query = Quotation::select("quotations.id","quotation_code","quotation_total","quotation_type_money","quotation_status","customer_name")
-        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter,(SELECT sub_categorie_name FROM quotations_details INNER JOIN products ON products.id = product_id INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie WHERE quotation_id = quotations.id ORDER BY detail_total DESC LIMIT 1) AS sub_categorie_name")
+        ->selectRaw("DATE_FORMAT(quotation_date_issue,'%d/%m/%Y') AS date_issue,CONCAT(user_name,' ',user_last_name) AS name_quoter,(
+        SELECT sub_categorie_name FROM (SELECT sub_categorie_name,SUM(detail_total) AS detail_quotation FROM quotations_details 
+        INNER JOIN products ON products.id = product_id 
+        INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie 
+        WHERE quotation_id = quotations.id GROUP BY sub_categories.id
+        ) AS table_temp ORDER BY detail_quotation DESC LIMIT 1 ) AS sub_categorie_name")
         ->join('customers','quotation_customer','=','customers.id')
         ->join('users','quotation_quoter','=','users.id')
         ->where(function($query)use($search){

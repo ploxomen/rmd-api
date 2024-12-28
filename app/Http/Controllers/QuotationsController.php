@@ -58,7 +58,7 @@ class QuotationsController extends Controller
         }
     }
     public function getInformationConfig() {
-        $configurations = Configurations::select("description","value")->whereIn('description',['quotation_conditions','quotation_observations','quotation_warranty_1','quotation_warranty_2'])->get();
+        $configurations = Configurations::select("description","value")->whereIn('description',['quotation_conditions','quotation_observations','quotation_warranty_1','quotation_warranty_2','quotation_method_payment'])->get();
         return response()->json([
             'redirect' => null,
             'error' => false, 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
+use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UserController;
 use App\Models\Products;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);
-Route::get('modules-roles',[UserController::class,'userModules']);
+Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
 
 Route::get('/ordenes/{order}', [OrdersController::class,'getReportPdf']);

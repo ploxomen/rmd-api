@@ -7,6 +7,7 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
@@ -25,8 +26,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::apiResource('role',RolesController::class);
     Route::apiResource('order',OrdersController::class);
+    Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
+    Route::get('product-store',[StoresController::class,'getStoresAndSubStoresSelect']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
     Route::get('type-documents',[UserController::class,'getTypeDocuments']);
     Route::get('my-info',[UserController::class,'getInfoUser']);
