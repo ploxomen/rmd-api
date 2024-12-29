@@ -199,7 +199,7 @@ class QuotationsController extends Controller
             'redirect' => null,
             'error' => false,
             'message' => 'Clientes obtenidos correctamente',
-            'data' => Products::select('id AS value','product_name AS label','product_public_customer','product_distributor','product_service')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->orderBy('product_name','asc')->get()
+            'data' => Products::select('id AS value','product_name AS label','product_public_customer','product_distributor','product_service','product_unit_measurement')->where(['product_status'=> 1])->where('product_name','like','%'.$search.'%')->orderBy('product_name','asc')->get()
         ]);
     }
     public function getCodeQuotation() {

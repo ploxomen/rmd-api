@@ -6,6 +6,7 @@ use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
+use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UserController;
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('order',OrdersController::class);
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
+    Route::apiResource('raw-material',RawMaterialController::class);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
     Route::get('product-store',[StoresController::class,'getStoresAndSubStoresSelect']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
@@ -38,6 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
+    Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
+    Route::get('/raw-material/product-add/{product}',[RawMaterialController::class,'addProduct']);
+
     Route::get('quotation-extra/products-details/{product}',[QuotationsController::class,'getProductDescription']);
     Route::get('quotation-extra/report',[QuotationsController::class,'getDataExport']);
     Route::get('user/password/admin',[UserController::class,'getPasswordAdmin']);
