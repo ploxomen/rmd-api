@@ -196,7 +196,9 @@
         </thead>
         <tbody>
             <tr>
-                <td class="parragraph-conditions" style="font-size: 11px;">{{$quotation['quotation_way_to_pay']}}</td>
+                <td class="parragraph-conditions">
+                    {!! $quotation['quotation_way_to_pay'] !!}
+                </td>
             </tr>
         </tbody>
     </table>

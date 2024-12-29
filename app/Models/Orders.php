@@ -70,12 +70,12 @@ class Orders extends Model
     }
     public static function getOrders($search,$filters){
         $query = Orders::select("orders.id","order_code","order_igv","order_money","order_status","order_mount","order_mount_igv","order_total","customer_name","order_file_name")
-        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,DATE_FORMAT(orders.created_at,"%d/%m/%Y") AS date_created,(SELECT sub_categorie_name FROM 
+        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,DATE_FORMAT(orders.created_at,"%d/%m/%Y") AS date_created,(SELECT sub_categorie_name FROM (SELECT sub_categorie_name,SUM(detail_total) AS detail_quotation FROM 
         quotations
         INNER JOIN quotations_details ON quotations_details.quotation_id = quotations.id
         INNER JOIN products ON products.id = product_id 
         INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie 
-        WHERE quotations.order_id = orders.id ORDER BY detail_total DESC LIMIT 1) AS sub_categorie_name')
+        WHERE quotations.order_id = orders.id GROUP BY sub_categories.id) AS table_temp ORDER BY detail_quotation DESC LIMIT 1) AS sub_categorie_name, CONCAT(user_name, " ", user_last_name) AS responsable_usuario')
         ->join('customers','customers.id','=','customer_id')
         ->leftJoin('users','users.id','=','user_id')
         ->where(function($query)use($search){

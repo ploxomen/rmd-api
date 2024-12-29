@@ -38,10 +38,17 @@ class ProductsController extends Controller
         return Excel::download(new ProductsExport($products,'reports.productsv2'),'products.xlsx');
     }
     public function categorie() {
+        $categories = Categories::where(['categorie_status' => 1])->orderBy('categorie_name')->get()->map(function ($categorie) {
+            return [
+                'label' => $categorie->categorie_name,
+                'options' => $categorie->subcategories()->select('id AS value','sub_categorie_name AS label')
+                ->where('sub_categorie_status',1)->orderBy('sub_categorie_name')->get()->toArray() 
+            ];
+        })->toArray();
         return response()->json([
             'error' => false,
             'message' => 'Categorias obtenidas correctamente',
-            'data' => Categories::select('id','categorie_name')->where('categorie_status',1)->orderBy('categorie_name')->get()
+            'data' => $categories
         ]);
     }
     public function subcategorie($categorie) {
@@ -189,7 +196,6 @@ class ProductsController extends Controller
                 'url' => $request->root(),
                 'product' => $product,
                 'categorieId' => $productCategorie,
-                'subcategories' => SubCategories::select('id','sub_categorie_name')->where(['sub_categorie_status' => 1, 'categorie_id' => $productCategorie])->get()
             ]
         ]);
     }
