@@ -1,5 +1,24 @@
 {
     "inter tight": {
+<<<<<<< HEAD
+        "100_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_100_italic_e5953718e72d3f19ccbe4ef6c2be2340",
+        "200_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_200_italic_9b8f636aaef408cb743aba6a4a03ffc1",
+        "300_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_300_italic_ba760388d1a5b1c28953cad1ec4ab269",
+        "italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_italic_f572b3a596b2e5bfeb3f17af7327b0a2",
+        "500_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_500_italic_d9ffe8819c386561f2b76944accac56e",
+        "600_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_600_italic_7a87053351630fc6df3664f904d2c806",
+        "bold_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_bold_italic_0e399670652128d27349a003729344d2",
+        "800_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_800_italic_b6d4d760620eba7bbfcb8f3ee37c80cc",
+        "900_italic": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_900_italic_5cb3061b3921434aba00cb5180733ad9",
+        "100": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_100_ddca2a56a85b7c1ccfa970dd11db71f1",
+        "200": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_200_3219928775f8a1219f331ef3283e9220",
+        "300": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_300_945d29889faadeba122bb50c1673ad8f",
+        "normal": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_normal_c1453fb3a7f50b374702ace75dfdf422",
+        "500": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_500_54cc6466aee84c5afb8bacb99d7350c5",
+        "600": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_600_a435ba11d6c5e5711c9651ec34a9f012",
+        "bold": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_bold_0733262b54b5beda1ebf84e306b65063",
+        "800": "\/var\/www\/html\/rmd-api\/storage\/fonts\/inter_tight_800_38de91030d29ee8584872c97fc655aae",
+=======
         "100_italic": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_100_italic_e5953718e72d3f19ccbe4ef6c2be2340",
         "200_italic": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_200_italic_9b8f636aaef408cb743aba6a4a03ffc1",
         "300_italic": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_300_italic_ba760388d1a5b1c28953cad1ec4ab269",
@@ -17,6 +36,7 @@
         "600": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_600_a435ba11d6c5e5711c9651ec34a9f012",
         "bold": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_bold_0733262b54b5beda1ebf84e306b65063",
         "800": "C:\\laragon\\www\\rmd-api\\storage\\fonts\/inter_tight_800_38de91030d29ee8584872c97fc655aae",
+>>>>>>> b5ec0537987cda706c91bd988a6ea30e49e71fcc
         "900": "inter_tight_900_9949fe7e814013db31a8c750f5d1c276"
     }
 }
