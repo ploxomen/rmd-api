@@ -25,6 +25,68 @@ class RawMaterialController extends Controller
             'data' => $rawMaterials->skip($skip)->take($show)->get()
         ]);
     }
+    public function updateHistory(Request $request, RawMaterialHistory $historyMaterial) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $historyMaterial->update([
+            'material_hist_bill' => $request->material_hist_bill,
+            'material_hist_guide' => $request->material_hist_guide,
+            'material_hist_amount' => $request->material_hist_amount,
+            'material_hist_price_buy' => $request->material_hist_price_buy,
+            'material_hist_igv' => $request->material_hist_igv,
+            'material_hist_money' => $request->material_hist_money,
+            'material_hist_total_buy' => $request->material_hist_total_buy,
+            'material_user' => $request->user()->id
+        ]);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false, 
+            'message' => 'Registro actualzado correctamente', 
+        ]);
+    }
+    public function oneHistory(Request $request, $historyMaterial) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'message' => 'El registro se eliminó correctamente',
+            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy"])
+        ]);
+    }
+    public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $historyMaterial->delete();
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'message' => 'El registro se eliminó correctamente',
+        ]);
+    }
+    public function listHistory(Request $request, $historyMaterial) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $show = $request->show;
+        $search = $request->has('search') ? $request->search : '';
+        $skip = ($request->page - 1) * $request->show;
+        $rawMaterials = RawMaterialHistory::getHistory($historyMaterial,$search);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false, 
+            'message' => 'Datos obtenidos correctamente',
+            'total' => $rawMaterials->count(),
+            'data' => $rawMaterials->skip($skip)->take($show)->get()
+        ]);
+    }
+    public function historyRawMaterial(Request $request, RawMaterial $material) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'data' => [
+                'nameMaterial' => $material->product->product_name,
+                'idMaterial' => $material->id,
+                'measurementProduct' => $material->product->product_unit_measurement
+            ]
+        ]);
+    }
     public function addProduct(Request $request, $product) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
@@ -73,10 +135,11 @@ class RawMaterialController extends Controller
             'material_hist_price_buy' => $request->material_hist_price_buy,
             'material_hist_igv' => $request->material_hist_igv,
             'material_hist_money' => $request->material_hist_money,
-            'material_hist_total_buy' => $request->material_hist_total_buy
+            'material_hist_total_buy' => $request->material_hist_total_buy,
+            'material_user' => $request->user()->id
         ]);
         $rawMaterial->update([
-            'raw_material_stock' => $this->stockTotal($rawMaterial->id)
+            'raw_material_stock' => $this->stockTotal($rawMaterial->id),
         ]);
         return response()->json([
             'redirect' => $redirect,

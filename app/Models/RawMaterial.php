@@ -23,10 +23,14 @@ class RawMaterial extends Model
             ->orWhere('raw_material_price_buy','like','%'.$search.'%')
             ->orWhere('raw_material_price_buy','like','%'.$search.'%')
             ->orWhere('product_name','like','%'.$search.'%');
-        });
+        })->groupBy('product_id');
         if(!is_null($subStore)){
             $rawMaterial = $rawMaterial->where('product_substore',$subStore);
         }
         return $rawMaterial;
+    }
+    public function product()
+    {
+        return $this->belongsTo(Products::class,'product_id');
     }
 }

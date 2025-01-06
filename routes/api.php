@@ -41,6 +41,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
+    Route::get('/raw-material/history/{material}',[RawMaterialController::class,'historyRawMaterial']);
+    Route::get('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'listHistory']);
+    Route::get('/raw-material/history-one/{historyMaterial}',[RawMaterialController::class,'oneHistory']);
+    Route::put('/raw-material/history-one/{historyMaterial}',[RawMaterialController::class,'updateHistory']);
+
+    Route::delete('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'deleteHistory']);
+
     Route::get('/raw-material/product-add/{product}',[RawMaterialController::class,'addProduct']);
 
     Route::get('quotation-extra/products-details/{product}',[QuotationsController::class,'getProductDescription']);
