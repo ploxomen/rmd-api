@@ -17,7 +17,8 @@ class Products extends Model
         'sub_categorie',
         'product_img',
         'product_status',
-        'product_substore',
+        'product_store',
+        'product_label',
         'product_unit_measurement',
         'product_code'
     ];
@@ -29,11 +30,9 @@ class Products extends Model
         return $product->product_code + 1;
     }
     public static function getProducts($search){
-        return Products::select("products.id","product_code","product_buy","store_sub_name","store_name","product_public_customer","product_distributor","sub_categorie_name","categorie_name","product_name")
+        return Products::select("products.id","product_code","product_buy","product_label","product_store","product_public_customer","product_distributor","sub_categorie_name","categorie_name","product_name")
         ->join('sub_categories','products.sub_categorie','=','sub_categories.id')
         ->join('categories','sub_categories.categorie_id','=','categories.id')
-        ->leftJoin('stores_sub','product_substore','=','stores_sub.id')
-        ->leftJoin('stores','store_id','=','stores.id')
         ->where('product_status','>',0)->where(function($query)use($search){
             $query->where('product_name','like','%'.$search.'%')
             ->orWhere('product_description','like','%'.$search.'%')
