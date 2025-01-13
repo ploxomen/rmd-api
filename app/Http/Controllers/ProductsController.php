@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ProductsExport;
 use App\Models\Categories;
 use App\Models\Products;
+use App\Models\RawMaterial;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -85,7 +86,6 @@ class ProductsController extends Controller
         }
         try {
             $dataProduct = $request->except('product_service');
-            
             if($request->has('product_img')){
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
@@ -102,6 +102,15 @@ class ProductsController extends Controller
             $dataProduct['product_status'] = 1;
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
+            if($request->product_store === 'MATERIA PRIMA'){
+                RawMaterial::create([
+                    'product_id' => $product->id,
+                    'raw_material_stock' => 0,
+                    'raw_material_price_buy' => 0,
+                    'raw_material_status' => 1,
+                    'raw_material_money' => 'PEN'
+                ]);
+            }
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
             return response()->json([
                 'redirect' => $redirect,
@@ -168,7 +177,22 @@ class ProductsController extends Controller
                 $file->move(public_path('storage/products'),$fileName);
                 $dataProduct['product_img'] = 'storage/products/'.$fileName;
             }
+            $dataProduct['product_label'] = $request->product_store !== 'MATERIA PRIMA' ? null : $request->product_label;
+            if($product->product_store === 'MATERIA PRIMA' && $request->product_store !== 'MATERIA PRIMA'){
+                RawMaterial::where('product_id',$product->id)->update(['raw_material_status' => 0]);
+            }
             $product->update($dataProduct);
+            if($request->product_store === 'MATERIA PRIMA'){
+                RawMaterial::firstOrCreate(
+                    ['product_id' => $product->id, 'raw_material_status' => 1],
+                    [
+                    'product_id' => $product->id,
+                    'raw_material_stock' => 0,
+                    'raw_material_price_buy' => 0,
+                    'raw_material_status' => 1,
+                    'raw_material_money' => 'PEN'
+                ]);
+            }
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
             return response()->json([
                 'redirect' => $redirect,
@@ -207,7 +231,16 @@ class ProductsController extends Controller
                 'error' => false, 
             ],403);
         }
-        Products::find($product)->update(['product_status' => 0]);
+        $productModel =  Products::find($product);
+        $rawMaterial = RawMaterial::where(['product_id' => $product, 'raw_material_status' => 1]);
+        if(!empty($rawMaterial->first())){
+            return response()->json([
+                'error' => true, 
+                'message'=>'Este producto contiene información en el módulo de Materia Prima, por favor elimine los datos relacionados a este producto en Materia Prima',
+                'redirect' => null
+            ]);
+        }
+        $productModel->update(['product_status' => 0]);
         return response()->json([
             'redirect' => null,
             'error' => false,

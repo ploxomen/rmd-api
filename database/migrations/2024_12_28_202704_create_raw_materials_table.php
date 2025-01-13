@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('raw_materials', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->unsigned()->unique();
+            $table->bigInteger('product_id')->unsigned();
             $table->integer('raw_material_stock');
             $table->text('raw_material_money');
             $table->decimal('raw_material_price_buy');

@@ -21,7 +21,7 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false, 
             'message' => 'Datos obtenidos correctamente',
-            'total' => $rawMaterials->count(),
+            'total' => $rawMaterials->get()->count(),
             'data' => $rawMaterials->skip($skip)->take($show)->get()
         ]);
     }
@@ -71,7 +71,7 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false, 
             'message' => 'Datos obtenidos correctamente',
-            'total' => $rawMaterials->count(),
+            'total' => $rawMaterials->get()->count(),
             'data' => $rawMaterials->skip($skip)->take($show)->get()
         ]);
     }
@@ -123,7 +123,7 @@ class RawMaterialController extends Controller
             ]);
         }
         $rawMaterial = RawMaterial::updateOrCreate(
-            ['product_id' => $request->product_id],
+            ['product_id' => $request->product_id,'raw_material_status' => 1],
             ['raw_material_price_buy' => $request->material_hist_total_buy,'raw_material_money' => $request->material_hist_money]
         );
         RawMaterialHistory::create([
