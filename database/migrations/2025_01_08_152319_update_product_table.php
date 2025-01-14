@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::table('products',function(Blueprint $table){
             $table->dropForeign(['product_substore']);
             $table->dropColumn('product_substore');
+            
             $table->string('product_store')->nullable()->after('product_code');
             $table->string('product_label')->nullable()->after('product_code');
         });
