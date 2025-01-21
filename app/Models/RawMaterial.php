@@ -14,7 +14,7 @@ class RawMaterial extends Model
         return $this->hasMany(RawMaterialHistory::class,'raw_material_id');
     }
     public static function getRawMasterials($subStore,$search) {
-        $rawMaterial = RawMaterial::select('product_id','product_name','raw_materials.id','raw_material_stock','raw_material_price_buy','product_label','product_store','raw_material_money')
+        $rawMaterial = RawMaterial::select('product_id','product_code','product_name','raw_materials.id','raw_material_stock','raw_material_price_buy','product_label','product_store','raw_material_money')
         ->join('products','product_id','=','products.id')
         ->where('raw_material_status',1)
         ->where(function($query)use($search){
