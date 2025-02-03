@@ -146,7 +146,7 @@ class OrdersController extends Controller
         $filters = [];
         $columns = [
             'customer' => 'customer_id',
-            'status' => 'order_status'
+            'status' => 'order_status',
         ];
         foreach ($request->all() as $key => $filter) {
             if(in_array($key,['status','customer']) && !is_null($filter)){
@@ -157,11 +157,14 @@ class OrdersController extends Controller
                 ];
             }
         }
-        $orders = Orders::getOrders($search,$filters);
+        $orders = Orders::getOrders($search,$filters)->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
         return response()->json([
             'redirect' => null,
             'error' => false,
             'message' => 'Pedidos obtenidos correctamente',
+            'igv' => $orders->sum('order_mount_igv'),
+            'amount' => $orders->sum('order_mount'),
+            'total' => $orders->sum('order_total'),
             'totalOrders' => $orders->count(),
             'data' => $orders->skip($skip)->take($show)->orderBy("id","desc")->get()
         ]);
