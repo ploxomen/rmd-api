@@ -1,10 +1,12 @@
 <?php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\RolesController;
@@ -26,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::apiResource('role',RolesController::class);
+    Route::get('money/change',[ChangeMoneyController::class,'index']);
+    Route::post('money/change',[ChangeMoneyController::class,'store']);
     Route::apiResource('order',OrdersController::class);
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
@@ -76,9 +80,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('product-subcategorie/{categorie}',[ProductsController::class,'subcategorie']);
     Route::put('users-reset/{user}',[AuthController::class,'resetPassword']);
     Route::apiResource('customer',CustomersController::class);
+    Route::apiResource('provider',ProviderController::class);
     Route::apiResource('categorie',CategoriesController::class);
     Route::delete('categorie-subcategorie/{subcategorie}',[CategoriesController::class,'deleteSubcategorie']);
     Route::delete('customer-contact/{contact}',[CustomersController::class,'deleteContact']);
+    Route::delete('provider-contact/{contact}',[ProviderController::class,'deleteContact']);
     Route::get('departaments',[UserController::class,'getDepartamentsUbigeo']);
     Route::get('provinces/{departament}',[UserController::class,'getProvincesUbigeo']);
     Route::get('districts/{province}',[UserController::class,'getDistrictsUbigeo']);

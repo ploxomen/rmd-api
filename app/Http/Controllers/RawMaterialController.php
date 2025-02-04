@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChangeMoney;
 use App\Models\Products;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
@@ -27,16 +28,21 @@ class RawMaterialController extends Controller
     }
     public function updateHistory(Request $request, RawMaterialHistory $historyMaterial) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $total = $request->material_hist_amount * ($request->material_hist_igv ? 1.18 : 1) * $request->material_hist_price_buy;
         $historyMaterial->update([
             'material_hist_bill' => $request->material_hist_bill,
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,
             'material_hist_price_buy' => $request->material_hist_price_buy,
-            'material_hist_igv' => $request->material_hist_igv,
+            'material_hist_igv' => $request->material_hist_igv ? $request->material_hist_amount * $request->material_hist_price_buy * 0.18 : 0,
             'material_hist_money' => $request->material_hist_money,
-            'material_hist_total_buy' => $request->material_hist_total_buy,
+            'material_hist_total_buy_pen' => $request->material_hist_money === 'PEN' ? $total : $total * $historyMaterial->material_hist_total_type_change,
+            'material_hist_total_buy_usd' => $request->material_hist_money === 'PEN' ? $total / $historyMaterial->material_hist_total_type_change : $total,
+            'material_hist_total_include_type_change' => $request->material_hist_total_include_type_change,
             'material_user' => $request->user()->id
         ]);
+        $raw_material = RawMaterial::find($historyMaterial->raw_material_id);
+        $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -49,12 +55,14 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'El registro se eliminó correctamente',
-            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy"])
+            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_include_type_change","material_hist_total_type_change"])
         ]);
     }
     public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $historyMaterial->delete();
+        $raw_material = RawMaterial::find($historyMaterial->raw_material_id);
+        $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -106,7 +114,7 @@ class RawMaterialController extends Controller
     public function destroy(Request $request, RawMaterial $raw_material) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $raw_material->history()->delete();
-        $raw_material->delete();
+        $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -122,10 +130,19 @@ class RawMaterialController extends Controller
                 'message' => 'El producto no puede ser añadido debido a que ya se encuentra registrado con el mismo numero de factura', 
             ]);
         }
+        $money = ChangeMoney::select('change_soles')->where('change_day',date('Y-m-d'))->first();
+        if(empty($money)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => true, 
+                'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'), 
+            ]);
+        }
         $rawMaterial = RawMaterial::updateOrCreate(
             ['product_id' => $request->product_id,'raw_material_status' => 1],
-            ['raw_material_price_buy' => $request->material_hist_total_buy,'raw_material_money' => $request->material_hist_money]
+            ['raw_material_money' => 'PEN']
         );
+        $total = $request->material_hist_amount * ($request->material_hist_igv ? 1.18 : 1) * $request->material_hist_price_buy;
         RawMaterialHistory::create([
             'raw_material_id' => $rawMaterial->id,
             'product_id' => $request->product_id,
@@ -133,14 +150,15 @@ class RawMaterialController extends Controller
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,
             'material_hist_price_buy' => $request->material_hist_price_buy,
-            'material_hist_igv' => $request->material_hist_igv,
+            'material_hist_igv' => $request->material_hist_igv ? $request->material_hist_amount * $request->material_hist_price_buy * 0.18 : 0,
             'material_hist_money' => $request->material_hist_money,
-            'material_hist_total_buy' => $request->material_hist_total_buy,
+            'material_hist_total_buy_pen' => $request->material_hist_money === 'PEN' ? $total : $total * $money->change_soles,
+            'material_hist_total_buy_usd' => $request->material_hist_money === 'PEN' ? $total / $money->change_soles : $total,
+            'material_hist_total_type_change' => $money->change_soles,
+            'material_hist_total_include_type_change' => $request->material_hist_total_include_type_change,
             'material_user' => $request->user()->id
         ]);
-        $rawMaterial->update([
-            'raw_material_stock' => $this->stockTotal($rawMaterial->id),
-        ]);
+        $this->calculateRawMaterial($rawMaterial);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -151,7 +169,14 @@ class RawMaterialController extends Controller
         $materialDuplicate = RawMaterialHistory::where(['product_id' => $idProduct, 'material_hist_bill' => $numberBill])->first();
         return !empty($materialDuplicate);
     }
+    public function calculateRawMaterial($rawMaterial) {
+        $rawMaterial->update([
+            'raw_material_stock' => $this->stockTotal($rawMaterial->id)['stock'],
+            'raw_material_price_buy' => $this->stockTotal($rawMaterial->id)['total'],
+        ]);
+    }
     public function stockTotal($idRawMaterial) {
-        return RawMaterialHistory::where('raw_material_id',$idRawMaterial)->sum('material_hist_amount');
+        $history = RawMaterialHistory::where('raw_material_id',$idRawMaterial);
+        return [ 'stock' => $history->sum('material_hist_amount'),'total' => $history->sum('material_hist_total_buy_pen')];
     }
 }
