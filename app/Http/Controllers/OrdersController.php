@@ -165,7 +165,7 @@ class OrdersController extends Controller
             'igv' => $orders->sum('order_mount_igv'),
             'amount' => $orders->sum('order_mount'),
             'total' => $orders->sum('order_total'),
-            'totalOrders' => $orders->count(),
+            'totalOrders' =>Orders::getOrdersCount($search,$filters)->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin])->count(),
             'data' => $orders->skip($skip)->take($show)->orderBy("id","desc")->get()
         ]);
     }

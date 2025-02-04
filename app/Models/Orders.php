@@ -71,21 +71,26 @@ class Orders extends Model
     }
     public static function getOrders($search,$filters){
         $query = Orders::select("orders.id","order_code","order_igv","order_money","order_status","order_mount","order_mount_igv","order_total","customer_name","order_file_name")
-        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,DATE_FORMAT(orders.created_at,"%d/%m/%Y") AS date_created,sub_categorie_name, CONCAT(user_name, " ", user_last_name) AS responsable_usuario')
-        ->leftJoin(DB::raw("(SELECT sub_categorie_name,id FROM (SELECT sub_categorie_name,SUM(detail_total) AS detail_quotation,orders.id FROM 
-        quotations
-        INNER JOIN orders ON orders.id = quotations.order_id
-        INNER JOIN quotations_details ON quotations_details.quotation_id = quotations.id
-        INNER JOIN products ON products.id = product_id 
-        INNER JOIN sub_categories ON sub_categories.id = products.sub_categorie 
-        WHERE quotations.order_id = orders.id GROUP BY sub_categories.id) AS table_temp ORDER BY detail_quotation DESC LIMIT 1) AS subquery"),'subquery.id', '=' , 'orders.id' )
+        ->selectRaw('DATE_FORMAT(order_date_issue,"%d/%m/%Y") AS date_issue,DATE_FORMAT(orders.created_at,"%d/%m/%Y") AS date_created,fn_name_subcategory_order(orders.id) AS sub_categorie_name, CONCAT(user_name, " ", user_last_name) AS responsable_usuario')
         ->join('customers','customers.id','=','customer_id')
         ->leftJoin('users','users.id','=','user_id')
         ->where(function($query)use($search){
             $query->where('customer_name','LIKE','%'.$search.'%')
             ->orWhere("order_code",'LIKE','%'.$search.'%')
-            ->orWhere("sub_categorie_name",'LIKE','%'.$search.'%')
-            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%')",[$search]);
+            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR fn_name_subcategory_order(orders.id) LIKE CONCAT('%',?,'%')",[$search,$search]);
+        });
+        foreach ($filters as $filter) {
+            $query = $query->where($filter['column'],$filter['sign'],$filter['value']);
+        }
+        return $query;
+    }
+    public static function getOrdersCount($search,$filters){
+        $query = Orders::join('customers','customers.id','=','customer_id')
+        ->leftJoin('users','users.id','=','user_id')
+        ->where(function($query)use($search){
+            $query->where('customer_name','LIKE','%'.$search.'%')
+            ->orWhere("order_code",'LIKE','%'.$search.'%')
+            ->orWhereRaw("CONCAT(user_name,' ',user_last_name) LIKE CONCAT('%',?,'%') OR fn_name_subcategory_order(orders.id) LIKE CONCAT('%',?,'%')",[$search,$search]);
         });
         foreach ($filters as $filter) {
             $query = $query->where($filter['column'],$filter['sign'],$filter['value']);
