@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ChangeMoney;
 use App\Models\Products;
+use App\Models\Provider;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class RawMaterialController extends Controller
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $total = $request->material_hist_amount * ($request->material_hist_igv ? 1.18 : 1) * $request->material_hist_price_buy;
         $historyMaterial->update([
+            'raw_provider' => $request->raw_provider,
             'material_hist_bill' => $request->material_hist_bill,
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,
@@ -55,7 +57,7 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'El registro se eliminó correctamente',
-            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_include_type_change","material_hist_total_type_change"])
+            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'raw_provider','product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_include_type_change","material_hist_total_type_change"])
         ]);
     }
     public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
@@ -91,16 +93,26 @@ class RawMaterialController extends Controller
             'data' => [
                 'nameMaterial' => $material->product->product_name,
                 'idMaterial' => $material->id,
-                'measurementProduct' => $material->product->product_unit_measurement
+                'measurementProduct' => $material->product->product_unit_measurement,
+                'idProduct' => $material->product_id
             ]
         ]);
     }
-    public function addProduct(Request $request, $product) {
+    public function gepProvider(Request $request) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
-            'data' => Products::find($product,['id','product_unit_measurement'])
+            'providers' => Provider::select('provider_name AS label','id AS value')->where('provider_status',1)->get()
+        ]);
+    }
+    public function addProduct(Request $request, $product) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $moneyChange = ChangeMoney::select('change_soles')->where('change_day',date('Y-m-d'))->first();
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'data' => array_merge(Products::find($product,['id','product_unit_measurement','product_name AS material_hist_name_product'])->toArray(),['material_hist_total_type_change' => empty($moneyChange) ? null : $moneyChange->change_soles])
         ]);
     }
     public function disabledProduct(Request $request, $numberBill) {
@@ -146,6 +158,7 @@ class RawMaterialController extends Controller
         RawMaterialHistory::create([
             'raw_material_id' => $rawMaterial->id,
             'product_id' => $request->product_id,
+            'raw_provider' => $request->raw_provider,
             'material_hist_bill' => $request->material_hist_bill,
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,

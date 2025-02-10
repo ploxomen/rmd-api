@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/raw-material/history-one/{historyMaterial}',[RawMaterialController::class,'updateHistory']);
 
     Route::delete('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'deleteHistory']);
+    Route::get('/raw-material/providers/list',[RawMaterialController::class,'gepProvider']);
 
     Route::get('/raw-material/product-add/{product}',[RawMaterialController::class,'addProduct']);
 
