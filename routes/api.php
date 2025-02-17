@@ -5,6 +5,7 @@ use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ProductProgressController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QuotationsController;
@@ -42,6 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-account',[UserController::class,'updateInfoUser']);
     Route::apiResource('users',UserController::class);
     Route::apiResource('product',ProductsController::class);
+    Route::apiResource('product-progress',ProductProgressController::class);
+    Route::get('product-progress-extra/raw-materials',[ProductProgressController::class,'getRawMaterialActive']);
+
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
