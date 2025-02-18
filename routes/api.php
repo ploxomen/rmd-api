@@ -45,10 +45,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('product-progress',ProductProgressController::class);
     Route::get('product-progress-extra/raw-materials',[ProductProgressController::class,'getRawMaterialActive']);
+    Route::get('product-progress-extra/history/{productProgress}',[ProductProgressController::class,'historyProductProgress']);
+    Route::get('product-progress/history-list/{productProgress}',[ProductProgressController::class,'listHistory']);
+    Route::get('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'oneHistory']);
+    Route::put('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'updateHistory']);
+    Route::delete('product-progress/history-list/{historyProgress}',[ProductProgressController::class,'deleteHistory']);
 
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
+
     Route::get('/raw-material/history/{material}',[RawMaterialController::class,'historyRawMaterial']);
     Route::get('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'listHistory']);
     Route::get('/raw-material/history-one/{historyMaterial}',[RawMaterialController::class,'oneHistory']);

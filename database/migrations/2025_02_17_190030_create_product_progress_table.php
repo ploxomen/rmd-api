@@ -27,6 +27,7 @@ return new class extends Migration
             $table->bigInteger('product_progress_id')->unsigned();
             $table->date('product_progress_history_date');
             $table->integer('product_progress_history_stock');
+            $table->text('product_progress_history_description')->nullable();
             $table->tinyInteger('product_progress_history_status')->default(1);
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('product_progress_id')->references('id')->on('product_progress');
