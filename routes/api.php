@@ -5,6 +5,7 @@ use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ProductProgressController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QuotationsController;
@@ -42,9 +43,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-account',[UserController::class,'updateInfoUser']);
     Route::apiResource('users',UserController::class);
     Route::apiResource('product',ProductsController::class);
+    Route::apiResource('product-progress',ProductProgressController::class);
+    Route::get('product-progress-extra/raw-materials',[ProductProgressController::class,'getRawMaterialActive']);
+    Route::get('product-progress-extra/history/{productProgress}',[ProductProgressController::class,'historyProductProgress']);
+    Route::get('product-progress/history-list/{productProgress}',[ProductProgressController::class,'listHistory']);
+    Route::get('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'oneHistory']);
+    Route::put('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'updateHistory']);
+    Route::delete('product-progress/history-list/{historyProgress}',[ProductProgressController::class,'deleteHistory']);
+
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
+
     Route::get('/raw-material/history/{material}',[RawMaterialController::class,'historyRawMaterial']);
     Route::get('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'listHistory']);
     Route::get('/raw-material/history-one/{historyMaterial}',[RawMaterialController::class,'oneHistory']);
