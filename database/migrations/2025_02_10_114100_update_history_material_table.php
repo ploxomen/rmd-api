@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('raw_materials_history', function (Blueprint $table) {
-            $table->bigInteger('raw_provider')->unsigned()->after('product_id');
+            $table->bigInteger('raw_provider')->unsigned()->nullable()->after('product_id');
             $table->foreign('raw_provider')->references('id')->on('provider');
 
         });
