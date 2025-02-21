@@ -156,7 +156,12 @@ class OrdersController extends Controller
                 ];
             }
         }
-        $orders = Orders::getOrders($search,$filters)->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
+        $totalOrders = Orders::getOrdersCount($search,$filters);
+        $orders = Orders::getOrders($search,$filters);
+        if(!empty($request->date_ini) && !empty($request->date_fin)){
+            $orders = $orders->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
+            $totalOrders = $totalOrders->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
+        }
         return response()->json([
             'redirect' => null,
             'error' => false,
@@ -164,7 +169,7 @@ class OrdersController extends Controller
             'igv' => $orders->sum('order_mount_igv'),
             'amount' => $orders->sum('order_mount'),
             'total' => $orders->sum('order_total'),
-            'totalOrders' =>Orders::getOrdersCount($search,$filters)->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin])->count(),
+            'totalOrders' => $totalOrders->get()->count(),
             'data' => $orders->skip($skip)->take($show)->orderBy("id","desc")->get()
         ]);
     }

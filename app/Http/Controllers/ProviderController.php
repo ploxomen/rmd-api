@@ -62,7 +62,7 @@ class ProviderController extends Controller
             'error' => false, 
             'message' => 'Cliente obtenido correctamente', 
             'data' => [
-                'provider' => $provider,
+                'customer' => $provider,
                 'districts' => $districts,
                 'provinces' => $provinces,
                 'contacts' => $provider->contacts()->select("id","provider_name","provider_number","provider_email","provider_position")->selectRaw("'old' AS type")->get()
