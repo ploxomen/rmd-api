@@ -159,18 +159,20 @@ class OrdersController extends Controller
         $totalOrders = Orders::getOrdersCount($search,$filters);
         $orders = Orders::getOrders($search,$filters);
         if(!empty($request->date_ini) && !empty($request->date_fin)){
-            $orders = $orders->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
-            $totalOrders = $totalOrders->whereBetween('order_date_issue',[$request->date_ini,$request->date_fin]);
+            $orders = $orders->whereRaw('DATE_FORMAT(orders.created_at, "%Y-%m-%d") BETWEEN ? AND ?',[$request->date_ini,$request->date_fin]);
+            $totalOrders = $totalOrders->whereRaw('DATE_FORMAT(orders.created_at, "%Y-%m-%d") BETWEEN ? AND ?',[$request->date_ini,$request->date_fin]);
         }
+        $responseData = $orders->skip($skip)->take($show)->orderBy("id","desc")->get();
+        $calculator = $orders->join('quotations','quotations.order_id','=','orders.id');
         return response()->json([
             'redirect' => null,
             'error' => false,
             'message' => 'Pedidos obtenidos correctamente',
-            'igv' => $orders->sum('order_mount_igv'),
-            'amount' => $orders->sum('order_mount'),
-            'total' => $orders->sum('order_total'),
+            'igv' =>  $calculator->selectRaw('SUM(IF(quotations.quotation_type_money = "USD",quotation_change_money * quotation_igv,quotation_igv)) AS order_igv')->value('order_igv'),
+            'amount' =>  $calculator->selectRaw('SUM(IF(quotations.quotation_type_money = "USD",quotation_change_money * quotation_amount,quotation_amount)) AS order_mount')->value('order_mount'),
+            'total' =>  $calculator->selectRaw('SUM(IF(quotations.quotation_type_money = "USD",quotation_change_money * quotation_total,quotation_total)) AS order_total')->value('order_total'),
             'totalOrders' => $totalOrders->get()->count(),
-            'data' => $orders->skip($skip)->take($show)->orderBy("id","desc")->get()
+            'data' => $responseData
         ]);
     }
     public function addQuotation(Request $request, Quotation $quotation){
