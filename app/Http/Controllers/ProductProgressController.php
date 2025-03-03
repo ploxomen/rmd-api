@@ -85,7 +85,7 @@ class ProductProgressController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'El registro se eliminó correctamente',
-            'data' => ProductProgressHistory::find($historyProgress,["product_id",'product_progress_history_date AS date','product_progress_history_stock AS stock',"product_progress_history_description AS details"])
+            'data' => ProductProgressHistory::select(["product_id",'product_progress_history_date AS date','product_progress_history_stock AS stock',"product_progress_history_description AS details", "product_unit_measurement AS unit_measurement"])->join('products','products.id','=','product_id')->where(['product_progress_history.id' => $historyProgress])->first()
         ]);
     }
     public function listHistory(Request $request, $productProgress) {

@@ -12,7 +12,7 @@ class ProductProgress extends Model
     protected $fillable = ['product_id','product_progress_stock','product_progress_status'];
 
     public static function getProductProgress($dateInitial,$dateFinal,$search) {
-        $productProgress = ProductProgress::select("product_id","product_code","product_progress_stock","product_name","product_progress.id AS progress_id")
+        $productProgress = ProductProgress::select("product_id","product_code","product_progress_stock","product_name","product_progress.id AS progress_id","product_unit_measurement")
         ->selectRaw("DATE_FORMAT(product_progress.created_at,'%d/%m/%Y') AS product_progres_created")
         ->join('products','product_id','=','products.id')
         ->where('product_progress_status','=',1)->where(function($query)use($search){
