@@ -12,8 +12,23 @@ class ProductProgress extends Model
     protected $fillable = ['product_id','product_progress_stock','product_progress_status'];
 
     public static function getProductProgress($dateInitial,$dateFinal,$search) {
-        $productProgress = ProductProgress::select("product_id","product_code","product_progress_stock","product_name","product_progress.id AS progress_id","product_unit_measurement")
-        ->selectRaw("DATE_FORMAT(product_progress.created_at,'%d/%m/%Y') AS product_progres_created")
+        $productProgress =ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_name','product_progress_history_description')
+        ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
+        ->join('products','product_id','=','products.id')
+        ->where('product_progress_history_status','=',1)->where(function($query)use($search){
+            $query->where('product_name','like','%'.$search.'%')
+            ->orWhere('product_progress_history_stock','like','%'.$search.'%')
+            ->orWhere("product_progress_history_date", "LIKE", "%" . $search ."%")
+            ->orWhere('product_code','like','%'.$search.'%');
+        });
+        if(!empty($dateInitial) && !empty($dateFinal)){
+            $productProgress = $productProgress->whereBetween("product_progress_history_date",[$dateInitial,$dateFinal]);
+        }
+        return $productProgress->orderBy('id','desc');
+    }
+    public static function getProductsProgessAgroup($dateInitial,$dateFinal,$search){
+        $productProgress = ProductProgress::select("product_id","product_code","product_progress_stock","product_name","product_progress.id","product_unit_measurement")
+        ->selectRaw("DATE_FORMAT(product_progress.created_at,'%d/%m/%Y') AS product_progress_history_date")
         ->join('products','product_id','=','products.id')
         ->where('product_progress_status','=',1)->where(function($query)use($search){
             $query->where('product_name','like','%'.$search.'%')

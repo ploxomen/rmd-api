@@ -15,7 +15,7 @@ class ProductProgressController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $productProgress = ProductProgress::getProductProgress($request->filter_initial,$request->filter_final,$search);
+        $productProgress = $request->has('agroup') ? ProductProgress::getProductsProgessAgroup($request->filter_initial,$request->filter_final,$search) : ProductProgress::getProductProgress($request->filter_initial,$request->filter_final,$search);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
