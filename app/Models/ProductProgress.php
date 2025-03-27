@@ -10,7 +10,12 @@ class ProductProgress extends Model
 {
     protected $table = 'product_progress';
     protected $fillable = ['product_id','product_progress_stock','product_progress_status'];
-
+    public function scopeProducts($query){
+        return $query->join("products","products.id","=","product_id")->where('product_status','>',0);
+    }
+    public function scopeActive($query) {
+        return $query->where('product_progress_status','>',0);
+    }
     public static function getProductProgress($dateInitial,$dateFinal,$search) {
         $productProgress =ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")

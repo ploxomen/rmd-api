@@ -32,4 +32,10 @@ class RawMaterial extends Model
     {
         return $this->belongsTo(Products::class,'product_id');
     }
+    public function scopeProducts($query){
+        return $query->join("products","products.id","=","product_id")->where('product_status','>',0);
+    }
+    public function scopeActive($query) {
+        return $query->where('raw_material_status','>',0);
+    }
 }

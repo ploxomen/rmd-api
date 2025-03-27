@@ -5,6 +5,7 @@ use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ProductFinaliesController;
 use App\Http\Controllers\ProductProgressController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProviderController;
@@ -35,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
     Route::apiResource('raw-material',RawMaterialController::class);
+    Route::apiResource('products-finaly',ProductFinaliesController::class);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
     Route::get('product-store',[StoresController::class,'getStoresAndSubStoresSelect']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
@@ -44,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users',UserController::class);
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('product-progress',ProductProgressController::class);
+    Route::get("product-extra/raw-process",[ProductsController::class,"getProductRawMaterialAndProcess"]);
     Route::get('product-progress-extra/raw-materials',[ProductProgressController::class,'getRawMaterialActive']);
     Route::get('product-progress-extra/history/{productProgress}',[ProductProgressController::class,'historyProductProgress']);
     Route::get('product-progress/history-list/{productProgress}',[ProductProgressController::class,'listHistory']);
@@ -62,6 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::delete('/raw-material/history-list/{historyMaterial}',[RawMaterialController::class,'deleteHistory']);
     Route::get('/raw-material/providers/list',[RawMaterialController::class,'gepProvider']);
+
+    
 
     Route::get('/raw-material/product-add/{product}',[RawMaterialController::class,'addProduct']);
 

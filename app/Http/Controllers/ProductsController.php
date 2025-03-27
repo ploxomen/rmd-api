@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\ProductsExport;
 use App\Models\Categories;
+use App\Models\ProductFinaly;
+use App\Models\ProductProgress;
 use App\Models\Products;
 use App\Models\RawMaterial;
 use App\Models\SubCategories;
@@ -28,6 +30,16 @@ class ProductsController extends Controller
             'message' => 'Productos obtenidos correctamente',
             'totalProducts' => $products->count(),
             'data' => $products->skip($skip)->take($show)->get()
+        ]);
+    }
+    public function getProductRawMaterialAndProcess(Request $request){
+        $rawsMaterial = RawMaterial::select("product_id","product_name","product_unit_measurement")->selectRaw("'MATERIA PRIMA' AS tipo")->products()->active();
+        $productProgress = ProductProgress::select("product_id","product_name","product_unit_measurement")->selectRaw("'PRODUCTO CURSO' AS tipo")->products()->active()->union($rawsMaterial)->get();
+        return response()->json([
+            'redirect' => null,
+            'error' => false,
+            'message' => 'Productos obtenidos correctamente',
+            'products' => $productProgress
         ]);
     }
     public function exportProductsExcel(Request $request) {
@@ -110,6 +122,12 @@ class ProductsController extends Controller
                     'raw_material_status' => 1,
                     'raw_material_money' => 'PEN'
                 ]);
+            }else if($request->product_store === 'PRODUCTO TERMINADO'){
+                ProductFinaly::create([
+                    'product_id' => $product->id,
+                    'product_finaly_stock' => 0,
+                    'product_finaly_price' => 0,
+                ]);                
             }
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
             return response()->json([
@@ -177,9 +195,10 @@ class ProductsController extends Controller
                 $file->move(public_path('storage/products'),$fileName);
                 $dataProduct['product_img'] = 'storage/products/'.$fileName;
             }
-            $dataProduct['product_label'] = $request->product_store !== 'MATERIA PRIMA' ? null : $request->product_label;
             if($product->product_store === 'MATERIA PRIMA' && $request->product_store !== 'MATERIA PRIMA'){
                 RawMaterial::where('product_id',$product->id)->update(['raw_material_status' => 0]);
+            }else if($product->product_store === 'PRODUCTO TERMINADO' && $request->product_store !== 'PRODUCTO TERMINADO'){
+                ProductFinaly::where('product_id',$product->id)->update(['product_finaly_status' => 0]);
             }
             $product->update($dataProduct);
             if($request->product_store === 'MATERIA PRIMA'){
@@ -191,6 +210,14 @@ class ProductsController extends Controller
                     'raw_material_price_buy' => 0,
                     'raw_material_status' => 1,
                     'raw_material_money' => 'PEN'
+                ]);
+            }else if($request->product_store === 'PRODUCTO TERMINADO'){
+                ProductFinaly::firstOrCreate(
+                    ['product_id' => $product->id, 'product_finaly_status' => 1],
+                    [
+                    'product_id' => $product->id,
+                    'product_finaly_stock' => 0,
+                    'product_finaly_price' => 0,
                 ]);
             }
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);

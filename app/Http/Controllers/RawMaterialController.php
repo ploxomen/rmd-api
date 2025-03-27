@@ -99,9 +99,8 @@ class RawMaterialController extends Controller
         ]);
     }
     public function gepProvider(Request $request) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        return response()->json([
-            'redirect' => $redirect,
+        return response()->json( [
+            'redirect' => null,
             'error' => false,
             'providers' => Provider::select('provider_name AS label','id AS value')->where('provider_status',1)->get()
         ]);

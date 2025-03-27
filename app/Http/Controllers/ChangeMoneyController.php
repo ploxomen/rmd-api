@@ -7,22 +7,19 @@ use Illuminate\Http\Request;
 
 class ChangeMoneyController extends Controller
 {
-    private $urlModule = '/raw-material';
 
     public function index(Request $request) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         return response()->json([
-            'redirect' => $redirect,
+            'redirect' => null,
             'error' => false,
             'value' => ChangeMoney::select('change_soles','change_attempts')->where('change_day',date('Y-m-d'))->first()
         ]);
     }
     public function store(Request $request) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $money = ChangeMoney::select('change_soles','change_attempts')->where('change_day',date('Y-m-d'))->first();
         if(!empty($money) && $money->change_attempts === 2){
             return response()->json([
-                'redirect' => $redirect,
+                'redirect' => null,
                 'error' => false,
                 'alert' => 'Solo se adminten 2 cambios como máximo'
             ]);
@@ -35,7 +32,7 @@ class ChangeMoneyController extends Controller
             'change_attempts' => empty($money) ? 1 : 2
         ]);
         return response()->json([
-            'redirect' => $redirect,
+            'redirect' => null,
             'error' => false,
             'message' => 'Tipo de cambios actualizado correctamente',
             'data' => $money
