@@ -25,7 +25,6 @@ class ProductFinaly extends Model
     }
     public function assembled() {
         return $this->hasMany(ProductFinalyImported::class,"product_finaly_id");
-
     }
     public function products(){
         return $this->belongsTo(Products::class,'product_id');

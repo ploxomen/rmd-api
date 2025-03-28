@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
     Route::apiResource('raw-material',RawMaterialController::class);
-    Route::apiResource('products-finaly',ProductFinaliesController::class);
+    Route::apiResource('products-finaly',ProductFinaliesController::class)->except(['update']);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
     Route::get('product-store',[StoresController::class,'getStoresAndSubStoresSelect']);
     Route::put('module-role/{module}',[ModulesController::class,'updateRoles']);
@@ -53,7 +53,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'oneHistory']);
     Route::put('product-progress/history-one/{historyProgress}',[ProductProgressController::class,'updateHistory']);
     Route::delete('product-progress/history-list/{historyProgress}',[ProductProgressController::class,'deleteHistory']);
-
+    Route::prefix('/product-finaly-extra/history')->group(function () {
+        Route::get('/verif/{productFinaly}',[ProductFinaliesController::class,'historiesProductVerif']);
+        Route::put('/assembled/{assembled}',[ProductFinaliesController::class,'updateAssembled']);
+        Route::put('/imported/{imported}',[ProductFinaliesController::class,'updateImported']);
+        Route::get('/assembled/{assembled}',[ProductFinaliesController::class,'getAssembledHistory']);
+        Route::get('/imported/{imported}',[ProductFinaliesController::class,'getImportedHistory']);
+        Route::delete('/assembled/{assembled}',[ProductFinaliesController::class,'deleteAssembled']);
+        Route::delete('/imported/{imported}',[ProductFinaliesController::class,'deleteImported']);
+        
+    });
     Route::apiResource('quotation',QuotationsController::class);
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
