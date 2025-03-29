@@ -68,7 +68,6 @@ class ProductFinaliesController extends Controller
     public function store(Request $request)
     {
         $productFinaly = ProductFinaly::select("product_finalies.id", "product_id")->joinProducts()->productExist()->where('product_id', $request->product_id)->first();
-
         if (empty($productFinaly)) {
             return response()->json([
                 'redirect' => null,

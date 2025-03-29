@@ -20,7 +20,7 @@ class ProductProgress extends Model
         $productProgress =ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
         ->join('products','product_id','=','products.id')
-        ->where('product_progress_history_status','=',1)->where(function($query)use($search){
+        ->where(function($query)use($search){
             $query->where('product_name','like','%'.$search.'%')
             ->orWhere('product_progress_history_stock','like','%'.$search.'%')
             ->orWhere("product_progress_history_date", "LIKE", "%" . $search ."%")

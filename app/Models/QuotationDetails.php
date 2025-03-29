@@ -17,7 +17,6 @@ class QuotationDetails extends Model
         'detail_price_additional',
         'detail_type_price',
         'detail_total',
-        'detail_status'
     ];
     protected $hidden = [
         'created_at',

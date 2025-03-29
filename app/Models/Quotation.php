@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\QuotationObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,10 +40,16 @@ class Quotation extends Model
         'created_at',
         'updated_at'
     ];
+    protected static function boot()
+    {
+        parent::boot();
+        // Registrar el observer aquí
+        static::observe(QuotationObserver::class);
+    }
     public function products()
     {
         return $this->belongsToMany(Products::class, 'quotations_details', 'quotation_id', 'product_id')
-            ->withPivot('detail_quantity', 'detail_price_unit', 'detail_price_buy', 'detail_price_additional', 'detail_total', 'detail_status', 'quotation_description')
+            ->withPivot('detail_quantity', 'detail_price_unit', 'detail_price_buy', 'detail_price_additional', 'detail_total', 'quotation_description','id')
             ->withTimestamps();
     }
     public static function getQuotations($search, $filters = [])

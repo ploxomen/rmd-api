@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
+use App\Observers\ProductProgresDetaObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductProgressHistory extends Model
 {
     protected $table = 'product_progress_history';
-    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_status','product_progress_history_description'];
-
+    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_description','product_final_assem_id'];
+    protected static function boot()
+    {
+        parent::boot();
+        // Registrar el observer aquí
+        static::observe(ProductProgresDetaObserver::class);
+    }
     public static function getHistory(int $idProductProgress, $search) {
         return ProductProgressHistory::select('product_progress_history.id','product_progress_id','product_id','product_progress_history_stock','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
@@ -22,4 +28,5 @@ class ProductProgressHistory extends Model
         })
         ->where('product_progress_id',$idProductProgress)->orderBy('product_progress_history_date','desc');
     }
+    
 }

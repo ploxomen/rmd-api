@@ -141,10 +141,9 @@ class ProductProgressController extends Controller
             'product_progress_history_date' => $request->date,
             'product_progress_history_stock' => $request->stock,
             'product_progress_history_description' => $request->details,
-            'product_progress_history_status' => 1,
         ]);
-        $this->calculateProductProgress($productProgress);
-        $this->calculateRawMaterial($rawMaterial,$request->stock);
+        // $this->calculateProductProgress($productProgress);
+        // $this->calculateRawMaterial($rawMaterial,$request->stock);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 

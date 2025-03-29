@@ -265,7 +265,6 @@ class QuotationsController extends Controller
                 'detail_type_price' => $detail['type_ammount'],
                 'detail_price_additional' => $detail['price_aditional'],
                 'detail_total' => $calcAmount,
-                'detail_status' => 1,
                 'quotation_description' => $detail['details']
             ]);
         }
@@ -335,7 +334,6 @@ class QuotationsController extends Controller
                     'detail_price_unit' => $detail['price_unit'],
                     'detail_price_additional' => $detail['price_aditional'],
                     'detail_type_price' => $detail['type_ammount'],
-                    'detail_status' => 1,
                     'quotation_description' => $detail['details'],
                     'detail_total' => $calcAmount
             ];

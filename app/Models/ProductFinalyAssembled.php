@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\ProductFinalyAssembledObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,8 +10,14 @@ class ProductFinalyAssembled extends Model
 {
     protected $table = "product_finaly_assembleds";
     protected $fillable = ['product_finaly_amount'];
+    protected static function boot()
+    {
+        parent::boot();
+        // Registrar el observer aquí
+        static::observe(ProductFinalyAssembledObserver::class);
+    }
     public function product(){
-        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->withPivot('product_finaly_stock','product_finaly_type')->withTimestamps();
+        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_type')->withTimestamps();
     }
     public function scopeGetActive($query,$productFinalyId) {
         return $query->select("product_finaly_assembleds.id","product_unit_measurement","product_finaly_amount","product_finaly_description")
