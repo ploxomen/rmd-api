@@ -64,7 +64,7 @@ class RawMaterialController extends Controller
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $historyMaterial->delete();
         $raw_material = RawMaterial::find($historyMaterial->raw_material_id);
-        $this->calculateRawMaterial($raw_material);
+        // $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -125,7 +125,7 @@ class RawMaterialController extends Controller
     public function destroy(Request $request, RawMaterial $raw_material) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $raw_material->history()->delete();
-        $this->calculateRawMaterial($raw_material);
+        // $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -170,7 +170,7 @@ class RawMaterialController extends Controller
             'material_hist_total_include_type_change' => $request->material_hist_total_include_type_change,
             'material_user' => $request->user()->id
         ]);
-        $this->calculateRawMaterial($rawMaterial);
+        // $this->calculateRawMaterial($rawMaterial);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 

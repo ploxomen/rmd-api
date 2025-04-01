@@ -37,8 +37,8 @@ class ProductProgressController extends Controller
             ]);
         }
         $historyProgress->delete();
-        $this->calculateProductProgress($productProgress);
-        $this->calculateRawMaterial($rawMaterial,$stockDelete,"sumar");
+        // $this->calculateProductProgress($productProgress);
+        // $this->calculateRawMaterial($rawMaterial,$stockDelete,"sumar");
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -184,10 +184,10 @@ class ProductProgressController extends Controller
                 'message' => 'El producto seleccionado no está relacionado con materia prima', 
             ]);
         }
-        $stockTotal = $this->stockTotal($product_progress->id)['stock'];
+        // $stockTotal = $this->stockTotal($product_progress->id)['stock'];
         $product_progress->history()->delete();
         $product_progress->delete();
-        $this->calculateRawMaterial($rawMaterial,$stockTotal,"sumar");
+        // $this->calculateRawMaterial($rawMaterial,$stockTotal,"sumar");
         return response()->json([
             'redirect' => $redirect,
             'error' => false,

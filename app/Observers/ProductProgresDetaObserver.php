@@ -8,6 +8,7 @@ use App\Models\RawMaterial;
 
 class ProductProgresDetaObserver
 {
+    public static bool $disable = false;
     /**
      * Handle the ProductProgressHistory "created" event.
      *
@@ -16,16 +17,18 @@ class ProductProgresDetaObserver
      */
     public function created(ProductProgressHistory $productProgressHistory)
     {
-        $rawMaterial = RawMaterial::where(['product_id' => $productProgressHistory->product_id, 'raw_material_status' => 1])->first();
-        if(!empty($rawMaterial)) {
-            $rawMaterial->history()->create([
-                'product_id' => $productProgressHistory->product_id,
-                'material_hist_amount' => $productProgressHistory->product_progress_history_stock * -1,
-                'product_progres_hist_id' => $productProgressHistory->id,
-                'material_user' => auth()->user()->id,
-            ]);
+        if(!self::$disable){
+            $rawMaterial = RawMaterial::where(['product_id' => $productProgressHistory->product_id, 'raw_material_status' => 1])->first();
+            if(!empty($rawMaterial)) {
+                $rawMaterial->history()->create([
+                    'product_id' => $productProgressHistory->product_id,
+                    'material_hist_amount' => $productProgressHistory->product_progress_history_stock * -1,
+                    'product_progres_hist_id' => $productProgressHistory->id,
+                    'material_user' => auth()->user()->id,
+                ]);
+            }
         }
-        $productProgres = ProductProgress::find($productProgressHistory);
+        $productProgres = ProductProgress::find($productProgressHistory->product_progress_id);
         $totalStock = $productProgres->history()->sum('product_progress_history_stock');
         $productProgres->product_progress_stock = $totalStock;
         $productProgres->save();
