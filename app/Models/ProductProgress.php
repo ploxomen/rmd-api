@@ -50,7 +50,7 @@ class ProductProgress extends Model
     {
         return $this->belongsTo(Products::class,'product_id');
     }
-    public function history(): HasMany
+    public function history()
     {
         return $this->hasMany(ProductProgressHistory::class,'product_progress_id');
     }
