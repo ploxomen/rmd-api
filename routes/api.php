@@ -19,7 +19,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('register',[AuthController::class,'register']);
     Route::get('home/info',[AuthController::class,'dataHome']);
     Route::prefix('user')->group(function () {
-        Route::delete('logout',[AuthController::class,'logout']);
         Route::put('change-password',[AuthController::class,'changePassword']);
         Route::get('modules-roles',[UserController::class,'userModules']);
         Route::get('change-role/{role}',[AuthController::class,'changeRole']);
@@ -115,4 +114,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('districts/{province}',[UserController::class,'getDistrictsUbigeo']);
     Route::get('contries',[UserController::class,'getContries']);
 });
-Route::get('login',[AuthController::class,'login']);

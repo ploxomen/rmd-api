@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
@@ -20,5 +21,6 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);
 Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
-
+Route::post('login',[AuthController::class,'login']);
 Route::get('/ordenes/{order}', [OrdersController::class,'getReportPdf']);
+Route::post('/user/logout',[AuthController::class,'logout']);
