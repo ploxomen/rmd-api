@@ -100,45 +100,53 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
+        $request->validate([
+            'username' => 'required|string|max:250',
+            'password' => 'required|string|max:255'
+        ]);
         $user = User::select('id', 'user_name', 'user_last_name')->where('user_email', $request->username)->where('user_status', '!=', 0)->first();
         if (empty($user)) {
             return response()->json([
                 'authenticate' => false,
                 'error' => false,
                 'message' => 'El usuario y/o la contraseña son incorrectos'
-            ]);
+            ], 401);
         }
         if (!empty($user) && Hash::check($request->password, Configurations::select('value')->where(['description' => 'password_admin_encrypt'])->first()->value)) {
-            $token = $user->createToken('auth_token', ['*'], now()->addDays($request->has('rememberme') ? 7 : 3))->plainTextToken;
-            return response()->json([
-                'authenticate' => true,
-                'error' => false,
-                'message' => 'Usuario autenticado',
-                'data' => [
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'user' => $user
-                ]
-            ]);
+            // $token = $user->createToken('auth_token', ['*'], now()->addDays($request->has('rememberme') ? 7 : 3))->plainTextToken;
+            $request->session()->regenerate();
+            return response()->json(['message' => 'Usuario autenticado']);
+            // return response()->json([
+            //     'authenticate' => true,
+            //     'error' => false,
+            //     'data' => [
+            //         'access_token' => $token,
+            //         'token_type' => 'Bearer',
+            //         'user' => $user
+            //     ],
+            //     'message' => 'Usuario autenticado',
+            // ]);
         }
         if (Auth::attempt(['user_email' => $request->username, 'password' => $request->password], $request->has('rememberme'))) {
-            $token = $user->createToken('auth_token', ['*'], now()->addDays($request->has('rememberme') ? 7 : 3))->plainTextToken;
-            return response()->json([
-                'authenticate' => true,
-                'error' => false,
-                'message' => 'Usuario autenticado',
-                'data' => [
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'user' => $user
-                ]
-            ]);
+            // $token = $user->createToken('auth_token', ['*'], now()->addDays($request->has('rememberme') ? 7 : 3))->plainTextToken;
+            // return response()->json([
+            //     'authenticate' => true,
+            //     'error' => false,
+            //     'message' => 'Usuario autenticado',
+            //     'data' => [
+            //         'access_token' => $token,
+            //         'token_type' => 'Bearer',
+            //         'user' => $user
+            //     ]
+            // ]);
+            $request->session()->regenerate();
+            return response()->json(['message' => 'Usuario autenticado']);
         }
         return response()->json([
             'authenticate' => false,
             'error' => false,
             'message' => 'El usuario y/o la contraseña son incorrectos'
-        ]);
+        ], 401);
     }
     public function register(Request $request)
     {
@@ -213,7 +221,9 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return response()->json([
             'error' => false,
             'message' => 'Se cerró la sesión correctamente'

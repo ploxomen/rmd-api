@@ -17,6 +17,7 @@ class ProductProgresDetaObserver
     public function created(ProductProgressHistory $productProgressHistory)
     {
         $rawMaterial = RawMaterial::where(['product_id' => $productProgressHistory->product_id, 'raw_material_status' => 1])->first();
+        // var_dump($rawMaterial);
         if(!empty($rawMaterial)) {
             $rawMaterial->history()->create([
                 'product_id' => $productProgressHistory->product_id,
