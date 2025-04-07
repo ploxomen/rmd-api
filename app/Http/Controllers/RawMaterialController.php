@@ -33,6 +33,7 @@ class RawMaterialController extends Controller
         $historyMaterial->update([
             'raw_provider' => $request->raw_provider,
             'material_hist_bill' => $request->material_hist_bill,
+            'material_hist_date' => $request->material_hist_date,
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,
             'material_hist_price_buy' => $request->material_hist_price_buy,
@@ -40,7 +41,6 @@ class RawMaterialController extends Controller
             'material_hist_money' => $request->material_hist_money,
             'material_hist_total_buy_pen' => $request->material_hist_money === 'PEN' ? $total : $total * $historyMaterial->material_hist_total_type_change,
             'material_hist_total_buy_usd' => $request->material_hist_money === 'PEN' ? $total / $historyMaterial->material_hist_total_type_change : $total,
-            'material_hist_total_include_type_change' => $request->material_hist_total_include_type_change,
             'material_user' => $request->user()->id
         ]);
         $raw_material = RawMaterial::find($historyMaterial->raw_material_id);
@@ -57,7 +57,7 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'El registro se eliminó correctamente',
-            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'raw_provider','product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_include_type_change","material_hist_total_type_change"])
+            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'raw_provider','product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_type_change",'material_hist_date'])
         ]);
     }
     public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
@@ -157,6 +157,7 @@ class RawMaterialController extends Controller
         RawMaterialHistory::create([
             'raw_material_id' => $rawMaterial->id,
             'product_id' => $request->product_id,
+            'material_hist_date' => $request->material_hist_date,
             'raw_provider' => $request->raw_provider,
             'material_hist_bill' => $request->material_hist_bill,
             'material_hist_guide' => $request->material_hist_guide,
@@ -167,7 +168,6 @@ class RawMaterialController extends Controller
             'material_hist_total_buy_pen' => $request->material_hist_money === 'PEN' ? $total : $total * $money->change_soles,
             'material_hist_total_buy_usd' => $request->material_hist_money === 'PEN' ? $total / $money->change_soles : $total,
             'material_hist_total_type_change' => $money->change_soles,
-            'material_hist_total_include_type_change' => $request->material_hist_total_include_type_change,
             'material_user' => $request->user()->id
         ]);
         // $this->calculateRawMaterial($rawMaterial);

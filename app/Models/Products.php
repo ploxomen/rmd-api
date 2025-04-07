@@ -20,7 +20,8 @@ class Products extends Model
         'product_store',
         'product_label',
         'product_unit_measurement',
-        'product_code'
+        'product_code',
+        "product_label_2"
     ];
     public static function getCodeProductNew(){
         $product = Products::select('product_code')->orderBy('product_code','desc')->first();

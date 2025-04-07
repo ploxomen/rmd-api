@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('product_finaly_imported', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_finaly_id');
-            $table->unsignedBigInteger('product_finaly_provider');
+            $table->unsignedBigInteger('product_finaly_provider')->nullable();
             $table->string('product_finaly_money');
             $table->date('product_finaly_created');
             $table->string('product_finaly_hist_bill');

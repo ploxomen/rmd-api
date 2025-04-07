@@ -9,7 +9,7 @@ class ProductFinaly extends Model
 {
     use HasFactory;
     protected $table = "product_finalies";
-    protected $fillable = ['product_id'];
+    protected $fillable = ['product_id','product_finaly_stock'];
     public function scopeProductsActive($query,$search){
         return $query->joinProducts()->productExist()->where(function($subquery)use($search){
             $subquery->where('product_name','like','%'.$search.'%')
@@ -24,7 +24,7 @@ class ProductFinaly extends Model
         return $this->hasMany(ProductFinalyImported::class,"product_finaly_id");
     }
     public function assembled() {
-        return $this->hasMany(ProductFinalyImported::class,"product_finaly_id");
+        return $this->hasMany(ProductFinalyAssembled::class,"product_finaly_id");
     }
     public function products(){
         return $this->belongsTo(Products::class,'product_id');

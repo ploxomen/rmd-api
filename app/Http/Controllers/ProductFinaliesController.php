@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ProductFinaly;
 use App\Models\ProductFinalyAssembled;
 use App\Models\ProductFinalyImported;
+use App\Models\ProductProgress;
+use App\Models\RawMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,7 +39,7 @@ class ProductFinaliesController extends Controller
     }
     public function getImportedHistory(ProductFinalyImported $imported)
     {
-        $data = $imported->only('product_finaly_id', 'id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
+        $data = $imported->only('product_finaly_id', 'id','quotation_detail_id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
         $data['product_id'] = $imported->productFinaly->products->id;
         $data['product_name'] = $imported->productFinaly->products->product_name;
         $data['product_finaly_unit_measurement'] = $imported->productFinaly->products->product_unit_measurement;
@@ -86,11 +88,63 @@ class ProductFinaliesController extends Controller
             $request->validate([
                 'product_finaly_provider' => 'required'
             ], [], ['product_finaly_provider' => 'proveedor']);
+            
         } else if ($productFinaly->products->product_label === "ENSAMBLADO") {
             $request->validate([
                 'details' => 'required|array'
             ], [], ['details' => 'detalles']);
+            $totalDetails = [];
+            foreach ($request->details as $product) {
+                $productExist = array_filter($totalDetails,function ($value) use ($product) {
+                    return $value['product_id'] === $product['detail_product_id'] && $value['type'] === $product['detail_store'];
+                });
+                if (count($productExist) === 0) {
+                    $totalDetails[] = [
+                        'type' => $product['detail_store'],
+                        'product_id' => $product['detail_product_id'],
+                        'stock' => $product['detail_stock']
+                    ];
+                    continue;
+                }
+                $totalDetails[key($productExist)]['stock'] += $product['detail_stock'];
+            }
+            foreach ($totalDetails as $detail) {
+                if($detail['type'] === "MATERIA PRIMA"){
+                    $rawMaterial = RawMaterial::where(['product_id' => $detail['product_id'], 'raw_material_status' => 1])->first();
+                    if(empty($rawMaterial)){
+                        return response()->json([
+                            'redirect' => null,
+                            'error' => true,
+                            'message' => 'No existe el producto de MATERIA PRIMA elegido'
+                        ], 422);
+                    }
+                    if($rawMaterial->raw_material_stock < $detail['stock']){
+                        return response()->json([
+                            'redirect' => null,
+                            'error' => true,
+                            'message' => "El producto {$rawMaterial->product->product_name} de MATERIA PRIMA no cuenta con estock suficiente, actualmente hay {$rawMaterial->raw_material_stock}, se está tratando de ingresar {$detail['stock']}"
+                        ], 422);
+                    }
+                    continue;
+                }
+                $productPorgres = ProductProgress::where(["product_id" => $detail["product_id"],'product_progress_status' => 1])->first();
+                if(empty($productPorgres)){
+                    return response()->json([
+                        'redirect' => null,
+                        'error' => true,
+                        'message' => 'No existe el producto de PRODUCTO EN CURSO elegido'
+                    ], 422);
+                }
+                if($productPorgres->product_progress_stock < $detail['stock']){
+                    return response()->json([
+                        'redirect' => null,
+                        'error' => true,
+                        'message' => "El producto {$productPorgres->product->product_name} de PRODUCTO EN CURSO no cuenta con estock suficiente, actualmente hay {$productPorgres->product_progress_stock}, se está tratando de ingresar {$detail['stock']}"
+                    ], 422);
+                }
+            }
         }
+        
         DB::beginTransaction();
         try {
             if ($productFinaly->products->product_label === "IMPORTADO") {

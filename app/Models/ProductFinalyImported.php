@@ -16,7 +16,7 @@ class ProductFinalyImported extends Model
        static::observe(ProductFinalyImportedObserver::class);
    }
    public function scopeGetActive($query,$productFinalyId) {
-      return $query->select("provider_name","product_finaly_amount","product_finaly_imported.id","product_unit_measurement","product_finaly_money","product_finaly_hist_bill","product_finaly_hist_guide","product_finaly_price_buy","product_finaly_total_buy")
+      return $query->select("provider_name",'quotation_detail_id',"product_finaly_amount","product_finaly_imported.id","product_unit_measurement","product_finaly_money","product_finaly_hist_bill","product_finaly_hist_guide","product_finaly_price_buy","product_finaly_total_buy")
       ->selectRaw("DATE_FORMAT(product_finaly_created, '%d/%m/%Y') as product_finaly_created, CONCAT(user_name,' ',user_last_name) as user_name")
       ->join("product_finalies","product_finalies.id","=",'product_finaly_id')
       ->leftJoin('provider','provider.id','=','product_finaly_provider')
