@@ -26,21 +26,21 @@ return new class extends Migration
             $table->unsignedBigInteger('product_final_assem_id')->nullable()->after('raw_provider');
             $table->unsignedBigInteger('quotation_detail_id')->nullable()->after('raw_provider');
             $table->unsignedBigInteger('product_progres_hist_id')->nullable()->after('raw_provider');
-            $table->foreign('product_final_assem_id')->references('id')->on('product_finaly_assem_deta')->onDelete('cascade');
-            $table->foreign('quotation_detail_id')->references('id')->on('quotations_details')->onDelete('cascade');
-            $table->foreign('product_progres_hist_id')->references('id')->on('product_progress_history')->onDelete('cascade');
+            $table->foreign('product_final_assem_id')->references('id')->on('product_finaly_assem_deta');
+            $table->foreign('quotation_detail_id')->references('id')->on('quotations_details');
+            $table->foreign('product_progres_hist_id')->references('id')->on('product_progress_history');
         });
         Schema::table('product_progress_history', function (Blueprint $table) {
             $table->unsignedBigInteger('product_final_assem_id')->nullable()->after('product_progress_id');
-            $table->foreign('product_final_assem_id')->references('id')->on('product_finaly_assem_deta')->onDelete('cascade');
+            $table->foreign('product_final_assem_id')->references('id')->on('product_finaly_assem_deta');
         });
         Schema::table('product_finaly_assembleds', function (Blueprint $table) {
             $table->unsignedBigInteger('quotation_detail_id')->nullable()->after('product_finaly_id');
-            $table->foreign( 'quotation_detail_id')->references('id')->on('quotations_details')->onDelete('cascade');
+            $table->foreign( 'quotation_detail_id')->references('id')->on('quotations_details');
         });
         Schema::table('product_finaly_imported', function (Blueprint $table) {
             $table->unsignedBigInteger('quotation_detail_id')->nullable()->after('product_finaly_id');
-            $table->foreign('quotation_detail_id')->references('id')->on('quotations_details')->onDelete('cascade');
+            $table->foreign('quotation_detail_id')->references('id')->on('quotations_details');
         });
     }
 

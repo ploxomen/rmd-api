@@ -17,7 +17,7 @@ class ProductProgress extends Model
         return $query->where('product_progress_status','>',0);
     }
     public static function getProductProgress($dateInitial,$dateFinal,$search) {
-        $productProgress =ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_name','product_progress_history_description')
+        $productProgress = ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_final_assem_id','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
         ->join('products','product_id','=','products.id')
         ->where(function($query)use($search){

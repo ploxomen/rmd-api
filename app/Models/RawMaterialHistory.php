@@ -28,4 +28,8 @@ class RawMaterialHistory extends Model
             })
             ->where('raw_material_id', $idRawMaterial)->orderBy('id', 'desc');
     }
+    public function rawMaterial()
+    {
+        return $this->belongsTo(RawMaterial::class,'raw_material_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
+use Illuminate\Support\Facades\Log;
 
 class RawMaterialHistoryObserver
 {

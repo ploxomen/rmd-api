@@ -6,6 +6,7 @@ use App\Models\ProductProgress;
 use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
+use Illuminate\Support\Facades\Log;
 
 class ProductProgresDetaObserver
 {
@@ -45,29 +46,18 @@ class ProductProgresDetaObserver
     {
         //
     }
-
-    /**
-     * Handle the ProductProgressHistory "deleted" event.
-     *
-     * @param  \App\Models\ProductProgressHistory  $productProgressHistory
-     * @return void
-     */
+    public function deleting(ProductProgressHistory $productProgressHistory){
+        RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) {
+            $item->delete();
+        });
+    }
     public function deleted(ProductProgressHistory $productProgressHistory)
     {
         $productProgres = ProductProgress::find($productProgressHistory->product_progress_id);
         $totalStock = $productProgres->history()->sum('product_progress_history_stock');
         $productProgres->product_progress_stock = $totalStock;
         $productProgres->save();
-        RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) {
-            $item->delete();
-        });
+        
     }
-
-    /**
-     * Handle the ProductProgressHistory "restored" event.
-     *
-     * @param  \App\Models\ProductProgressHistory  $productProgressHistory
-     * @return void
-     */
     
 }

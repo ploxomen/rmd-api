@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductFinalAssemDeta;
 use App\Models\ProductFinaly;
 use App\Models\ProductFinalyAssembled;
 use App\Models\ProductFinalyImported;
 use App\Models\ProductProgress;
+use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
+use App\Models\RawMaterialHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -144,7 +147,6 @@ class ProductFinaliesController extends Controller
                 }
             }
         }
-        
         DB::beginTransaction();
         try {
             if ($productFinaly->products->product_label === "IMPORTADO") {
@@ -222,8 +224,10 @@ class ProductFinaliesController extends Controller
                 }
                 $attach[$product['detail_product_id']] = ['product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store']];
             }
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             $assembled->product()->sync($syncs);
             $assembled->product()->attach($attach);
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             DB::commit();
             return response()->json([
                 'redirect' => null,
@@ -248,15 +252,38 @@ class ProductFinaliesController extends Controller
             'message' => 'Historial eliminado correctamente'
         ]);
     }
+    public function deleteProducts(ProductFinalyAssembled $assembled){
+        foreach ($assembled->product as $product) {
+            ProductProgressHistory::where(['product_final_assem_id' => $product->pivot->id])->get()->each(function ($history) {
+                $history->delete();
+            });
+            RawMaterialHistory::where(['product_final_assem_id' => $product->pivot->id])->get()->each(function ($history) {
+                $history->delete();
+            });
+        }
+    }
     public function deleteAssembled(ProductFinalyAssembled $assembled)
     {
-        $assembled->product()->detach();
-        $assembled->delete();
-        return response()->json([
-            'redirect' => null,
-            'error' => false,
-            'message' => 'Historial eliminado correctamente'
-        ]);
+        DB::beginTransaction();
+        try {
+            ProductFinalAssemDeta::where('product_assembled_id',$assembled->id)->get()->each(function($value){
+                $value->delete();
+            });
+            $assembled->delete();
+            DB::commit();
+            return response()->json([
+                'redirect' => null,
+                'error' => false,
+                'message' => 'Historial eliminado correctamente'
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => $th->getMessage()
+            ]);
+        }
     }
     public function updateImported(Request $request, ProductFinalyImported $imported)
     {
@@ -282,7 +309,12 @@ class ProductFinaliesController extends Controller
             $products_finaly->imported()->delete();
         }
         if($products_finaly->assembled()->exists()){
-            $products_finaly->assembled()->delete();
+            $products_finaly->assembled()->get()->each(function($assembled){
+                ProductFinalAssemDeta::where('product_assembled_id',$assembled->id)->get()->each(function($value){
+                    $value->delete();
+                });
+                $assembled->delete();
+            });
         }
         $products_finaly->update(['product_finaly_stock' => 0]);
         return response()->json([

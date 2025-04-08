@@ -17,7 +17,7 @@ class ProductFinalyAssembled extends Model
         static::observe(ProductFinalyAssembledObserver::class);
     }
     public function product(){
-        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_type')->withTimestamps();
+        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_type','id')->withTimestamps();
     }
     public function scopeGetActive($query,$productFinalyId) {
         return $query->select("product_finaly_assembleds.id","quotation_detail_id","product_unit_measurement","product_finaly_amount","product_finaly_description")

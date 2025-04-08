@@ -28,5 +28,9 @@ class ProductProgressHistory extends Model
         })
         ->where('product_progress_id',$idProductProgress)->orderBy('product_progress_history_date','desc');
     }
+    public function productProgress()
+    {
+        return $this->belongsTo(ProductProgress::class,'product_progress_id');
+    }
     
 }

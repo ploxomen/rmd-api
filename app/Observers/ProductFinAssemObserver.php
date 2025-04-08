@@ -3,18 +3,13 @@
 namespace App\Observers;
 
 use App\Models\ProductFinalAssemDeta;
-use App\Models\ProductFinalyAssembled;
 use App\Models\ProductProgress;
+use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
+use App\Models\RawMaterialHistory;
 use App\Observers\ProductProgresDetaObserver;
 class ProductFinAssemObserver
 {
-    /**
-     * Handle the ProductFinalAssemDeta "created" event.
-     *
-     * @param  \App\Models\ProductFinalAssemDeta  $productFinalAssemDeta
-     * @return void
-     */
     public function created(ProductFinalAssemDeta $productFinalAssemDeta)
     {
         if($productFinalAssemDeta->product_finaly_type == "PRODUCTO CURSO"){
@@ -40,53 +35,17 @@ class ProductFinAssemObserver
                 ]);
             }
         }
-        $productAssembled = ProductFinalyAssembled::find($productFinalAssemDeta->product_assembled_id);
-        $productAssembled->productFinaly()->update([
-            'product_finaly_stock' => ProductFinalyAssembled::where('product_finaly_id',$productAssembled->product_finaly_id)->sum('product_finaly_amount')
-        ]);
     }
-
-    /**
-     * Handle the ProductFinalAssemDeta "updated" event.
-     *
-     * @param  \App\Models\ProductFinalAssemDeta  $productFinalAssemDeta
-     * @return void
-     */
-    public function updated(ProductFinalAssemDeta $productFinalAssemDeta)
-    {
-        //
+    public function deleting(ProductFinalAssemDeta $productFinalAssemDeta){
+        if(!isset($productFinalAssemDeta->id) || empty($productFinalAssemDeta->id)){
+            return null;
+        }
+        RawMaterialHistory::where(['product_final_assem_id' => $productFinalAssemDeta->id])->get()->each(function($history){
+            $history->delete();
+        });
+        ProductProgressHistory::where(['product_final_assem_id' => $productFinalAssemDeta->id])->get()->each(function($history){
+            $history->delete();
+        });
     }
-
-    /**
-     * Handle the ProductFinalAssemDeta "deleted" event.
-     *
-     * @param  \App\Models\ProductFinalAssemDeta  $productFinalAssemDeta
-     * @return void
-     */
-    public function deleted(ProductFinalAssemDeta $productFinalAssemDeta)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinalAssemDeta "restored" event.
-     *
-     * @param  \App\Models\ProductFinalAssemDeta  $productFinalAssemDeta
-     * @return void
-     */
-    public function restored(ProductFinalAssemDeta $productFinalAssemDeta)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinalAssemDeta "force deleted" event.
-     *
-     * @param  \App\Models\ProductFinalAssemDeta  $productFinalAssemDeta
-     * @return void
-     */
-    public function forceDeleted(ProductFinalAssemDeta $productFinalAssemDeta)
-    {
-        //
-    }
+    
 }
