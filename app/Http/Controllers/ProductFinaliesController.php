@@ -276,8 +276,18 @@ class ProductFinaliesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(ProductFinaly $products_finaly)
     {
-        //
+        if($products_finaly->imported()->exists()){
+            $products_finaly->imported()->delete();
+        }
+        if($products_finaly->assembled()->exists()){
+            $products_finaly->assembled()->delete();
+        }
+        $products_finaly->update(['product_finaly_stock' => 0]);
+        return response()->json([
+            'error' => false,
+            'success' => 'Se eliminaron los historiales correctamente'
+        ]);
     }
 }

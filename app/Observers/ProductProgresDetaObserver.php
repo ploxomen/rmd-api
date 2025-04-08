@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\ProductProgress;
 use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
+use App\Models\RawMaterialHistory;
 
 class ProductProgresDetaObserver
 {
@@ -53,10 +54,13 @@ class ProductProgresDetaObserver
      */
     public function deleted(ProductProgressHistory $productProgressHistory)
     {
-        $productProgres = ProductProgress::find($productProgressHistory);
+        $productProgres = ProductProgress::find($productProgressHistory->product_progress_id);
         $totalStock = $productProgres->history()->sum('product_progress_history_stock');
         $productProgres->product_progress_stock = $totalStock;
         $productProgres->save();
+        RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) {
+            $item->delete();
+        });
     }
 
     /**

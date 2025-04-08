@@ -106,53 +106,10 @@ class OrdersController extends Controller
                 Quotation::where([
                     'id' => $quotation->id,
                     'quotation_status' => 1
-                ])->whereNull('order_id')->update([
+                ])->whereNull('order_id')->first()->update([
                     'order_id' => $order->id,
                     'quotation_status' => 2
                 ]);
-            }
-            $order->refresh();
-            foreach ($order->quotations as $quotation) {
-                foreach ($quotation->products as $product) {
-                    if ($product->product_store === "MATERIA PRIMA") {
-                        $rawMaterial = RawMaterial::where(['product_id' => $product->id, 'raw_material_status' => 1])->first();
-                        if(empty($rawMaterial)){
-                            throw new Exception("El producto {$product->product_name}, que corresponde a la cotización {$quotation->quotation_code} no se encuentra registrado en la tabla de MATERIA PRIMA");
-                        }
-                        if($rawMaterial->raw_material_stock < $product->pivot->detail_quantity){
-                            throw new Exception("El producto {$product->product_name} del almacen MATERIA PRIMA, que corresponde a la cotización {$quotation->quotation_code} no tiene suficiente STOCK");
-                        }
-                        $rawMaterial->history()->create([
-                            'product_id' => $product->id,
-                            'material_hist_amount' => $product->pivot->detail_quantity * -1,
-                            'quotation_detail_id' => $product->pivot->id,
-                            'material_user' => auth()->user()->id,
-                        ]);
-                    } else if ($product->product_store === "PRODUCTO TERMINADO") {
-                        $productFinal = ProductFinaly::where(['product_id' => $product->id, 'product_finaly_status' => 1])->first();
-                        if(empty($productFinal)){
-                            throw new Exception("El producto {$product->product_name}, que corresponde a la cotización {$quotation->quotation_code} no se encuentra registrado en la tabla de PRODUCTO TERMINADO");
-                        }
-                        if($productFinal->product_finaly_stock < $product->pivot->detail_quantity){
-                            throw new Exception("El producto {$product->product_name} del almacen PRODUCTO TERMINADO, que corresponde a la cotización {$quotation->quotation_code} no tiene suficiente STOCK");
-                        }
-                        if ($product->product_label === "ENSAMBLADO") {
-                            $productFinal->assembled()->create([
-                                'product_finaly_created' => now()->toDateString(),
-                                'product_finaly_amount' => $product->pivot->detail_quantity * -1,
-                                'product_finaly_user' => auth()->user()->id,
-                                'quotation_detail_id' => $product->pivot->id,
-                            ]);
-                        } else if ($product->product_label === "IMPORTADO" ) {
-                            $productFinal->imported()->create([
-                                'quotation_detail_id' => $product->pivot->id,
-                                'product_finaly_created' => now()->toDateString(),
-                                'product_finaly_amount' => $product->pivot->detail_quantity * -1,
-                                'product_finaly_user' => auth()->user()->id,
-                            ]);
-                        }
-                    }
-                }
             }
             $order->update(array_merge($this->calculateMount($order->id), [
                 'order_file_url' => $filePath,
@@ -356,45 +313,58 @@ class OrdersController extends Controller
                 'message' => 'Acceso denegado'
             ], 403);
         }
-        $order = Orders::find($request->order);
-        $order->update([
-            'order_date_issue' => $request->order_date_issue,
-            'order_district' => $request->order_district,
-            'order_conditions_pay' => $request->order_conditions_pay,
-            'order_conditions_delivery' => $request->order_conditions_delivery,
-            'order_address' => $request->order_address,
-            'customer_id' => $request->customer_id,
-            'order_igv' => $request->order_igv,
-            'order_money' => $request->order_money,
-            'order_project' => $request->order_project,
-            'order_contact_email' => $request->order_contact_email,
-            'order_contact_telephone' => $request->order_contact_telephone,
-            'order_contact_name' => $request->order_contact_name,
-            'order_retaining_customer' => $request->order_retaining_customer
-        ]);
-        if ($request->has('order_file_update')) {
-            if (Storage::exists($order->order_file_url)) {
-                Storage::delete($order->order_file_url);
-            }
-            $file = $request->file("order_file_update");
-            $fileName = $file->getClientOriginalName();
-            $fileNameDB = time() . '_' . $fileName;
-            $filePath = $file->storeAs('documents_os', $fileNameDB);
+        DB::beginTransaction();
+        try {
+            $order = Orders::find($request->order);
             $order->update([
-                'order_file_url' => $filePath,
-                'order_file_name' => $fileName
+                'order_date_issue' => $request->order_date_issue,
+                'order_district' => $request->order_district,
+                'order_conditions_pay' => $request->order_conditions_pay,
+                'order_conditions_delivery' => $request->order_conditions_delivery,
+                'order_address' => $request->order_address,
+                'customer_id' => $request->customer_id,
+                'order_igv' => $request->order_igv,
+                'order_money' => $request->order_money,
+                'order_project' => $request->order_project,
+                'order_contact_email' => $request->order_contact_email,
+                'order_contact_telephone' => $request->order_contact_telephone,
+                'order_contact_name' => $request->order_contact_name,
+                'order_retaining_customer' => $request->order_retaining_customer
+            ]);
+            if ($request->has('order_file_update')) {
+                if (Storage::exists($order->order_file_url)) {
+                    Storage::delete($order->order_file_url);
+                }
+                $file = $request->file("order_file_update");
+                $fileName = $file->getClientOriginalName();
+                $fileNameDB = time() . '_' . $fileName;
+                $filePath = $file->storeAs('documents_os', $fileNameDB);
+                $order->update([
+                    'order_file_url' => $filePath,
+                    'order_file_name' => $fileName
+                ]);
+            }
+            $quotationsRequest = collect(json_decode($request->quotations, true));
+            $order->quotations()->whereIn("quotations.id", $quotationsRequest->pluck("id"))->get()->each(function ($quotation) {
+                $quotation->quotation_status = 1;
+                $quotation->order_id = null;
+                $quotation->save();
+            });
+            $order->update($this->calculateMount($order->id));
+            DB::commit();
+            return response()->json([
+                'redirect' => null,
+                'error' => false,
+                'message' => 'Pedidos actualizados correctamente',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => $th->getMessage(),
             ]);
         }
-        $order->quotations()->update(['quotation_status' => 1, 'order_id' => null]);
-        foreach (json_decode($request->quotations) as $quotation) {
-            Quotation::find($quotation->id)->update(['quotation_status' => 2, 'order_id' => $order->id]);
-        }
-        $order->update($this->calculateMount($order->id));
-        return response()->json([
-            'redirect' => null,
-            'error' => false,
-            'message' => 'Pedidos actualizados correctamente',
-        ]);
     }
     public function destroy(Request $request)
     {
@@ -406,13 +376,28 @@ class OrdersController extends Controller
                 'message' => 'Acceso denegado'
             ]);
         }
-        $order = Orders::find($request->order);
-        $order->quotations()->update(['quotation_status' => 1, 'order_id' => null]);
-        $order->update(['order_status' => 0, 'order_mount' => 0, 'order_mount_igv' => 0, 'order_total' => 0]);
-        return response()->json([
-            'redirect' => null,
-            'error' => false,
-            'message' => 'Pedidos eliminados correctamente',
-        ]);
+        DB::beginTransaction();
+        try {
+            $order = Orders::find($request->order);
+            $order->quotations()->get()->each(function ($quotation) {
+                $quotation->quotation_status = 1;
+                $quotation->order_id = null;
+                $quotation->save();
+            });
+            $order->update(['order_status' => 0, 'order_mount' => 0, 'order_mount_igv' => 0, 'order_total' => 0]);
+            DB::commit();
+            return response()->json([
+                'redirect' => null,
+                'error' => false,
+                'message' => 'Pedidos eliminados correctamente',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 }

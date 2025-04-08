@@ -17,7 +17,7 @@ class ProductProgressHistory extends Model
         static::observe(ProductProgresDetaObserver::class);
     }
     public static function getHistory(int $idProductProgress, $search) {
-        return ProductProgressHistory::select('product_progress_history.id','product_progress_id','product_id','product_progress_history_stock','product_name','product_progress_history_description')
+        return ProductProgressHistory::select('product_progress_history.id',"product_final_assem_id",'product_progress_id','product_id','product_progress_history_stock','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
         ->leftJoin('products','products.id','=','product_id')
         ->where(function($query)use($search){

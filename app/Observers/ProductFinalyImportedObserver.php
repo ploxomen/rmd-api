@@ -21,12 +21,6 @@ class ProductFinalyImportedObserver
         $productFinaly->save();
     }
 
-    /**
-     * Handle the ProductFinalyImported "updated" event.
-     *
-     * @param  \App\Models\ProductFinalyImported  $productFinalyImported
-     * @return void
-     */
     public function updated(ProductFinalyImported $productFinalyImported)
     {
         //
@@ -44,27 +38,5 @@ class ProductFinalyImportedObserver
         $totalStock = $productFinaly->imported()->sum('product_finaly_amount');
         $productFinaly->product_finaly_stock = $totalStock;
         $productFinaly->save();
-    }
-
-    /**
-     * Handle the ProductFinalyImported "restored" event.
-     *
-     * @param  \App\Models\ProductFinalyImported  $productFinalyImported
-     * @return void
-     */
-    public function restored(ProductFinalyImported $productFinalyImported)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinalyImported "force deleted" event.
-     *
-     * @param  \App\Models\ProductFinalyImported  $productFinalyImported
-     * @return void
-     */
-    public function forceDeleted(ProductFinalyImported $productFinalyImported)
-    {
-        //
     }
 }

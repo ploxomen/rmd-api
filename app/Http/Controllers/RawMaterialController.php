@@ -63,7 +63,7 @@ class RawMaterialController extends Controller
     public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         $historyMaterial->delete();
-        $raw_material = RawMaterial::find($historyMaterial->raw_material_id);
+        RawMaterial::find($historyMaterial->raw_material_id);
         // $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,
@@ -124,7 +124,9 @@ class RawMaterialController extends Controller
     }
     public function destroy(Request $request, RawMaterial $raw_material) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        $raw_material->history()->delete();
+        $raw_material->history()->each(function($history){
+            $history->delete();
+        });
         // $this->calculateRawMaterial($raw_material);
         return response()->json([
             'redirect' => $redirect,

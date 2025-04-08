@@ -26,9 +26,7 @@ class ProductProgressController extends Controller
     }
     public function deleteHistory(Request $request, ProductProgressHistory $historyProgress) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
-        $productProgress = ProductProgress::find($historyProgress->product_progress_id);
-        $stockDelete = $historyProgress->product_progress_history_stock;
-        $rawMaterial = RawMaterial::where(['product_id' => $productProgress->product_id,'raw_material_status' => 1])->first();
+        $rawMaterial = RawMaterial::where(['product_id' => $historyProgress->product_id,'raw_material_status' => 1])->first();
         if(empty($rawMaterial)){
             return response()->json([
                 'redirect' => $redirect,
