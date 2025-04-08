@@ -52,14 +52,12 @@ class ProductProgressController extends Controller
                 'message' => 'El producto no existe como materia prima', 
             ]);
         }
-        $stockLast = $historyProgress->product_progress_history_stock;
-        $productProgress->update(['product_progress_stock' => $productProgress->product_progress_stock + $stockLast]);
-        $rawMaterial->update(['raw_material_stock' => $rawMaterial->raw_material_stock + $stockLast]);
-        if($rawMaterial->raw_material_stock < $request->stock){
+        $totalStockMaterial = $rawMaterial->raw_material_stock + $historyProgress->product_progress_history_stock;
+        if($totalStockMaterial < $request->stock){
             return response()->json([
                 'redirect' => $redirect,
-                'error' => true, 
-                'message' => 'La cantidad ingresada supera el stock del producto', 
+                'error' => true,
+                'message' => 'La cantidad ingresada supera el stock en MATERIA PRIMA',
             ]);
         }
         $historyProgress->update([
@@ -67,8 +65,6 @@ class ProductProgressController extends Controller
             'product_progress_history_stock' => $request->stock,
             'product_progress_history_description' => $request->details
         ]);
-        $this->calculateProductProgress($productProgress);
-        $this->calculateRawMaterial($rawMaterial,$request->stock);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -138,8 +134,6 @@ class ProductProgressController extends Controller
             'product_progress_history_stock' => $request->stock,
             'product_progress_history_description' => $request->details,
         ]);
-        // $this->calculateProductProgress($productProgress);
-        // $this->calculateRawMaterial($rawMaterial,$request->stock);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
@@ -184,7 +178,6 @@ class ProductProgressController extends Controller
             $history->delete();
         });
         $product_progress->delete();
-        // $this->calculateRawMaterial($rawMaterial,$stockTotal,"sumar");
         return response()->json([
             'redirect' => $redirect,
             'error' => false,

@@ -6,17 +6,16 @@ use App\Models\ProductProgress;
 use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
-use Illuminate\Support\Facades\Log;
 
 class ProductProgresDetaObserver
 {
     public static bool $disable = false;
-    /**
-     * Handle the ProductProgressHistory "created" event.
-     *
-     * @param  \App\Models\ProductProgressHistory  $productProgressHistory
-     * @return void
-     */
+    public function totalProductProgress(int $id){
+        $productProgres = ProductProgress::find($id);
+        $totalStock = $productProgres->history()->sum('product_progress_history_stock');
+        $productProgres->product_progress_stock = $totalStock;
+        $productProgres->save();
+    }
     public function created(ProductProgressHistory $productProgressHistory)
     {
         if(!self::$disable){
@@ -30,21 +29,15 @@ class ProductProgresDetaObserver
                 ]);
             }
         }
-        $productProgres = ProductProgress::find($productProgressHistory->product_progress_id);
-        $totalStock = $productProgres->history()->sum('product_progress_history_stock');
-        $productProgres->product_progress_stock = $totalStock;
-        $productProgres->save();
+        $this->totalProductProgress($productProgressHistory->product_progress_id);
     }
-
-    /**
-     * Handle the ProductProgressHistory "updated" event.
-     *
-     * @param  \App\Models\ProductProgressHistory  $productProgressHistory
-     * @return void
-     */
     public function updated(ProductProgressHistory $productProgressHistory)
     {
-        //
+        RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) use ($productProgressHistory) {
+            $item->material_hist_amount = $productProgressHistory->product_progress_history_stock * -1;
+            $item->save();
+        });
+        $this->totalProductProgress($productProgressHistory->product_progress_id);
     }
     public function deleting(ProductProgressHistory $productProgressHistory){
         RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) {
@@ -53,11 +46,6 @@ class ProductProgresDetaObserver
     }
     public function deleted(ProductProgressHistory $productProgressHistory)
     {
-        $productProgres = ProductProgress::find($productProgressHistory->product_progress_id);
-        $totalStock = $productProgres->history()->sum('product_progress_history_stock');
-        $productProgres->product_progress_stock = $totalStock;
-        $productProgres->save();
-        
+        $this->totalProductProgress($productProgressHistory->product_progress_id);   
     }
-    
 }

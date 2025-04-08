@@ -10,6 +10,9 @@ class ProductFinalAssemDeta extends Pivot
     public $incrementing = true; // Indica que tiene una clave primaria auto-incremental
     protected $primaryKey = "id";
     protected $table = "product_finaly_assem_deta";
+    protected $fillable = [
+        'product_finaly_stock','product_id','product_finaly_type'
+    ];
     protected static function boot()
     {
         parent::boot();

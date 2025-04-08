@@ -42,7 +42,7 @@ class ProductFinaliesController extends Controller
     }
     public function getImportedHistory(ProductFinalyImported $imported)
     {
-        $data = $imported->only('product_finaly_id', 'id','quotation_detail_id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
+        $data = $imported->only('product_finaly_id', 'id', 'quotation_detail_id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
         $data['product_id'] = $imported->productFinaly->products->id;
         $data['product_name'] = $imported->productFinaly->products->product_name;
         $data['product_finaly_unit_measurement'] = $imported->productFinaly->products->product_unit_measurement;
@@ -91,14 +91,13 @@ class ProductFinaliesController extends Controller
             $request->validate([
                 'product_finaly_provider' => 'required'
             ], [], ['product_finaly_provider' => 'proveedor']);
-            
         } else if ($productFinaly->products->product_label === "ENSAMBLADO") {
             $request->validate([
                 'details' => 'required|array'
             ], [], ['details' => 'detalles']);
             $totalDetails = [];
             foreach ($request->details as $product) {
-                $productExist = array_filter($totalDetails,function ($value) use ($product) {
+                $productExist = array_filter($totalDetails, function ($value) use ($product) {
                     return $value['product_id'] === $product['detail_product_id'] && $value['type'] === $product['detail_store'];
                 });
                 if (count($productExist) === 0) {
@@ -112,16 +111,16 @@ class ProductFinaliesController extends Controller
                 $totalDetails[key($productExist)]['stock'] += $product['detail_stock'];
             }
             foreach ($totalDetails as $detail) {
-                if($detail['type'] === "MATERIA PRIMA"){
+                if ($detail['type'] === "MATERIA PRIMA") {
                     $rawMaterial = RawMaterial::where(['product_id' => $detail['product_id'], 'raw_material_status' => 1])->first();
-                    if(empty($rawMaterial)){
+                    if (empty($rawMaterial)) {
                         return response()->json([
                             'redirect' => null,
                             'error' => true,
                             'message' => 'No existe el producto de MATERIA PRIMA elegido'
                         ], 422);
                     }
-                    if($rawMaterial->raw_material_stock < $detail['stock']){
+                    if ($rawMaterial->raw_material_stock < $detail['stock']) {
                         return response()->json([
                             'redirect' => null,
                             'error' => true,
@@ -130,15 +129,15 @@ class ProductFinaliesController extends Controller
                     }
                     continue;
                 }
-                $productPorgres = ProductProgress::where(["product_id" => $detail["product_id"],'product_progress_status' => 1])->first();
-                if(empty($productPorgres)){
+                $productPorgres = ProductProgress::where(["product_id" => $detail["product_id"], 'product_progress_status' => 1])->first();
+                if (empty($productPorgres)) {
                     return response()->json([
                         'redirect' => null,
                         'error' => true,
                         'message' => 'No existe el producto de PRODUCTO EN CURSO elegido'
                     ], 422);
                 }
-                if($productPorgres->product_progress_stock < $detail['stock']){
+                if ($productPorgres->product_progress_stock < $detail['stock']) {
                     return response()->json([
                         'redirect' => null,
                         'error' => true,
@@ -215,19 +214,24 @@ class ProductFinaliesController extends Controller
             $assembled->fill($request->only('product_finaly_description', 'product_finaly_amount'));
             $assembled->product_finaly_user = $request->user()->id;
             $assembled->save();
-            $syncs = [];
+            $idsUpdates = [];
             $attach = [];
             foreach ($request->details as $product) {
                 if ($product['detail_type'] === "old") {
-                    $syncs[$product['detail_product_id']] = ['product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store']];
+                    ProductFinalAssemDeta::find($product['detail_id'])->update([
+                        'product_finaly_stock' => $product['detail_stock'],
+                        'product_id' => $product['detail_product_id'],
+                        'product_finaly_type' => $product['detail_store']
+                    ]);
+                    $idsUpdates[] = $product['detail_id'];
                     continue;
                 }
                 $attach[$product['detail_product_id']] = ['product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store']];
             }
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            $assembled->product()->sync($syncs);
+            ProductFinalAssemDeta::whereNotIn('id', $idsUpdates)->where('product_assembled_id',$request->id)->get()->each(function($detail){
+                $detail->delete();
+            });
             $assembled->product()->attach($attach);
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             DB::commit();
             return response()->json([
                 'redirect' => null,
@@ -252,7 +256,8 @@ class ProductFinaliesController extends Controller
             'message' => 'Historial eliminado correctamente'
         ]);
     }
-    public function deleteProducts(ProductFinalyAssembled $assembled){
+    public function deleteProducts(ProductFinalyAssembled $assembled)
+    {
         foreach ($assembled->product as $product) {
             ProductProgressHistory::where(['product_final_assem_id' => $product->pivot->id])->get()->each(function ($history) {
                 $history->delete();
@@ -266,7 +271,7 @@ class ProductFinaliesController extends Controller
     {
         DB::beginTransaction();
         try {
-            ProductFinalAssemDeta::where('product_assembled_id',$assembled->id)->get()->each(function($value){
+            ProductFinalAssemDeta::where('product_assembled_id', $assembled->id)->get()->each(function ($value) {
                 $value->delete();
             });
             $assembled->delete();
@@ -305,21 +310,32 @@ class ProductFinaliesController extends Controller
      */
     public function destroy(ProductFinaly $products_finaly)
     {
-        if($products_finaly->imported()->exists()){
-            $products_finaly->imported()->delete();
-        }
-        if($products_finaly->assembled()->exists()){
-            $products_finaly->assembled()->get()->each(function($assembled){
-                ProductFinalAssemDeta::where('product_assembled_id',$assembled->id)->get()->each(function($value){
-                    $value->delete();
+        DB::beginTransaction();
+        try {
+            if ($products_finaly->imported()->exists()) {
+                $products_finaly->imported()->delete();
+            }
+            if ($products_finaly->assembled()->exists()) {
+                $products_finaly->assembled()->get()->each(function ($assembled) {
+                    ProductFinalAssemDeta::where('product_assembled_id', $assembled->id)->get()->each(function ($value) {
+                        $value->delete();
+                    });
+                    $assembled->delete();
                 });
-                $assembled->delete();
-            });
+            }
+            $products_finaly->update(['product_finaly_stock' => 0]);
+            DB::commit();
+            return response()->json([
+                'error' => false,
+                'success' => 'Se eliminaron los historiales correctamente'
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'error' =>true,
+                'message' => $th->getMessage()
+            ]);
         }
-        $products_finaly->update(['product_finaly_stock' => 0]);
-        return response()->json([
-            'error' => false,
-            'success' => 'Se eliminaron los historiales correctamente'
-        ]);
+        
     }
 }
