@@ -40,12 +40,11 @@ class Quotation extends Model
         'created_at',
         'updated_at'
     ];
-    protected static function boot()
-    {
-        parent::boot();
-        // Registrar el observer aquí
-        static::observe(QuotationObserver::class);
-    }
+    // protected static function boot()
+    // {
+    //     parent::boot();
+    //     static::observe(QuotationObserver::class);
+    // }
     public function products()
     {
         return $this->belongsToMany(Products::class, 'quotations_details', 'quotation_id', 'product_id')
