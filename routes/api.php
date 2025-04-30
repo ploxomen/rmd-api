@@ -3,6 +3,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\GuidesReferralController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductFinaliesController;
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('order',OrdersController::class);
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
+    Route::apiResource('billing/guide-referral',GuidesReferralController::class);
     Route::apiResource('raw-material',RawMaterialController::class);
     Route::apiResource('products-finaly',ProductFinaliesController::class)->except(['update']);
     Route::get('module-role/{module}',[ModulesController::class,'getRoles']);
@@ -46,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product',ProductsController::class);
     Route::apiResource('product-progress',ProductProgressController::class);
     Route::get("product-extra/raw-process",[ProductsController::class,"getProductRawMaterialAndProcess"]);
+    Route::get("product-extra/finaly",[ProductsController::class,"getProductRawMaterialAndFinaly"]);
+
     Route::get('product-progress-extra/raw-materials',[ProductProgressController::class,'getRawMaterialActive']);
     Route::get('product-progress-extra/history/{productProgress}',[ProductProgressController::class,'historyProductProgress']);
     Route::get('product-progress/history-list/{productProgress}',[ProductProgressController::class,'listHistory']);

@@ -42,6 +42,16 @@ class ProductsController extends Controller
             'products' => $productProgress
         ]);
     }
+    public function getProductRawMaterialAndFinaly(Request $request){
+        $rawsMaterial = RawMaterial::select("product_id","product_name","product_unit_measurement")->selectRaw("'MATERIA PRIMA' AS tipo")->products()->active();
+        $productFinaly = ProductFinaly::select("product_id","product_name","product_unit_measurement")->selectRaw("'PRODUCTO TERMINADO' AS tipo")->leftJoin('products','products.id','=','product_id')->where('product_finaly_status','!=',0)->union($rawsMaterial)->get();
+        return response()->json([
+            'redirect' => null,
+            'error' => false,
+            'message' => 'Productos obtenidos correctamente',
+            'products' => $productFinaly
+        ]);
+    }
     public function exportProductsExcel(Request $request) {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
         if(!is_null($redirect)){

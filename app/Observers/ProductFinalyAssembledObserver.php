@@ -14,10 +14,6 @@ class ProductFinalyAssembledObserver
         $productFinaly->product_finaly_stock = $totalStock;
         $productFinaly->save();
     }
-    public function updated(ProductFinalyAssembled $productFinalyAssembled)
-    {
-        //
-    }
     public function deleted(ProductFinalyAssembled $productFinalyAssembled)
     {
         $productFinaly = ProductFinaly::find($productFinalyAssembled->product_finaly_id);

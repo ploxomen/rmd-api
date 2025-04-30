@@ -6,13 +6,9 @@ use App\Models\Configurations;
 use App\Models\Customers;
 use App\Models\Districts;
 use App\Models\Orders;
-use App\Models\ProductFinaly;
-use App\Models\ProductFinalyAssembled;
 use App\Models\Provinces;
 use App\Models\Quotation;
-use App\Models\RawMaterial;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -71,7 +67,6 @@ class OrdersController extends Controller
                 'message' => 'Acceso denegado'
             ]);
         }
-        // dd($request->all());
         $orderCode = $this->getCodeOrder();
         DB::beginTransaction();
         try {

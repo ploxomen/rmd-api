@@ -9,7 +9,7 @@ class ProductFinaly extends Model
 {
     use HasFactory;
     protected $table = "product_finalies";
-    protected $fillable = ['product_id','product_finaly_stock'];
+    protected $fillable = ['product_id','product_finaly_stock','product_finaly_status'];
     public function scopeProductsActive($query,$search){
         return $query->joinProducts()->productExist()->where(function($subquery)use($search){
             $subquery->where('product_name','like','%'.$search.'%')

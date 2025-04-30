@@ -9,7 +9,6 @@ use App\Models\Quotation;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class QuotationObserver
 {

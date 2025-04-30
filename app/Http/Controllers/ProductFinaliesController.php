@@ -42,7 +42,7 @@ class ProductFinaliesController extends Controller
     }
     public function getImportedHistory(ProductFinalyImported $imported)
     {
-        $data = $imported->only('product_finaly_id', 'id', 'quotation_detail_id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
+        $data = $imported->only('product_finaly_id', 'id', 'guide_refer_id', 'product_finaly_hist_bill', 'product_finaly_hist_guide', 'product_finaly_provider', 'product_finaly_money', 'product_finaly_type_change', 'product_finaly_amount', 'product_finaly_price_buy', 'product_finaly_total_buy');
         $data['product_id'] = $imported->productFinaly->products->id;
         $data['product_name'] = $imported->productFinaly->products->product_name;
         $data['product_finaly_unit_measurement'] = $imported->productFinaly->products->product_unit_measurement;
@@ -174,14 +174,6 @@ class ProductFinaliesController extends Controller
             return response()->json(['message' => $th->getMessage(), 'error' => true]);
         }
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function totalStock(ProductFinaly $productFinaly) {}
     public function show($id, Request $request)
     {
         $productFinaly = ProductFinaly::findOrFail($id);
@@ -301,13 +293,6 @@ class ProductFinaliesController extends Controller
             'message' => 'Historial actualizado correctamente'
         ]);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(ProductFinaly $products_finaly)
     {
         DB::beginTransaction();
@@ -336,6 +321,5 @@ class ProductFinaliesController extends Controller
                 'message' => $th->getMessage()
             ]);
         }
-        
     }
 }
