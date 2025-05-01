@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalculatorController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ChangeMoneyController;
 use App\Http\Controllers\CustomersController;
@@ -23,6 +24,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('change-password',[AuthController::class,'changePassword']);
         Route::get('modules-roles',[UserController::class,'userModules']);
         Route::get('change-role/{role}',[AuthController::class,'changeRole']);
+    });
+    Route::prefix('calculator')->group(function () {
+        Route::get('configuration',[CalculatorController::class,'getConfiguration']);
+        Route::put('configuration',[CalculatorController::class,'updateConfiguration']);
+        // Route::get('change-role/{role}',[AuthController::class,'changeRole']);
     });
     Route::get('role-module/{role}',[RolesController::class,'getModules']);
     Route::get('my-business',[UserController::class,'getBusiness']);
