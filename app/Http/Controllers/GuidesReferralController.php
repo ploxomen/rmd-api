@@ -29,13 +29,13 @@ class GuidesReferralController extends Controller
             'error' => false,
             'message' => 'Guias de remisión obtenidas correctamente',
             'total' => $guidesReferral->get()->count(),
-            'data' => $guidesReferral->select("guides_referral.id","guide_issue_year","guide_issue_number","guide_issue_date","guite_total","customer_name","guide_address_destination","guide_justification")->skip($skip)->take($show)->get()
+            'data' => $guidesReferral->select("guides_referral.id","guide_issue_number","guide_issue_date","guite_total","customer_name","guide_address_destination","guide_justification")->skip($skip)->take($show)->get()
         ]);
     }
     public function store(Request $request)
     {
         $year = Carbon::parse($request->guide_issue_date)->year;
-        if(!empty($request->guide_issue_number) && GuidesReferral::where('guide_issue_year', $year)->where('guide_issue_number', $request->guide_issue_number)->exists()){
+        if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->exists()){
             return response()->json([
                 'redirect' => null,
                 'error' => true,
@@ -98,9 +98,7 @@ class GuidesReferralController extends Controller
         DB::beginTransaction();
         try {
             $guideReferral = new GuidesReferral();
-            $guideReferral->fill($request->only(['guide_issue_date','guide_address_destination','guide_customer_id','guide_justification']));
-            $guideReferral->guide_issue_year = $year;
-            $guideReferral->guide_issue_number = empty($request->guide_issue_number) ? $guideReferral->numberGuide($year) : $request->guide_issue_number;
+            $guideReferral->fill($request->only(['guide_issue_date','guide_issue_number','guide_address_destination','guide_customer_id','guide_justification']));
             $guideReferral->guide_user_id = $request->user()->id;
             $guideReferral->save();
             foreach ($request->details as $product) {
@@ -128,8 +126,7 @@ class GuidesReferralController extends Controller
             'details' => 'required|array',
             'guide_issue_number' => 'required|numeric'
         ], [], ['details' => 'detalles']);
-        $year = Carbon::parse($request->guide_issue_date)->year;
-        if(!empty($request->guide_issue_number) && GuidesReferral::where('guide_issue_year', $year)->where('guide_issue_number', $request->guide_issue_number)->where('id','!=',$guide_referral->id)->exists()){
+        if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->where('id','!=',$guide_referral->id)->exists()){
             return response()->json([
                 'redirect' => null,
                 'error' => true,
@@ -140,8 +137,6 @@ class GuidesReferralController extends Controller
         try {
             $guide_referral->fill($request->only('guide_issue_date', 'guide_customer_id','guide_issue_number','guide_address_destination','guide_justification'));
             $guide_referral->guide_user_id = $request->user()->id;
-            $guide_referral->guide_issue_year = $year;
-            $guide_referral->guide_issue_number = $request->guide_issue_number;
             $guide_referral->save();
             $idsUpdates = [];
             $attach = [];

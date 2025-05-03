@@ -11,7 +11,7 @@ class CalculatorController extends Controller
     public function getConfiguration(Request $request)
     {
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
-        $data = Configurations::whereIn('description',['calculator_price_supervition','calculator_price_opertor','calculator_price_operating_margin','calculator_price_km_desplacement','calculator_price_site_visit','calculator_price_overnight_voucher','calculator_price_food_diary','calculator_price_medical_exam','calculator_price_supervition_extra','calculator_price_opertor_extra','calculator_price_hour_daily'])->get()->map(function ($item) {
+        $data = Configurations::whereIn('description',['calculator_price_supervition','calculator_price_opertor','calculator_price_operating_margin','calculator_price_km_desplacement','calculator_price_site_visit','calculator_price_overnight_voucher','calculator_price_food_diary','calculator_price_medical_exam','calculator_price_supervition_extra','calculator_price_opertor_extra','calculator_price_hour_daily','calculator_price_pay_pernoctar'])->get()->map(function ($item) {
             return [ $item->description => $item->value ];
         })->values();
         return response()->json([
@@ -37,6 +37,7 @@ class CalculatorController extends Controller
             'calculator_price_hour_daily' => 'required|numeric',
             'calculator_price_supervition_extra' => 'required|numeric',
             'calculator_price_opertor_extra' => 'required|numeric',
+            'calculator_price_pay_pernoctar' => 'required|numeric',
         ]);
         foreach ($request->all() as $key => $value) {
             Configurations::where('description', $key)->update(['value' => $value]);

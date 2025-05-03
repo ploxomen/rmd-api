@@ -11,7 +11,6 @@ class GuidesReferral extends Model
     protected $fillable = [
         'guide_issue_date',
         'guide_customer_id',
-        'guide_issue_year',
         'guide_issue_number',
         'guide_address_destination',
         'guide_justification',
@@ -39,14 +38,14 @@ class GuidesReferral extends Model
             $q->where('customer_name', 'like', "%$search%")
                 ->orWhere('guide_justification', 'like', "%$search%")
                 ->orWhere('guide_address_destination', 'like', "%$search%")
-                ->orWhereRaw("CONCAT('GR',guide_issue_year,'-',guide_issue_number) LIKE CONCAT('%',?,'%')",[$search]);
+                ->orWhere('guide_issue_number', 'like', "%$search%");
         });
     }
     public function product(){
         return $this->belongsToMany(Products::class,'guides_referral_details','guide_referral_id','guide_product_id')->using(GuidesReferralDetails::class)->withPivot('guide_product_quantity','guide_product_type','id')->withTimestamps();
     }
-    public function numberGuide(int $year){
-        $number = GuidesReferral::where('guide_issue_year', $year)->max('guide_issue_number');
-        return $number ? $number + 1 : 1;
-    }
+    // public function numberGuide(int $year){
+    //     $number = GuidesReferral::where('guide_issue_year', $year)->max('guide_issue_number');
+    //     return $number ? $number + 1 : 1;
+    // }
 }
