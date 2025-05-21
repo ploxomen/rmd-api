@@ -74,7 +74,7 @@ class GuidesReferralController extends Controller
                     return response()->json([
                         'redirect' => null,
                         'error' => true,
-                        'message' => "El producto {$rawMaterial->product->product_name} de MATERIA PRIMA no cuenta con estock suficiente, actualmente hay {$rawMaterial->raw_material_stock}, se está tratando de ingresar {$detail['stock']}"
+                        'message' => "El producto {$rawMaterial->product->product_name} de MATERIA PRIMA no cuenta con stock suficiente, actualmente hay {$rawMaterial->raw_material_stock}, se está tratando de ingresar {$detail['stock']}"
                     ], 422);
                 }
                 continue;
@@ -91,7 +91,7 @@ class GuidesReferralController extends Controller
                 return response()->json([
                     'redirect' => null,
                     'error' => true,
-                    'message' => "El producto {$productFinaly->product->product_name} de PRODUCTO TERMINADO no cuenta con estock suficiente, actualmente hay {$productFinaly->product_finaly_stock}, se está tratando de ingresar {$detail['stock']}"
+                    'message' => "El producto {$productFinaly->product->product_name} de PRODUCTO TERMINADO no cuenta con stock suficiente, actualmente hay {$productFinaly->product_finaly_stock}, se está tratando de ingresar {$detail['stock']}"
                 ], 422);
             }
         }

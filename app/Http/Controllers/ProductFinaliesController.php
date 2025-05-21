@@ -18,12 +18,12 @@ class ProductFinaliesController extends Controller
     private $urlModule = '/store/products-finaly';
     public function historiesProductVerif(ProductFinaly $productFinaly)
     {
-        $result = $productFinaly->products()->whereIn('product_label', ['IMPORTADO', 'ENSAMBLADO'])->first();
+        $result = $productFinaly->products()->whereIn('product_label_2', ['IMPORTADO', 'ENSAMBLADO'])->first();
         return response()->json([
             'data' => [
                 'nameProduct' => $result?->product_name,
                 'idProductFinaly' => $productFinaly->id,
-                'typeProductFinaly' => $result->product_label,
+                'typeProductFinaly' => $result->product_label_2,
             ]
         ]);
     }
@@ -58,9 +58,9 @@ class ProductFinaliesController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $productsFinaly = ProductFinaly::select("product_name", "products.id", "product_code", "product_label", "product_finaly_stock", "product_unit_measurement", "product_public_customer", "product_finalies.id AS product_finaly_id")->productsActive($search);
+        $productsFinaly = ProductFinaly::select("product_name", "products.id", "product_code", "product_label_2", "product_finaly_stock", "product_unit_measurement", "product_public_customer", "product_finalies.id AS product_finaly_id")->productsActive($search);
         if ($request->filled('tipo')) {
-            $productsFinaly->where('product_label', $request->tipo);
+            $productsFinaly->where('product_label_2', $request->tipo);
         }
         return response()->json([
             'redirect' => $redirect,
@@ -87,11 +87,11 @@ class ProductFinaliesController extends Controller
                 'message' => 'El producto seleccionado no es un producto terminado'
             ], 422);
         }
-        if ($productFinaly->products->product_label === "IMPORTADO") {
+        if ($productFinaly->products->product_label_2 === "IMPORTADO") {
             $request->validate([
                 'product_finaly_provider' => 'required'
             ], [], ['product_finaly_provider' => 'proveedor']);
-        } else if ($productFinaly->products->product_label === "ENSAMBLADO") {
+        } else if ($productFinaly->products->product_label_2 === "ENSAMBLADO") {
             $request->validate([
                 'details' => 'required|array'
             ], [], ['details' => 'detalles']);
@@ -124,7 +124,7 @@ class ProductFinaliesController extends Controller
                         return response()->json([
                             'redirect' => null,
                             'error' => true,
-                            'message' => "El producto {$rawMaterial->product->product_name} de MATERIA PRIMA no cuenta con estock suficiente, actualmente hay {$rawMaterial->raw_material_stock}, se está tratando de ingresar {$detail['stock']}"
+                            'message' => "El producto {$rawMaterial->product->product_name} de MATERIA PRIMA no cuenta con stock suficiente, actualmente hay {$rawMaterial->raw_material_stock}, se está tratando de ingresar {$detail['stock']}"
                         ], 422);
                     }
                     continue;
@@ -141,21 +141,21 @@ class ProductFinaliesController extends Controller
                     return response()->json([
                         'redirect' => null,
                         'error' => true,
-                        'message' => "El producto {$productPorgres->product->product_name} de PRODUCTO EN CURSO no cuenta con estock suficiente, actualmente hay {$productPorgres->product_progress_stock}, se está tratando de ingresar {$detail['stock']}"
+                        'message' => "El producto {$productPorgres->product->product_name} de PRODUCTO EN CURSO no cuenta con stock suficiente, actualmente hay {$productPorgres->product_progress_stock}, se está tratando de ingresar {$detail['stock']}"
                     ], 422);
                 }
             }
         }
         DB::beginTransaction();
         try {
-            if ($productFinaly->products->product_label === "IMPORTADO") {
+            if ($productFinaly->products->product_label_2 === "IMPORTADO") {
                 $productImported = new ProductFinalyImported();
                 $productImported->product_finaly_id = $productFinaly->id;
                 $productImported->product_finaly_created = now()->toDateString();
                 $productImported->fill($request->except('product_finaly_id', 'product_name', 'product_id'));
                 $productImported->product_finaly_user = $request->user()->id;
                 $productImported->save();
-            } else if ($productFinaly->products->product_label === "ENSAMBLADO") {
+            } else if ($productFinaly->products->product_label_2 === "ENSAMBLADO") {
                 $productAssembled = new ProductFinalyAssembled();
                 $productAssembled->product_finaly_id = $productFinaly->id;
                 $productAssembled->product_finaly_created = now()->toDateString();
@@ -182,9 +182,9 @@ class ProductFinaliesController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        if ($product->product_label === "IMPORTADO") {
+        if ($product->product_label_2 === "IMPORTADO") {
             $result = ProductFinalyImported::getActive($productFinaly->id)->searchHistory($search)->orderBy('product_finaly_created', 'desc');
-        } else if ($product->product_label === 'ENSAMBLADO') {
+        } else if ($product->product_label_2 === 'ENSAMBLADO') {
             $result = ProductFinalyAssembled::getActive($productFinaly->id)->searchHistory($search)->orderBy('product_finaly_created', 'desc');
         }
         return response()->json([
