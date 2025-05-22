@@ -34,7 +34,6 @@ class GuidesReferralController extends Controller
     }
     public function store(Request $request)
     {
-        $year = Carbon::parse($request->guide_issue_date)->year;
         if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->exists()){
             return response()->json([
                 'redirect' => null,
@@ -124,7 +123,7 @@ class GuidesReferralController extends Controller
     public function update(Request $request, GuidesReferral $guide_referral){
         $request->validate([
             'details' => 'required|array',
-            'guide_issue_number' => 'required|numeric'
+            'guide_issue_number' => 'required'
         ], [], ['details' => 'detalles']);
         if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->where('id','!=',$guide_referral->id)->exists()){
             return response()->json([

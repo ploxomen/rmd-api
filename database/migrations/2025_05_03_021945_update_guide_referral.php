@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('guides_referral', function (Blueprint $table) {
             $table->dropColumn('guide_issue_year');
+            $table->string('guide_issue_number')->change();
         });
     }
 
@@ -27,6 +28,7 @@ return new class extends Migration
     {
         Schema::table('guides_referral', function (Blueprint $table) {
             $table->string('guide_issue_year');
+            $table->integer('guide_issue_number')->change();
         });
     }
 };
