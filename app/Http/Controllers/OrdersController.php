@@ -244,6 +244,10 @@ class OrdersController extends Controller
                 'message' => 'Acceso denegado'
             ], 403);
         }
+        $quotation->update([
+            'quotation_status' => 1,
+            'order_id' => null
+        ]);
         return response()->json([
             'message' => 'Cotización eliminada',
             'data' => [
@@ -339,12 +343,19 @@ class OrdersController extends Controller
                     'order_file_name' => $fileName
                 ]);
             }
-            $quotationsRequest = collect(json_decode($request->quotations, true));
-            $order->quotations()->whereIn("quotations.id", $quotationsRequest->pluck("id"))->get()->each(function ($quotation) {
-                $quotation->quotation_status = 1;
-                $quotation->order_id = null;
-                $quotation->save();
-            });
+            foreach (json_decode($request->quotations) as $quotation) {
+                $modelQuotation = Quotation::where([
+                    'id' => $quotation->id,
+                    'quotation_status' => 1
+                ])->whereNull('order_id')->first();
+                if(empty($modelQuotation)) {
+                    continue;
+                }
+                $modelQuotation->update([
+                    'order_id' => $order->id,
+                    'quotation_status' => 2
+                ]);
+            }
             $order->update($this->calculateMount($order->id));
             DB::commit();
             return response()->json([
@@ -358,6 +369,7 @@ class OrdersController extends Controller
                 'redirect' => null,
                 'error' => true,
                 'message' => $th->getMessage(),
+                'line' => $th->getLine(),
             ]);
         }
     }
