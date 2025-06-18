@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::table('customers', function (Blueprint $table) {
+            $table->bigInteger('customer_contrie')->unsigned();
+            $table->foreign('customer_contrie')->references('id')->on('contries');
+        });
         Schema::table('orders',function(Blueprint $table){
             $table->string('order_retaining_customer',2)->after('customer_id');
         });
@@ -28,6 +32,10 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropForeign('customer_contrie');
+            $table->dropColumn('customer_contrie');
+        });
         Schema::table('orders',function(Blueprint $table){
             $table->dropColumn('order_retaining_customer');
         });

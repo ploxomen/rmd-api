@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('detail_price_unit', 16, 2)->change();
             $table->decimal('detail_price_buy', 16, 2)->change();
         });
-        Schema::table('orders', function (Blueprint $table) {
+        Schema::table('orders', callback: function (Blueprint $table) {
             $table->decimal('order_mount', 16, 2)->change();
             $table->decimal('order_total', 16, 2)->change();
             $table->decimal('order_mount_igv', 16, 2)->change();

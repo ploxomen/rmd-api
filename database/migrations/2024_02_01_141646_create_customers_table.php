@@ -17,8 +17,6 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('customer_type_document')->unsigned()->nullable();
             $table->foreign('customer_type_document')->references('id')->on('type_documents');
-            $table->bigInteger('customer_contrie')->unsigned();
-            $table->foreign('customer_contrie')->references('id')->on('contries');
             $table->string('customer_number_document',30)->nullable();
             $table->string('customer_name',250);
             $table->string('customer_email',250)->nullable();

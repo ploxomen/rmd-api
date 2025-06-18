@@ -21,10 +21,17 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('order_money');
+            $table->decimal('order_mount')->nullable();
+            $table->decimal('order_total')->nullable();
+            $table->decimal('order_mount_igv')->nullable();
             $table->tinyInteger('order_igv');
             $table->tinyInteger('order_status');
             $table->timestamps();
         });
+        Schema::table('quotations', function (Blueprint $table) {
+            $table->foreign('order_id')->references('id')->on('orders');
+        });
+        
     }
 
     /**
@@ -34,6 +41,9 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::table('quotations', function (Blueprint $table) {
+            $table->dropForeign('order_id');
+        });
         Schema::dropIfExists('orders');
     }
 };
