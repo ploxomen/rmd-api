@@ -48,6 +48,7 @@ class Products extends Model
     public static function reportExcel()
     {
         return Products::with(['subcategorie.categorie'])
+        ->where('product_status','!=',0)
         ->get()
         ->sortBy(function($product){
             return $product->subcategorie->categorie->categorie_name . ' ' . $product->subcategorie->sub_categorie_name;
