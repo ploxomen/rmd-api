@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RawMaterial extends Model
 {
-    protected $fillable = ['product_id','raw_material_stock','raw_material_price_buy','raw_material_status','raw_material_money'];
+    protected $fillable = ['product_id','raw_material_stock','raw_material_price_buy','raw_material_status','raw_material_money','raw_hist_bala_amou','raw_hist_bala_cost','raw_hist_prom_weig'];
     public function history(): HasMany
     {
         return $this->hasMany(RawMaterialHistory::class,'raw_material_id');

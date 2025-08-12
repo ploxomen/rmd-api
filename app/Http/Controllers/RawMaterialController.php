@@ -159,6 +159,7 @@ class RawMaterialController extends Controller
             'material_hist_date' => $request->material_hist_date,
             'raw_provider' => $request->raw_provider,
             'material_hist_bill' => $request->material_hist_bill,
+            'raw_hist_type' => 'ENTRADA',
             'material_hist_guide' => $request->material_hist_guide,
             'material_hist_amount' => $request->material_hist_amount,
             'material_hist_price_buy' => $request->material_hist_price_buy,
