@@ -9,15 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ProductProgress extends Model
 {
     protected $table = 'product_progress';
-    protected $fillable = ['product_id','product_progress_stock','product_progress_status'];
-    public function scopeProducts($query){
+    protected $fillable = ['product_id','product_progress_stock','product_progress_status','prod_prog_bala_amou','prod_prog_bala_cost','prod_prog_prom_weig'];
+    public function scopeProducts($query): mixed{
         return $query->join("products","products.id","=","product_id")->where('product_status','>',0);
     }
     public function scopeActive($query) {
         return $query->where('product_progress_status','>',0);
     }
     public static function getProductProgress($dateInitial,$dateFinal,$search) {
-        $productProgress = ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','product_final_assem_id','product_name','product_progress_history_description')
+        $productProgress = ProductProgressHistory::select('product_progress_history.id','product_code','product_id','product_progress_history_stock AS product_progress_stock','product_unit_measurement','prod_prog_hist_type','product_progress_history_total','product_progress_history_pu','prod_prog_hist_bala_amou','prod_prog_hist_bala_cost','prod_prog_hist_prom_weig','product_final_assem_id','product_name','product_progress_history_description')
         ->selectRaw("DATE_FORMAT(product_progress_history_date,'%d/%m/%Y') AS product_progress_history_date")
         ->join('products','product_id','=','products.id')
         ->where(function($query)use($search){

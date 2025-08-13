@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ProductsExport;
 use App\Models\Categories;
+use App\Models\Commodity;
 use App\Models\ProductFinaly;
 use App\Models\ProductProgress;
 use App\Models\Products;
@@ -137,6 +138,13 @@ class ProductsController extends Controller
                     'product_id' => $product->id,
                     'product_finaly_stock' => 0,
                     'product_finaly_price' => 0,
+                ]);
+            }else if($request->product_store === 'ALMACEN MERCADERIA'){
+                Commodity::create([
+                    'product_id' => $product->id,
+                    'commodi_stock' => 0,
+                    'commodi_money' => 'PEN',
+                    'commodi_price_buy' => 0
                 ]);                
             }
             $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);

@@ -29,7 +29,20 @@ class ProductProgresDetaObserver
                 ]);
             }
         }
-        $this->totalProductProgress($productProgressHistory->product_progress_id);
+        $idProductProgress = $productProgressHistory->product_progress_id;
+        $productProgress = ProductProgress::find($idProductProgress);
+        $amount = $productProgressHistory->product_progress_history_stock + $productProgress->prod_prog_bala_amou;
+        $total = $productProgressHistory->product_progress_history_total + $productProgress->prod_prog_bala_cost;
+        $avg = round($total / $amount,2);
+        $productProgressHistory->prod_prog_hist_bala_amou = $amount;
+        $productProgressHistory->prod_prog_hist_bala_cost = $total;
+        $productProgressHistory->prod_prog_hist_prom_weig = $avg;
+        $productProgressHistory->saveQuietly();
+        $productProgress->prod_prog_bala_amou = $amount;
+        $productProgress->prod_prog_bala_cost = $total;
+        $productProgress->prod_prog_prom_weig = $avg;
+        $productProgress->save();
+        $this->totalProductProgress($idProductProgress);
     }
     public function updated(ProductProgressHistory $productProgressHistory)
     {
@@ -40,6 +53,14 @@ class ProductProgresDetaObserver
         $this->totalProductProgress($productProgressHistory->product_progress_id);
     }
     public function deleting(ProductProgressHistory $productProgressHistory){
+        $productProgress = ProductProgress::find($productProgressHistory->product_progress_id);
+        $amount = $productProgress->prod_prog_bala_amou - $productProgressHistory->product_progress_history_stock;
+        $total = $productProgress->prod_prog_bala_cost - $productProgressHistory->product_progress_history_total;
+        $avg = $amount <= 0 ? 0 : round($total / $amount,2);
+        $productProgress->prod_prog_bala_amou = $amount;
+        $productProgress->prod_prog_bala_cost = $total;
+        $productProgress->prod_prog_prom_weig = $avg;
+        $productProgress->save();
         RawMaterialHistory::where('product_progres_hist_id',$productProgressHistory->id)->get()->each(function($item) {
             $item->delete();
         });

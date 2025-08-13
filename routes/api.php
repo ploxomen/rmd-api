@@ -3,6 +3,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalculatorController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ChangeMoneyController;
+use App\Http\Controllers\CommodityController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\GuidesReferralController;
 use App\Http\Controllers\ModulesController;
@@ -73,6 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
         
     });
     Route::apiResource('quotation',QuotationsController::class);
+    Route::apiResource('store-commodity',CommodityController::class);
+
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);
 

@@ -42,8 +42,8 @@ class RawMaterialHistoryObserver
     public function deleting(RawMaterialHistory $rawMaterialHistory)
     {
         $rawMaterial = RawMaterial::find($rawMaterialHistory->raw_material_id);
-        $amount = $rawMaterial->raw_hist_bala_amou - $rawMaterialHistory->raw_hist_bala_amou;
-        $total = $rawMaterial->raw_hist_bala_cost - $rawMaterialHistory->raw_hist_bala_cost;
+        $amount = $rawMaterial->raw_hist_bala_amou - $rawMaterialHistory->material_hist_amount;
+        $total = $rawMaterial->raw_hist_bala_cost - $rawMaterialHistory->material_hist_total_buy_pen;
         $avg = $amount <= 0 ? 0 : round($total / $amount,2);
         $rawMaterial->raw_hist_bala_amou = $amount;
         $rawMaterial->raw_hist_bala_cost = $total;
