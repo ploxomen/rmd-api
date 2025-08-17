@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Commodity;
+use App\Models\CommodityHistory;
 use Illuminate\Http\Request;
 
 class CommodityController extends Controller
@@ -22,5 +23,20 @@ class CommodityController extends Controller
             'total' => $commodity->get()->count(),
             'data' => $commodity->skip($skip)->take($show)->get()
         ]);
+    }
+    public function store(Request $request)
+    {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        if($this->validateDuplicateProduct($request->commodi_hist_bill,$request->product_id)){
+            return response()->json([
+                'redirect' => $redirect,
+                'error' => true, 
+                'message' => 'El historial no puede ser añadido debido a que ya se encuentra registrado con el mismo numero de factura', 
+            ]);
+        }
+    }
+    public function validateDuplicateProduct($numberBill,$idProduct) {
+        $materialDuplicate = CommodityHistory::where(['product_id' => $idProduct, 'commodi_hist_bill' => $numberBill])->first();
+        return !empty($materialDuplicate);
     }
 }
