@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store-commodity',CommodityController::class);
     Route::get('store-commodity/histories/{commodity}',[CommodityController::class,'historiesCommodities']);
     Route::get('store-commodity/history-one/{commodityHistory}',[CommodityController::class,'historyCommodity']);
+    Route::delete('store-commodity/history-one/{commodityHistory}',[CommodityController::class,'historyCommodityDelete']);
 
     Route::get('quotation-extra/products',[QuotationsController::class,'getProductsActive']);
     Route::get('/raw-material/valid-product/{numberBill}',[RawMaterialController::class,'disabledProduct']);

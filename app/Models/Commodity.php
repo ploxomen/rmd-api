@@ -37,11 +37,15 @@ class Commodity extends Model
             'commodi_bala_cost' => $cost,
             'commodi_prom_weig' => $average
         ]);
+        if($type != 'suma'){
+            return true;
+        }
         $history->updateQuietly([
             'commodi_hist_bala_amou' => $amount,
             'commodi_hist_bala_cost' => $cost,
             'commodi_hist_prom_weig' => $average,
         ]);
+        return true;
     }
     public function history(): HasMany
     {
