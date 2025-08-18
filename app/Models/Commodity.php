@@ -22,6 +22,10 @@ class Commodity extends Model
     {
         return $query->join('products','products.id','=','product_id')->where('product_status',1);
     }
+    public function product()
+    {
+        return $this->belongsTo(Products::class,'product_id');
+    }
     public static function calculationAvgHistory(int $idCommodity, float $amountHistory, float $costHistory, CommodityHistory $history, string $type = 'suma')
     {
         $commodity = Commodity::find($idCommodity);

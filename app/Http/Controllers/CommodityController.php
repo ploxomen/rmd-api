@@ -25,6 +25,7 @@ class CommodityController extends Controller
             'data' => $commodity->skip($skip)->take($show)->get()
         ]);
     }
+    //AGREGAR HISTORIAL
     public function store(Request $request)
     {
         $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
@@ -73,5 +74,68 @@ class CommodityController extends Controller
     public function validateDuplicateProduct($numberBill,$idProduct) {
         $materialDuplicate = CommodityHistory::where(['product_id' => $idProduct, 'commodi_hist_bill' => $numberBill])->first();
         return !empty($materialDuplicate);
+    }
+    public function historiesCommodities(Request $request, $commodity)
+    {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $show = $request->show;
+        $search = $request->has('search') ? $request->search : '';
+        $skip = ($request->page - 1) * $request->show;
+        $commodities = CommodityHistory::getHistory($commodity,$search);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false, 
+            'message' => 'Datos obtenidos correctamente',
+            'total' => $commodities->get()->count(),
+            'data' => $commodities->skip($skip)->take($show)->get()
+        ]);
+    }
+    public function historyCommodity(Request $request, CommodityHistory $commodityHistory)
+    {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'message' => 'El registro se obtuvo correctamente',
+            'name_product' => $commodityHistory->commodity->product->product_name,
+            'measurement_product' => $commodityHistory->commodity->product->product_unit_measurement,
+            'data' => $commodityHistory->only(["commodi_hist_bill",'commodity_provider','product_id',"commodi_hist_guide","commodi_hist_amount","commodi_hist_price_buy","id","commodi_hist_money","commodi_hist_total_buy","commodi_hist_total_buy_usd","commodi_hist_type_change",'commodi_hist_date'])
+        ]);
+    }
+    //ACTUALIZAR HISTORIAL
+    public function update(Request $request, CommodityHistory $storeCommodity)
+    {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $total = $request->commodi_hist_price_buy * $request->commodi_hist_amount;
+        $storeCommodity->update([
+            'commodi_hist_date' => $request->commodi_hist_date,
+            'commodity_provider' => $request->commodity_provider,
+            'commodi_hist_bill' => $request->commodi_hist_bill,
+            'commodi_hist_guide' => $request->commodi_hist_guide,
+            'commodi_hist_amount' => $request->commodi_hist_amount,
+            'commodi_hist_price_buy' => $request->commodi_hist_price_buy,
+            'commodi_hist_money' => $request->commodi_hist_money,
+            'commodi_hist_total_buy' => $request->commodi_hist_money === 'PEN' ? $total : $total * $storeCommodity->commodi_hist_type_change,
+            'commodi_hist_total_buy_usd' => $request->commodi_hist_money === 'PEN' ? $total / $storeCommodity->commodi_hist_type_change : $total,
+        ]);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false, 
+            'message' => 'Registro actualizado correctamente', 
+        ]);
+    }
+    //VER HISTORIAL
+    public function show(Request $request, Commodity $storeCommodity) {
+        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        return response()->json([
+            'redirect' => $redirect,
+            'error' => false,
+            'data' => [
+                'nameProduct' => $storeCommodity->product->product_name,
+                'idCommodity' => $storeCommodity->id,
+                'measurementProduct' => $storeCommodity->product->product_unit_measurement,
+                'idProduct' => $storeCommodity->product_id
+            ]
+        ]);
     }
 }
