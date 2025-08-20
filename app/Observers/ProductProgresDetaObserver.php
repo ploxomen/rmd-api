@@ -21,9 +21,15 @@ class ProductProgresDetaObserver
         if(!self::$disable){
             $rawMaterial = RawMaterial::where(['product_id' => $productProgressHistory->product_id, 'raw_material_status' => 1])->first();
             if(!empty($rawMaterial)) {
+                $amount = $productProgressHistory->product_progress_history_stock * -1;
+                $priceUnit = $rawMaterial->raw_hist_prom_weig;
+                $subtotal = $amount * $priceUnit;
                 $rawMaterial->history()->create([
                     'product_id' => $productProgressHistory->product_id,
-                    'material_hist_amount' => $productProgressHistory->product_progress_history_stock * -1,
+                    'material_hist_amount' => $amount,
+                    'material_hist_total_buy_pen' => $subtotal,
+                    'material_hist_price_buy' => $priceUnit,
+                    'raw_hist_type' => 'SALIDA',
                     'product_progres_hist_id' => $productProgressHistory->id,
                     'material_user' => auth()->user()->id,
                 ]);

@@ -34,8 +34,8 @@ class ProductsController extends Controller
         ]);
     }
     public function getProductRawMaterialAndProcess(Request $request){
-        $rawsMaterial = RawMaterial::select("product_id","product_name","product_unit_measurement")->selectRaw("'MATERIA PRIMA' AS tipo")->products()->active();
-        $productProgress = ProductProgress::select("product_id","product_name","product_unit_measurement")->selectRaw("'PRODUCTO CURSO' AS tipo")->products()->active()->union($rawsMaterial)->get();
+        $rawsMaterial = RawMaterial::select("product_id","product_name","product_unit_measurement","raw_hist_prom_weig AS cost_unit")->selectRaw("'MATERIA PRIMA' AS tipo")->products()->active();
+        $productProgress = ProductProgress::select("product_id","product_name","product_unit_measurement","prod_prog_prom_weig AS cost_unit")->selectRaw("'PRODUCTO CURSO' AS tipo")->products()->active()->union($rawsMaterial)->get();
         return response()->json([
             'redirect' => null,
             'error' => false,
