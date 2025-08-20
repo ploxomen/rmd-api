@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Commodity;
 use App\Models\GuidesReferral;
 use App\Models\GuidesReferralDetails;
 use App\Models\ProductFinaly;
@@ -18,23 +19,23 @@ class GuidesReferralController extends Controller
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
-        $customer = $request->input('customer','');
+        $customer = $request->input('customer', '');
         $skip = ($request->page - 1) * $request->show;
         $guidesReferral = GuidesReferral::withCustomer()->search($search);
-        if(!empty($customer)){
-            $guidesReferral->where('guide_customer_id',$customer);
+        if (!empty($customer)) {
+            $guidesReferral->where('guide_customer_id', $customer);
         }
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
             'message' => 'Guias de remisión obtenidas correctamente',
             'total' => $guidesReferral->get()->count(),
-            'data' => $guidesReferral->select("guides_referral.id","guide_issue_number","guide_issue_date","guite_total","customer_name","guide_address_destination","guide_justification")->skip($skip)->take($show)->get()
+            'data' => $guidesReferral->select("guides_referral.id", "guide_issue_number", "guide_issue_date", "guite_total", "customer_name", "guide_address_destination", "guide_justification")->skip($skip)->take($show)->get()
         ]);
     }
     public function store(Request $request)
     {
-        if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->exists()){
+        if (GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->exists()) {
             return response()->json([
                 'redirect' => null,
                 'error' => true,
@@ -78,26 +79,44 @@ class GuidesReferralController extends Controller
                 }
                 continue;
             }
-            $productFinaly = ProductFinaly::where(["product_id" => $detail["product_id"], 'product_finaly_status' => 1])->first();
-            if (empty($productFinaly)) {
+            if ($detail['type'] === "PRODUCTO TERMINADO") {
+                $productFinaly = ProductFinaly::where(["product_id" => $detail["product_id"], 'product_finaly_status' => 1])->first();
+                if (empty($productFinaly)) {
+                    return response()->json([
+                        'redirect' => null,
+                        'error' => true,
+                        'message' => 'No existe el producto de PRODUCTO TERMINADO elegido'
+                    ], 422);
+                }
+                if ($productFinaly->product_finaly_stock < $detail['stock']) {
+                    return response()->json([
+                        'redirect' => null,
+                        'error' => true,
+                        'message' => "El producto {$productFinaly->products->product_name} de PRODUCTO TERMINADO no cuenta con stock suficiente, actualmente hay {$productFinaly->product_finaly_stock}, se está tratando de ingresar {$detail['stock']}"
+                    ], 422);
+                }
+                continue;
+            }
+            $commodity = Commodity::where(["product_id" => $detail["product_id"], 'commodi_status' => 1])->first();
+            if (empty($commodity)) {
                 return response()->json([
                     'redirect' => null,
                     'error' => true,
-                    'message' => 'No existe el producto de PRODUCTO TERMINADO elegido'
+                    'message' => 'No existe el producto MERCADERIA elegido'
                 ], 422);
             }
-            if ($productFinaly->product_finaly_stock < $detail['stock']) {
+            if ($commodity->commodi_stock < $detail['stock']) {
                 return response()->json([
                     'redirect' => null,
                     'error' => true,
-                    'message' => "El producto {$productFinaly->product->product_name} de PRODUCTO TERMINADO no cuenta con stock suficiente, actualmente hay {$productFinaly->product_finaly_stock}, se está tratando de ingresar {$detail['stock']}"
+                    'message' => "El producto {$commodity->product->product_name} de ALMACEN MERCADERIA no cuenta con stock suficiente, actualmente hay {$commodity->commodi_stock}, se está tratando de ingresar {$detail['stock']}"
                 ], 422);
             }
         }
         DB::beginTransaction();
         try {
             $guideReferral = new GuidesReferral();
-            $guideReferral->fill($request->only(['guide_issue_date','guide_issue_number','guide_address_destination','guide_customer_id','guide_justification']));
+            $guideReferral->fill($request->except(['details']));
             $guideReferral->guide_user_id = $request->user()->id;
             $guideReferral->save();
             foreach ($request->details as $product) {
@@ -112,7 +131,7 @@ class GuidesReferralController extends Controller
     }
     public function show(GuidesReferral $guide_referral)
     {
-        $data = $guide_referral->only('guide_customer_id', 'id', 'guide_issue_date', 'guide_issue_number', 'guide_address_destination','guide_justification');
+        $data = $guide_referral->only('guide_customer_id', 'id', 'guide_issue_date', 'guide_issue_number', 'guide_address_destination', 'guide_justification');
         return response()->json([
             'redirect' => null,
             'error' => false,
@@ -120,12 +139,13 @@ class GuidesReferralController extends Controller
             'details' => $guide_referral->product()->select("guides_referral_details.id AS detail_id", "guide_product_quantity as detail_stock", "guide_product_type as detail_store", "guide_product_id as detail_product_id")->selectRaw("'old' AS detail_type")->get()->makeHidden('pivot')
         ]);
     }
-    public function update(Request $request, GuidesReferral $guide_referral){
+    public function update(Request $request, GuidesReferral $guide_referral)
+    {
         $request->validate([
             'details' => 'required|array',
             'guide_issue_number' => 'required'
         ], [], ['details' => 'detalles']);
-        if(GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->where('id','!=',$guide_referral->id)->exists()){
+        if (GuidesReferral::where('guide_issue_number', $request->guide_issue_number)->where('id', '!=', $guide_referral->id)->exists()) {
             return response()->json([
                 'redirect' => null,
                 'error' => true,
@@ -134,8 +154,7 @@ class GuidesReferralController extends Controller
         }
         DB::beginTransaction();
         try {
-            $guide_referral->fill($request->only('guide_issue_date', 'guide_customer_id','guide_issue_number','guide_address_destination','guide_justification'));
-            $guide_referral->guide_user_id = $request->user()->id;
+            $guide_referral->fill($request->except(['details']));
             $guide_referral->save();
             $idsUpdates = [];
             $attach = [];
@@ -151,7 +170,7 @@ class GuidesReferralController extends Controller
                 }
                 $attach[$product['detail_product_id']] = ['guide_product_quantity' => $product['detail_stock'], 'guide_product_type' => $product['detail_store']];
             }
-            GuidesReferralDetails::whereNotIn('id', $idsUpdates)->where('guide_referral_id',$guide_referral->id)->get()->each(function($detail){
+            GuidesReferralDetails::whereNotIn('id', $idsUpdates)->where('guide_referral_id', $guide_referral->id)->get()->each(function ($detail) {
                 $detail->delete();
             });
             $guide_referral->product()->attach($attach);
@@ -186,7 +205,7 @@ class GuidesReferralController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'error' =>true,
+                'error' => true,
                 'message' => $th->getMessage()
             ]);
         }

@@ -13,6 +13,27 @@ class ProductProgress extends Model
     public function scopeProducts($query): mixed{
         return $query->join("products","products.id","=","product_id")->where('product_status','>',0);
     }
+    public static function calculationAvgHistory(int $idProductProgress, float $amountHistory, float $costHistory, ProductProgressHistory $history, string $type = 'suma')
+    {
+        $productProgress = ProductProgress::find($idProductProgress);
+        $amount = $type == 'suma' ? $amountHistory + $productProgress->prod_prog_bala_amou : $productProgress->prod_prog_bala_amou - $amountHistory;
+        $cost = $type == 'suma' ? $costHistory + $productProgress->prod_prog_bala_cost : $productProgress->prod_prog_bala_cost - $costHistory;
+        $average = $cost <= 0 ? 0 : round($amount / $cost,2);
+        $productProgress->update([
+            'prod_prog_bala_amou' => $amount,
+            'prod_prog_bala_cost' => $cost,
+            'prod_prog_prom_weig' => $average
+        ]);
+        if($type != 'suma'){
+            return true;
+        }
+        $history->updateQuietly([
+            'prod_prog_hist_bala_amou' => $amount,
+            'prod_prog_hist_bala_cost' => $cost,
+            'prod_prog_hist_prom_weig' => $average,
+        ]);
+        return true;
+    }
     public function scopeActive($query) {
         return $query->where('product_progress_status','>',0);
     }

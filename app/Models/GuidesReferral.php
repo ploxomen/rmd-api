@@ -12,7 +12,11 @@ class GuidesReferral extends Model
         'guide_issue_date',
         'guide_customer_id',
         'guide_issue_number',
+        'guide_bill_number',
         'guide_address_destination',
+        'guide_observations',
+        'guide_transfer_date',
+        'guide_type_motion',
         'guide_justification',
         'guide_user_id',
         'guite_total'

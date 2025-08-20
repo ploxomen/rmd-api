@@ -45,12 +45,14 @@ class ProductsController extends Controller
     }
     public function getProductRawMaterialAndFinaly(Request $request){
         $rawsMaterial = RawMaterial::select("product_id","product_name","product_unit_measurement")->selectRaw("'MATERIA PRIMA' AS tipo")->products()->active();
-        $productFinaly = ProductFinaly::select("product_id","product_name","product_unit_measurement")->selectRaw("'PRODUCTO TERMINADO' AS tipo")->leftJoin('products','products.id','=','product_id')->where('product_finaly_status','!=',0)->union($rawsMaterial)->get();
+        $productFinaly = ProductFinaly::select("product_id","product_name","product_unit_measurement")->selectRaw("'PRODUCTO TERMINADO' AS tipo")->joinProducts()->productExist();
+        $commodity = Commodity::select("product_id","product_name","product_unit_measurement")->selectRaw("'MERCADERIA' AS tipo")->products()->active();
+        $products = $commodity->union($rawsMaterial)->union($productFinaly)->get();
         return response()->json([
             'redirect' => null,
             'error' => false,
             'message' => 'Productos obtenidos correctamente',
-            'products' => $productFinaly
+            'products' => $products
         ]);
     }
     public function exportProductsExcel(Request $request) {

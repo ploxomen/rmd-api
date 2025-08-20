@@ -165,7 +165,8 @@ class ProductFinaliesController extends Controller
                 $productAssembled->save();
                 foreach ($request->details as $product) {
                     $productAssembled->product()->attach($product['detail_product_id'], [
-                        'product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store'],
+                        'product_finaly_stock' => $product['detail_stock'], 
+                        'product_finaly_type' => $product['detail_store'],
                     ]);
                 }
             }

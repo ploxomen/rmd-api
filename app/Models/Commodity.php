@@ -22,6 +22,10 @@ class Commodity extends Model
     {
         return $query->join('products','products.id','=','product_id')->where('product_status',1);
     }
+    public function scopeActive($query)
+    {
+        return $query->where('commodi_status',1);
+    }
     public function product()
     {
         return $this->belongsTo(Products::class,'product_id');

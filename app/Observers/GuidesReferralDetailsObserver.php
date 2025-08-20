@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Models\Commodity;
+use App\Models\CommodityHistory;
 use App\Models\GuidesReferral;
 use App\Models\GuidesReferralDetails;
 use App\Models\ProductFinaly;
@@ -22,20 +24,40 @@ class GuidesReferralDetailsObserver
                     'product_finaly_amount' => $guideDetail->guide_product_quantity * -1,
                     'product_finaly_user' => auth()->user()->id
                 ];
-                if($productProgres->imported()->exists()){
-                    $productProgres->imported()->create($insert);
-                }else if($productProgres->assembled()->exists()){
+                if($productProgres->assembled()->exists()){
                     $productProgres->assembled()->create($insert);
                 }
             }
         }else if($guideDetail->guide_product_type == "MATERIA PRIMA"){
             $rawMaterial = RawMaterial::where(['product_id' => $guideDetail->guide_product_id, 'raw_material_status' => 1])->first();
             if(!empty($rawMaterial)){
+                $amount = $guideDetail->guide_product_quantity * -1;
+                $priceUnit = $rawMaterial->raw_hist_prom_weig;
+                $subtotal = $amount * $priceUnit;
                 $rawMaterial->history()->create([
                     'product_id' => $guideDetail->guide_product_id,
-                    'material_hist_amount' => $guideDetail->guide_product_quantity * -1,
+                    'material_hist_amount' => $amount,
+                    'material_hist_total_buy_pen' => $subtotal,
+                    'material_hist_price_buy' => $priceUnit,
+                    'raw_hist_type' => 'SALIDA',
                     'guide_refer_id' => $guideDetail->id,
                     'material_user' => auth()->user()->id,
+                ]);
+            }
+        }else if($guideDetail->guide_product_type == "MERCADERIA"){
+            $commodity = Commodity::where(['product_id' => $guideDetail->guide_product_id, 'commodi_status' => 1])->first();
+            if(!empty($commodity)){
+                $amount = $guideDetail->guide_product_quantity * -1;
+                $priceUnit = $commodity->commodi_prom_weig;
+                $subtotal = $amount * $priceUnit;
+                $commodity->history()->create([
+                    'product_id' => $guideDetail->guide_product_id,
+                    'commodi_hist_type' => 'SALIDA',
+                    'commodi_hist_amount' => $amount,
+                    'commodi_hist_price_buy' => $priceUnit,
+                    'commodi_hist_total_buy' => $subtotal,
+                    'guide_refer_id' => $guideDetail->id,
+                    'commodi_hist_user' => auth()->user()->id,
                 ]);
             }
         }
@@ -64,6 +86,10 @@ class GuidesReferralDetailsObserver
                 RawMaterialHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function($history){
                     $history->delete();
                 });
+            }else if($oldType === 'MERCADERIA'){
+                CommodityHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function($history){
+                    $history->delete();
+                });
             }
             $this->newDetail($guideDetail);
         }
@@ -79,7 +105,16 @@ class GuidesReferralDetailsObserver
                 });
             }else if($guideDetail->product_finaly_type == "MATERIA PRIMA"){
                 RawMaterialHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function ($value) use ($guideDetail){
-                    $value->material_hist_amount = $guideDetail->guide_product_quantity * -1;
+                    $amount = $guideDetail->guide_product_quantity * -1;
+                    $value->material_hist_amount = $amount;
+                    $value->material_hist_total_buy_pen = $amount * $value->material_hist_price_buy;
+                    $value->save();
+                });
+            }else if($guideDetail->product_finaly_type == "MERCADERIA"){
+                CommodityHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function ($value) use ($guideDetail){
+                    $amount = $guideDetail->guide_product_quantity * -1;
+                    $value->commodi_hist_amount = $amount;
+                    $value->commodi_hist_total_buy = $amount * $value->commodi_hist_price_buy;
                     $value->save();
                 });
             }
@@ -105,6 +140,9 @@ class GuidesReferralDetailsObserver
             $history->delete();
         });
         RawMaterialHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function($history){
+            $history->delete();
+        });
+        CommodityHistory::where(['guide_refer_id' => $guideDetail->id])->get()->each(function($history){
             $history->delete();
         });
     }
