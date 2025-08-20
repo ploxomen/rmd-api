@@ -11,7 +11,7 @@ class ProductFinalAssemDeta extends Pivot
     protected $primaryKey = "id";
     protected $table = "product_finaly_assem_deta";
     protected $fillable = [
-        'product_finaly_stock','product_id','product_finaly_type'
+        'product_finaly_stock','product_id','product_finaly_type', 'product_finaly_price_unit', 'product_finaly_subtotal'
     ];
     protected static function boot()
     {

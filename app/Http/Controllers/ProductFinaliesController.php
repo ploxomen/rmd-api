@@ -37,7 +37,7 @@ class ProductFinaliesController extends Controller
             'redirect' => null,
             'error' => false,
             'data' => $data,
-            'details' => $assembled->product()->select("product_finaly_assem_deta.id AS detail_id", "product_finaly_stock as detail_stock", "product_finaly_type as detail_store", "product_id as detail_product_id")->selectRaw("'old' AS detail_type")->get()->makeHidden('pivot')
+            'details' => $assembled->product()->select("product_finaly_assem_deta.id AS detail_id", "product_finaly_stock as detail_stock", "product_finaly_price_unit AS detail_price_unit", "product_finaly_type as detail_store", "product_id as detail_product_id", "product_id as detail_product_id_old")->selectRaw("'old' AS detail_type")->get()->makeHidden('pivot')
         ]);
     }
     public function getImportedHistory(ProductFinalyImported $imported)
@@ -164,7 +164,9 @@ class ProductFinaliesController extends Controller
                 $productAssembled->product_finaly_user = $request->user()->id;
                 $productAssembled->save();
                 foreach ($request->details as $product) {
-                    $productAssembled->product()->attach($product['detail_product_id'], ['product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store']]);
+                    $productAssembled->product()->attach($product['detail_product_id'], [
+                        'product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store'],
+                    ]);
                 }
             }
             DB::commit();
@@ -220,7 +222,7 @@ class ProductFinaliesController extends Controller
                 }
                 $attach[$product['detail_product_id']] = ['product_finaly_stock' => $product['detail_stock'], 'product_finaly_type' => $product['detail_store']];
             }
-            ProductFinalAssemDeta::whereNotIn('id', $idsUpdates)->where('product_assembled_id',$request->id)->get()->each(function($detail){
+            ProductFinalAssemDeta::whereNotIn('id', $idsUpdates)->where('product_assembled_id', $request->id)->get()->each(function ($detail) {
                 $detail->delete();
             });
             $assembled->product()->attach($attach);
@@ -317,7 +319,7 @@ class ProductFinaliesController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'error' =>true,
+                'error' => true,
                 'message' => $th->getMessage()
             ]);
         }

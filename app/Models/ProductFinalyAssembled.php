@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductFinalyAssembled extends Model
 {
     protected $table = "product_finaly_assembleds";
-    protected $fillable = ['product_finaly_amount','product_finaly_id','guide_refer_id','product_finaly_created','product_finaly_description','product_finaly_user'];
+    protected $fillable = ['product_finaly_amount','product_finaly_id','guide_refer_id','product_finaly_created','product_finaly_description','product_finaly_user','product_finaly_total'];
     protected static function boot()
     {
         parent::boot();
@@ -17,10 +17,10 @@ class ProductFinalyAssembled extends Model
         static::observe(ProductFinalyAssembledObserver::class);
     }
     public function product(){
-        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_type','id')->withTimestamps();
+        return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_subtotal','product_finaly_price_unit','product_finaly_type','id')->withTimestamps();
     }
     public function scopeGetActive($query,$productFinalyId) {
-        return $query->select("product_finaly_assembleds.id","guide_refer_id","product_unit_measurement","product_finaly_amount","product_finaly_description")
+        return $query->select("product_finaly_assembleds.id","guide_refer_id","product_unit_measurement","product_finaly_amount","product_finaly_description","product_finaly_total")
         ->selectRaw("DATE_FORMAT(product_finaly_created, '%d/%m/%Y') as product_finaly_created, CONCAT(user_name,' ',user_last_name) as user_name")
         ->join("product_finalies","product_finalies.id","=",'product_finaly_id')
         ->join("products","products.id","=",'product_id')
