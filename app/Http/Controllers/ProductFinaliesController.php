@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ProductHelper;
 use App\Models\ProductFinalAssemDeta;
 use App\Models\ProductFinaly;
 use App\Models\ProductFinalyAssembled;
@@ -95,21 +96,7 @@ class ProductFinaliesController extends Controller
             $request->validate([
                 'details' => 'required|array'
             ], [], ['details' => 'detalles']);
-            $totalDetails = [];
-            foreach ($request->details as $product) {
-                $productExist = array_filter($totalDetails, function ($value) use ($product) {
-                    return $value['product_id'] === $product['detail_product_id'] && $value['type'] === $product['detail_store'];
-                });
-                if (count($productExist) === 0) {
-                    $totalDetails[] = [
-                        'type' => $product['detail_store'],
-                        'product_id' => $product['detail_product_id'],
-                        'stock' => $product['detail_stock']
-                    ];
-                    continue;
-                }
-                $totalDetails[key($productExist)]['stock'] += $product['detail_stock'];
-            }
+            $totalDetails = ProductHelper::unionOfProducts($request->details);
             foreach ($totalDetails as $detail) {
                 if ($detail['type'] === "MATERIA PRIMA") {
                     $rawMaterial = RawMaterial::where(['product_id' => $detail['product_id'], 'raw_material_status' => 1])->first();

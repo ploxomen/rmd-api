@@ -100,7 +100,7 @@ class RawMaterialController extends Controller
         return response()->json( [
             'redirect' => null,
             'error' => false,
-            'providers' => Provider::select('provider_name AS label','id AS value')->where('provider_status',1)->get()
+            'providers' => Provider::select('provider_name AS label','id AS value', 'provider_number_document')->where('provider_status',1)->get()
         ]);
     }
     public function addProduct(Request $request, $product) {

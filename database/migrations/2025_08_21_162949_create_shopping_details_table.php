@@ -19,8 +19,10 @@ return new class extends Migration
             $table->unsignedBigInteger('shopping_id');
             $table->unsignedBigInteger('shopping_product');
             $table->integer('shopping_deta_ammount');
-            $table->decimal('shopping_deta_price',16,2);
-            $table->decimal('shopping_deta_subtotal',16,2);
+            $table->decimal('shopping_deta_price',16,2)->default(0);
+            $table->decimal('shopping_deta_price_usd',16,2)->default(0);
+            $table->decimal('shopping_deta_subtotal',16,2)->default(0);
+            $table->decimal('shopping_deta_subtotal_usd',16,2)->default(0);
             $table->foreign('shopping_id')->references('id')->on('shopping');
             $table->foreign('shopping_product')->references('id')->on('products');
             $table->timestamps();

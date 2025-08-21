@@ -15,6 +15,7 @@ use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\ShoppingController;
 use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
         
     });
     Route::apiResource('quotation',QuotationsController::class);
+    Route::apiResource('store-shopping',ShoppingController::class);
     Route::apiResource('store-commodity',CommodityController::class);
     Route::get('store-commodity/histories/{commodity}',[CommodityController::class,'historiesCommodities']);
     Route::get('store-commodity/history-one/{commodityHistory}',[CommodityController::class,'historyCommodity']);
