@@ -14,6 +14,7 @@ class Shopping extends Model
         'buy_number_guide',
         'buy_type',
         'buy_type_money',
+        'buy_type_change',
         'buy_total'
     ];
     protected $table = 'shopping';

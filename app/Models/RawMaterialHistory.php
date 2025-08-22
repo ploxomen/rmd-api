@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class RawMaterialHistory extends Model
 {
     protected $table = 'raw_materials_history';
-    protected $fillable = ['raw_material_id', 'raw_provider', 'product_id', 'material_hist_bill', 'material_hist_guide', 'material_hist_amount', 'material_hist_price_buy', 'material_hist_igv', 'material_hist_money', 'material_hist_total_buy_pen', 'material_user', 'material_hist_total_buy_usd', 'material_hist_total_type_change', 'product_final_assem_id', 'guide_refer_id', 'product_progres_hist_id', 'material_hist_date','raw_hist_type','raw_hist_bala_amou','raw_hist_bala_cost','raw_hist_prom_weig'];
+    protected $fillable = ['raw_material_id', 'raw_provider', 'product_id', 'material_hist_bill', 'material_hist_guide', 'material_hist_amount', 'material_hist_price_buy', 'material_hist_igv', 'material_hist_money', 'material_hist_total_buy_pen', 'material_user', 'material_hist_total_buy_usd', 'material_hist_total_type_change', 'product_final_assem_id', 'guide_refer_id', 'product_progres_hist_id', 'material_hist_date','raw_hist_type','raw_hist_bala_amou','raw_hist_bala_cost','raw_hist_prom_weig','shopping_detail_id'];
 
     protected static function boot()
     {

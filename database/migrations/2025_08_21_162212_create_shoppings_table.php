@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('buy_number_invoice');
             $table->string('buy_number_guide')->nullable();
             $table->string('buy_type');
+            $table->decimal('buy_type_change')->default(0);
             $table->string('buy_type_money');
             $table->decimal('buy_total',16,2);
             $table->decimal('buy_total_usd',16,2);
