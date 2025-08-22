@@ -33,17 +33,6 @@ class ProductsExport implements FromView,ShouldAutoSize,WithStyles
         $title->getFont()->setUnderline(true);
         $title->getFont()->setSize(22);
         $title->getAlignment()->setHorizontal('center');
-        // $headerTable = $sheet->getStyle("B".$this->rowInitial . ':E' . $this->rowInitial);
-        // $headerTable->applyFromArray([
-        //     'fill' => [
-        //         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-        //         'startColor' => [
-        //             'rgb' => 'E5E5E5', // Color plomo (puedes cambiar esto)
-        //         ],
-        //     ],
-        // ]);
-        // $headerTable->getFont()->setBold(true);
-        // $headerTable->getAlignment()->setHorizontal('center');
         $sheet->getStyle($rango)->getFont()->setSize(14);
         $sheet->getStyle($rango)->getBorders()->getAllBorders()->setBorderStyle('thin');
         $sheet->getStyle($rango)->getAlignment()->setHorizontal('center');

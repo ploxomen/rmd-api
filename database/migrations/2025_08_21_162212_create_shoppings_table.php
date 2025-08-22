@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('buy_date');
             $table->date('buy_date_invoice')->nullable();
             $table->unsignedBigInteger(column: 'buy_provider');
+            $table->unsignedBigInteger(column: 'buy_user');
             $table->string('buy_number_invoice');
             $table->string('buy_number_guide')->nullable();
             $table->string('buy_type');
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->decimal('buy_total',16,2);
             $table->decimal('buy_total_usd',16,2);
             $table->foreign('buy_provider')->references('id')->on('provider');
+            $table->foreign('buy_user')->references('id')->on(table: 'users');
             $table->timestamps();
         });
     }

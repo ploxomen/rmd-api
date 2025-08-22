@@ -14,6 +14,7 @@ class Shopping extends Model
         'buy_number_guide',
         'buy_type',
         'buy_type_money',
+        'buy_user',
         'buy_type_change',
         'buy_total_usd',
         'buy_total'
@@ -34,6 +35,10 @@ class Shopping extends Model
     public function scopeTypeImported($query)
     {
         return $query->leftJoin('shopping_imported', 'shopping_imported.shopping_id', '=', 'shopping.id');
+    }
+    public function scopeUsers($query)
+    {
+        return $query->leftJoin('users', 'buy_user', '=', 'users.id');
     }
     public function scopeList($query, $search)
     {

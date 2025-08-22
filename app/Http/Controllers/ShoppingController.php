@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ShoppingExport;
 use App\Helpers\ProductHelper;
 use App\Models\ChangeMoney;
 use App\Models\Shopping;
@@ -10,6 +11,7 @@ use App\Models\ShoppingImported;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ShoppingController extends Controller
 {
@@ -29,6 +31,12 @@ class ShoppingController extends Controller
             'totalProducts' => $shopping->get()->count(),
             'data' => $shopping->skip($skip)->take($show)->get()
         ]);
+    }
+    public function exportShopping(Request $request)
+    {
+        $search = $request->has('search') ? $request->search : '';
+        $shopping = Shopping::select("buy_date_invoice", "provider_name", "provider_number_document", "buy_number_invoice", "buy_type_change","imported_expenses_cost","buy_total","imported_flete_cost","imported_insurance_cost","imported_destination_cost","user_name","user_last_name")->providers()->typeImported()->users()->list($search)->get();
+        return Excel::download(new ShoppingExport($shopping),'compras.xlsx');
     }
     public function store(Request $request)
     {
@@ -50,6 +58,7 @@ class ShoppingController extends Controller
             $shopping = new Shopping();
             $shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
             $shopping->buy_type_change = $priceChange;
+            $shopping->buy_user = $request->user()->id;
             $shopping->save();
             $detailsProducts = ProductHelper::unionOfProducts($request->shopping_details);
             $totals = [
