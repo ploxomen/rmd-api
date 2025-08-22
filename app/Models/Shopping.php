@@ -15,6 +15,7 @@ class Shopping extends Model
         'buy_type',
         'buy_type_money',
         'buy_type_change',
+        'buy_total_usd',
         'buy_total'
     ];
     protected $table = 'shopping';
@@ -25,6 +26,14 @@ class Shopping extends Model
     public function products()
     {
         return $this->belongsToMany(Products::class, 'shopping_details', 'shopping_id', 'shopping_product')->using(ShoppingDetail::class)->withPivot(['shopping_deta_store', 'shopping_deta_ammount', 'shopping_deta_price', 'shopping_deta_subtotal'])->withTimestamps();
+    }
+    public function imported()
+    {
+        return $this->hasOne(ShoppingImported::class, 'shopping_id');
+    }
+    public function scopeTypeImported($query)
+    {
+        return $query->leftJoin('shopping_imported', 'shopping_imported.shopping_id', '=', 'shopping.id');
     }
     public function scopeList($query, $search)
     {

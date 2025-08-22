@@ -3,18 +3,16 @@
 namespace App\Observers;
 
 use App\Models\Commodity;
+use App\Models\CommodityHistory;
 use App\Models\RawMaterial;
+use App\Models\RawMaterialHistory;
 use App\Models\Shopping;
 use App\Models\ShoppingDetail;
+use Illuminate\Support\Facades\Log;
 
 class ShoppinDetailObserver
 {
-    /**
-     * Handle the ShoppingDetail "created" event.
-     *
-     * @param  \App\Models\ShoppingDetail  $shoppingDetail
-     * @return void
-     */
+
     public function created(ShoppingDetail $shoppingDetail)
     {
         $shopping = Shopping::find($shoppingDetail->shopping_id);
@@ -54,48 +52,18 @@ class ShoppinDetailObserver
             ]);
         }
     }
-
-    /**
-     * Handle the ShoppingDetail "updated" event.
-     *
-     * @param  \App\Models\ShoppingDetail  $shoppingDetail
-     * @return void
-     */
     public function updated(ShoppingDetail $shoppingDetail)
     {
-        //
+        
     }
-
-    /**
-     * Handle the ShoppingDetail "deleted" event.
-     *
-     * @param  \App\Models\ShoppingDetail  $shoppingDetail
-     * @return void
-     */
-    public function deleted(ShoppingDetail $shoppingDetail)
+    public function deleting(ShoppingDetail $shoppingDetail)
     {
-        //
-    }
-
-    /**
-     * Handle the ShoppingDetail "restored" event.
-     *
-     * @param  \App\Models\ShoppingDetail  $shoppingDetail
-     * @return void
-     */
-    public function restored(ShoppingDetail $shoppingDetail)
-    {
-        //
-    }
-
-    /**
-     * Handle the ShoppingDetail "force deleted" event.
-     *
-     * @param  \App\Models\ShoppingDetail  $shoppingDetail
-     * @return void
-     */
-    public function forceDeleted(ShoppingDetail $shoppingDetail)
-    {
-        //
+        Log::info('observer',['pase por aqui']);
+        RawMaterialHistory::where(['shopping_detail_id' => $shoppingDetail->id])->get()->each(function($history){
+            $history->delete();
+        });
+        CommodityHistory::where(['shopping_detail_id' => $shoppingDetail->id])->get()->each(function($history){
+            $history->delete();
+        });
     }
 }
