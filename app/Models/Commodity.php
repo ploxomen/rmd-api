@@ -35,7 +35,7 @@ class Commodity extends Model
         $commodity = Commodity::find($idCommodity);
         $amount = $type == 'suma' ? $amountHistory + $commodity->commodi_bala_amou : $commodity->commodi_bala_amou - $amountHistory;
         $cost = $type == 'suma' ? $costHistory + $commodity->commodi_bala_cost : $commodity->commodi_bala_cost - $costHistory;
-        $average = $cost <= 0 ? 0 : round($cost / $amount,2);
+        $average = $amount <= 0 ? 0 : round($cost / $amount,2);
         $commodity->update([
             'commodi_bala_amou' => $amount,
             'commodi_bala_cost' => $cost,
