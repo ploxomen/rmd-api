@@ -40,7 +40,11 @@ class ShoppinDetailObserver
             }
             $commodity->history()->create([
                 'product_id' => $shoppingDetail->shopping_product,
+                'commodi_hist_date' => $shopping->buy_date,
+                'commodi_hist_bill' => $shopping->buy_number_invoice,
+                'commodi_hist_guide' => $shopping->buy_number_guide,
                 'commodi_hist_money' => $shopping->buy_type_money,
+                'commodity_provider' => $shopping->buy_provider,
                 'commodi_hist_amount' => $shoppingDetail->shopping_deta_ammount,
                 'commodi_hist_total_buy' => $shoppingDetail->shopping_deta_subtotal,
                 'commodi_hist_total_buy_usd' => $shoppingDetail->shopping_deta_subtotal_usd,
@@ -58,7 +62,6 @@ class ShoppinDetailObserver
     }
     public function deleting(ShoppingDetail $shoppingDetail)
     {
-        Log::info('observer',['pase por aqui']);
         RawMaterialHistory::where(['shopping_detail_id' => $shoppingDetail->id])->get()->each(function($history){
             $history->delete();
         });

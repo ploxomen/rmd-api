@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChangeMoney;
 use App\Models\ProductProgress;
 use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
@@ -123,6 +124,14 @@ class ProductProgressController extends Controller
                 'message' => 'La cantidad ingresada supera el stock del producto', 
             ]);
         }
+        $money = ChangeMoney::select('change_soles')->where('change_day', $request->date)->first();
+        if (empty($money)) {
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => 'No se ha establecido un tipo de cambio para el dia ' . $request->date,
+            ]);
+        }
         $productProgress = ProductProgress::updateOrCreate(
             ['product_id' => $request->product_id,'product_progress_status' => 1],
             ['product_progress_stock' => 0]
@@ -130,6 +139,7 @@ class ProductProgressController extends Controller
         ProductProgressHistory::create([
             'product_id' => $request->product_id,
             'prod_prog_hist_type' => 'ENTRADA',
+            'prod_prog_type_change' => $money->change_soles,
             'product_progress_history_total' => $request->stock * $request->price_unit,
             'product_progress_history_pu' => $request->price_unit,
             'product_progress_id' => $productProgress->id,

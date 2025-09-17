@@ -141,7 +141,7 @@ class ProductsController extends Controller
                     'product_finaly_stock' => 0,
                     'product_finaly_price' => 0,
                 ]);
-            }else if($request->product_store === 'ALMACEN MERCADERIA'){
+            }else if($request->product_store === 'PRODUCTO MERCADERIA'){
                 Commodity::create([
                     'product_id' => $product->id,
                     'commodi_stock' => 0,

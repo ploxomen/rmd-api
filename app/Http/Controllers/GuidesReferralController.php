@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChangeMoney;
 use App\Models\Commodity;
 use App\Models\GuidesReferral;
 use App\Models\GuidesReferralDetails;
@@ -41,6 +42,14 @@ class GuidesReferralController extends Controller
                 'error' => true,
                 'message' => 'Ya existe una guía de remisión con el mismo número'
             ], 422);
+        }
+        $money = ChangeMoney::select('change_soles')->where('change_day', $request->guide_issue_date)->first();
+        if (empty($money)) {
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => 'No se ha establecido un tipo de cambio para el dia ' . $request->guide_issue_date,
+            ]);
         }
         $request->validate([
             'details' => 'required|array'
@@ -109,7 +118,7 @@ class GuidesReferralController extends Controller
                 return response()->json([
                     'redirect' => null,
                     'error' => true,
-                    'message' => "El producto {$commodity->product->product_name} de ALMACEN MERCADERIA no cuenta con stock suficiente, actualmente hay {$commodity->commodi_stock}, se está tratando de ingresar {$detail['stock']}"
+                    'message' => "El producto {$commodity->product->product_name} de PRODUCTO MERCADERIA no cuenta con stock suficiente, actualmente hay {$commodity->commodi_stock}, se está tratando de ingresar {$detail['stock']}"
                 ], 422);
             }
         }
@@ -118,6 +127,7 @@ class GuidesReferralController extends Controller
             $guideReferral = new GuidesReferral();
             $guideReferral->fill($request->except(['details']));
             $guideReferral->guide_user_id = $request->user()->id;
+            $guideReferral->guide_type_change = $money->change_soles;
             $guideReferral->save();
             foreach ($request->details as $product) {
                 $guideReferral->product()->attach($product['detail_product_id'], ['guide_product_quantity' => $product['detail_stock'], 'guide_product_type' => $product['detail_store']]);

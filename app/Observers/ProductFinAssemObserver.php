@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\ProductFinalAssemDeta;
+use App\Models\ProductFinalyAssembled;
 use App\Models\ProductProgress;
 use App\Models\ProductProgressHistory;
 use App\Models\RawMaterial;
@@ -37,9 +38,13 @@ class ProductFinAssemObserver
                 $amount = $productFinalAssemDeta->product_finaly_stock * -1;
                 $priceUnit = $rawMaterial->raw_hist_prom_weig;
                 $subtotal = $amount * $priceUnit;
+                $productAssembled = ProductFinalyAssembled::find($productFinalAssemDeta->product_assembled_id);
                 $rawMaterial->history()->create([
                     'product_id' => $productFinalAssemDeta->product_id,
                     'material_hist_amount' => $amount,
+                    'material_hist_total_type_change' => $productAssembled->prod_fina_type_change,
+                    'material_hist_money' => 'PEN',
+                    'material_hist_date' => $productAssembled->product_finaly_created,
                     'material_hist_total_buy_pen' => $subtotal,
                     'material_hist_price_buy' => $priceUnit,
                     'raw_hist_type' => 'SALIDA',

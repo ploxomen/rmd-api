@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ProductHelper;
+use App\Models\ChangeMoney;
 use App\Models\ProductFinalAssemDeta;
 use App\Models\ProductFinaly;
 use App\Models\ProductFinalyAssembled;
@@ -88,6 +89,14 @@ class ProductFinaliesController extends Controller
                 'message' => 'El producto seleccionado no es un producto terminado'
             ], 422);
         }
+        $money = ChangeMoney::select('change_soles')->where('change_day', $request->product_finaly_created)->first();
+        if (empty($money)) {
+            return response()->json([
+                'redirect' => null,
+                'error' => true,
+                'message' => 'No se ha establecido un tipo de cambio para el dia ' . $request->product_finaly_created,
+            ]);
+        }
         if ($productFinaly->products->product_label_2 === "IMPORTADO") {
             $request->validate([
                 'product_finaly_provider' => 'required'
@@ -146,6 +155,7 @@ class ProductFinaliesController extends Controller
                 $productAssembled = new ProductFinalyAssembled();
                 $productAssembled->product_finaly_id = $productFinaly->id;
                 $productAssembled->product_finaly_created = now()->toDateString();
+                $productAssembled->prod_fina_type_change = $money->change_soles;
                 $productAssembled->product_finaly_amount = $request->product_finaly_amount;
                 $productAssembled->product_finaly_description = $request->product_finaly_description;
                 $productAssembled->product_finaly_user = $request->user()->id;

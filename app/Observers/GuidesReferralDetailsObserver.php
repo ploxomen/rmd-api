@@ -31,11 +31,15 @@ class GuidesReferralDetailsObserver
         }else if($guideDetail->guide_product_type == "MATERIA PRIMA"){
             $rawMaterial = RawMaterial::where(['product_id' => $guideDetail->guide_product_id, 'raw_material_status' => 1])->first();
             if(!empty($rawMaterial)){
+                $guides = GuidesReferral::find($guideDetail->guide_referral_id);
                 $amount = $guideDetail->guide_product_quantity * -1;
                 $priceUnit = $rawMaterial->raw_hist_prom_weig;
                 $subtotal = $amount * $priceUnit;
                 $rawMaterial->history()->create([
                     'product_id' => $guideDetail->guide_product_id,
+                    'material_hist_total_type_change' => $guides->guide_type_change,
+                    'material_hist_money' => 'PEN',
+                    'material_hist_date' => $guides->guide_issue_date,
                     'material_hist_amount' => $amount,
                     'material_hist_total_buy_pen' => $subtotal,
                     'material_hist_price_buy' => $priceUnit,
@@ -47,15 +51,22 @@ class GuidesReferralDetailsObserver
         }else if($guideDetail->guide_product_type == "MERCADERIA"){
             $commodity = Commodity::where(['product_id' => $guideDetail->guide_product_id, 'commodi_status' => 1])->first();
             if(!empty($commodity)){
+                $guides = GuidesReferral::find($guideDetail->guide_referral_id);
                 $amount = $guideDetail->guide_product_quantity * -1;
                 $priceUnit = $commodity->commodi_prom_weig;
                 $subtotal = $amount * $priceUnit;
                 $commodity->history()->create([
                     'product_id' => $guideDetail->guide_product_id,
+                    'commodi_hist_date' => $guides->guide_issue_date,
+                    'commodi_hist_bill' => "",
+                    'commodi_hist_guide' => $guides->guide_issue_number,
+                    'commodi_hist_type_change' => $guides->guide_type_change,
+                    'commodi_hist_money' => 'PEN',
                     'commodi_hist_type' => 'SALIDA',
                     'commodi_hist_amount' => $amount,
                     'commodi_hist_price_buy' => $priceUnit,
                     'commodi_hist_total_buy' => $subtotal,
+                    'commodi_hist_total_buy_usd' => $subtotal * $guides->guide_type_change,
                     'guide_refer_id' => $guideDetail->id,
                     'commodi_hist_user' => auth()->user()->id,
                 ]);

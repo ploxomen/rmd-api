@@ -57,7 +57,7 @@ class RawMaterialController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'El registro se eliminó correctamente',
-            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'raw_provider','product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_type_change",'material_hist_date'])
+            'data' => RawMaterialHistory::find($historyMaterial,["material_hist_bill",'raw_provider','product_id',"material_hist_guide","material_hist_amount","material_hist_price_buy","id AS history_id","material_hist_igv","","material_hist_money","material_hist_total_buy_pen","material_hist_total_buy_usd","material_hist_total_type_change",'material_hist_date'])
         ]);
     }
     public function deleteHistory(Request $request, RawMaterialHistory $historyMaterial) {
@@ -125,6 +125,11 @@ class RawMaterialController extends Controller
         $raw_material->history()->each(function($history){
             $history->delete();
         });
+        $raw_material->update([
+            'raw_hist_bala_amou' => 0,
+            'raw_hist_bala_cost' => 0,
+            'raw_hist_prom_weig' => 0
+        ]);
         return response()->json([
             'redirect' => $redirect,
             'error' => false, 
