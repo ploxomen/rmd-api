@@ -23,6 +23,8 @@ class ShoppinDetailObserver
             }
             $rawMaterial->history()->create([
                 'product_id' => $shoppingDetail->shopping_product,
+                'material_hist_date' => $shopping->buy_date,
+                'material_hist_guide' => $shopping->buy_number_guide,
                 'material_hist_money' => $shopping->buy_type_money,
                 'material_hist_amount' => $shoppingDetail->shopping_deta_ammount,
                 'material_hist_total_buy_pen' => $shoppingDetail->shopping_deta_subtotal,
