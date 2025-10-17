@@ -12,7 +12,7 @@ use App\Models\ShoppingDetail;
 class ShoppinDetailObserver
 {
 
-    public function customCreated(ShoppingDetail $shoppingDetail, Shopping $shopping)
+    public function customCreatedRawMaterial(ShoppingDetail $shoppingDetail, Shopping $shopping)
     {
         $rawMaterial = RawMaterial::where(['product_id' => $shoppingDetail->shopping_product, 'raw_material_status' => 1])->first();
         if (empty($rawMaterial)) {
@@ -33,7 +33,7 @@ class ShoppinDetailObserver
             'material_user' => auth()->user()->id,
         ]);
     }
-    public function customUpdated(ShoppingDetail $shoppingDetail, Shopping $shopping)
+    public function customCreatedCommodity(ShoppingDetail $shoppingDetail, Shopping $shopping)
     {
         $commodity = Commodity::where(['product_id' => $shoppingDetail->shopping_product, 'commodi_status' => 1])->first();
         if (empty($commodity)) {
@@ -60,8 +60,9 @@ class ShoppinDetailObserver
     {
         $shopping = Shopping::find($shoppingDetail->shopping_id);
         if ($shoppingDetail->shopping_deta_store == "MATERIA PRIMA") {
-            $this->customCreated($shoppingDetail, $shopping);
+            $this->customCreatedRawMaterial($shoppingDetail, $shopping);
         } else if ($shoppingDetail->shopping_deta_store == "MERCADERIA") {
+            $this->customCreatedCommodity($shoppingDetail, $shopping);
         }
     }
     public function updating(ShoppingDetail $shoppingDetail)
@@ -80,9 +81,9 @@ class ShoppinDetailObserver
                 });
             }
             if ($shoppingDetail->shopping_deta_store == 'MATERIA PRIMA') {
-                $this->customCreated($shoppingDetail, $shopping);
+                $this->customCreatedRawMaterial($shoppingDetail, $shopping);
             } else if ($shoppingDetail->shopping_deta_store == 'MERCADERIA') {
-                $this->customUpdated($shoppingDetail, $shopping);
+                $this->customCreatedCommodity($shoppingDetail, $shopping);
             }
         }
     }
