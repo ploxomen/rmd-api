@@ -28,7 +28,7 @@ class ShoppingController extends Controller
             'redirect' => $redirect,
             'error' => false,
             'message' => 'Compras obtenidas correctamente',
-            'totalProducts' => $shopping->get()->count(),
+            'total' => $shopping->get()->count(),
             'data' => $shopping->skip($skip)->take($show)->get()
         ]);
     }
