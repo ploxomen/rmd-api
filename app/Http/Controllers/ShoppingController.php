@@ -23,7 +23,7 @@ class ShoppingController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $shopping = Shopping::select("shopping.id", "buy_date", "provider_name", "buy_total_usd", "buy_number_invoice", "buy_number_guide", "buy_type", "buy_total", "buy_type_money")->providers()->list($search);
+        $shopping = Shopping::select("shopping.id", "buy_date", "provider_name", "buy_total_usd", "buy_number_invoice", "buy_number_guide", "buy_type", "buy_total", "buy_type_money")->providers()->list($search)->orderBy('buy_date','DESC');
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -56,7 +56,7 @@ class ShoppingController extends Controller
         DB::beginTransaction();
         try {
             $shopping = new Shopping();
-            $shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
+            $shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice','buy_details', 'buy_number_guide', 'buy_type', 'buy_type_money']));
             $shopping->buy_type_change = $priceChange;
             $shopping->buy_user = $request->user()->id;
             $shopping->save();
@@ -130,7 +130,7 @@ class ShoppingController extends Controller
     public function show($store_shopping, Request $request)
     {
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
-        $shopping = Shopping::select('buy_date', 'shopping.id', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money', 'imported_nro_dam', 'imported_expenses_cost', 'imported_flete_cost', 'imported_insurance_cost', 'imported_destination_cost')->typeImported()->where('shopping.id', $store_shopping)->first();
+        $shopping = Shopping::select('buy_date', 'shopping.id','buy_details', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money', 'imported_nro_dam', 'imported_expenses_cost', 'imported_flete_cost', 'imported_insurance_cost', 'imported_destination_cost')->typeImported()->where('shopping.id', $store_shopping)->first();
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -160,7 +160,7 @@ class ShoppingController extends Controller
         ],[],['shopping_details' => 'detalle de producto','buy_provider' => 'proveedor']);
         try {
             $priceChange = $store_shopping->buy_type_change ?? 1;
-            $store_shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
+            $store_shopping->fill($request->only(['buy_date', 'buy_date_invoice','buy_details', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
             $detailsProducts = ProductHelper::unionOfProducts($request->shopping_details);
             $totals = [
                 'USD' => 0,

@@ -18,13 +18,19 @@ class RawMaterialHistory extends Model
     }
     public static function getHistory(int $idRawMaterial, $search)
     {
-        return RawMaterialHistory::select('raw_materials_history.id', 'material_hist_date', 'material_hist_bill', 'material_hist_guide', 'material_hist_amount', 'material_hist_price_buy', 'material_hist_money', 'raw_hist_type', 'raw_hist_bala_amou', 'raw_hist_bala_cost', 'raw_hist_prom_weig', 'material_hist_total_buy_pen', 'material_hist_total_buy_usd', 'material_hist_igv', 'material_hist_total_type_change', 'product_final_assem_id', 'raw_materials_history.guide_refer_id', 'product_progres_hist_id',"product_finaly_assembleds.product_finaly_description")
-            ->selectRaw('(material_hist_total_buy_pen - material_hist_price_buy) AS material_price_igv, CONCAT(user_name," ", user_last_name) AS user_name')
+        return RawMaterialHistory::select('raw_materials_history.id', 'material_hist_date', 'material_hist_bill', 'material_hist_amount', 'material_hist_price_buy', 'material_hist_money', 'raw_hist_type', 'raw_hist_bala_amou', 'raw_hist_bala_cost', 'raw_hist_prom_weig', 'material_hist_total_buy_pen', 'material_hist_total_buy_usd', 'material_hist_igv', 'material_hist_total_type_change', 'product_final_assem_id', 'raw_materials_history.guide_refer_id', 'product_progres_hist_id')
+            ->selectRaw('(material_hist_total_buy_pen - material_hist_price_buy) AS material_price_igv, CONCAT(user_name," ", user_last_name) AS user_name, COALESCE(product_finaly_assembleds.product_finaly_description,shopping.buy_details) AS justification, COALESCE(shopping.buy_number_guide) AS material_hist_guide')
             ->leftJoin('users', 'material_user', '=', 'users.id')
             ->leftJoin('product_finaly_assem_deta', function ($join) {
                 $join->on('product_finaly_assem_deta.id', '=', 'raw_materials_history.product_final_assem_id')
                     ->join('product_finaly_assembleds', function ($subJoin) {
                         $subJoin->on('product_finaly_assembleds.id', '=', 'product_finaly_assem_deta.product_assembled_id');
+                    });
+            })
+            ->leftJoin('shopping_details', function ($join) {
+                $join->on('shopping_details.id', '=', 'shopping_detail_id')
+                    ->join('shopping', function ($subJoin) {
+                        $subJoin->on('shopping.id', '=', 'shopping_details.shopping_id');
                     });
             })
             ->where(function ($query) use ($search) {

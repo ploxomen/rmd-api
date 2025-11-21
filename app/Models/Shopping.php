@@ -15,6 +15,7 @@ class Shopping extends Model
         'buy_type',
         'buy_type_money',
         'buy_user',
+        'buy_details',
         'buy_type_change',
         'buy_total_usd',
         'buy_total'
