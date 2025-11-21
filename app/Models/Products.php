@@ -30,6 +30,23 @@ class Products extends Model
         }
         return $product->product_code + 1;
     }
+    public const STATUS_ACTIVE_RELATION = 1;
+    public function productRawMaterial()
+    {
+        return $this->hasOne(RawMaterial::class,'product_id')->where('raw_material_status',self::STATUS_ACTIVE_RELATION);
+    }
+    public function productProgress()
+    {
+        return $this->hasOne(ProductProgress::class,'product_id')->where('product_progress_status',self::STATUS_ACTIVE_RELATION);
+    }
+    public function scopeStockInitial($query)
+    {
+        return $query->leftJoin('product_stock_initial','product_stock_initial.product_id','=','products.id')->addSelect('product_stock_initial.stock_initial')->selectRaw('COALESCE(product_stock_initial.type_money,"PEN") AS type_money');
+    }
+    public function productFinaly()
+    {
+        return $this->hasOne(ProductFinaly::class,'product_id')->where('product_finaly_status',self::STATUS_ACTIVE_RELATION);
+    }
     public static function getProducts($search){
         return Products::select("products.id","product_code","product_buy","product_label","product_store","product_public_customer","product_distributor","sub_categorie_name","categorie_name","product_name")
         ->join('sub_categories','products.sub_categorie','=','sub_categories.id')
