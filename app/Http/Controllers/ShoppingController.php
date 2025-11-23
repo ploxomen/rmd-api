@@ -136,7 +136,7 @@ class ShoppingController extends Controller
             'error' => false,
             'message' => 'compras obtenidos correctamente',
             'compra' => $shopping,
-            'compra_details' => ShoppingDetail::select(['shopping_deta_store AS detail_store', 'shopping_product AS detail_product_id', 'shopping_deta_ammount AS detail_stock', 'shopping_deta_price AS datail_price_unit','shopping_details.id AS detail_id'])->selectRaw("'old' AS detail_type")->where('shopping_id', $store_shopping)->get()
+            'compra_details' => ShoppingDetail::select(['shopping_deta_store AS detail_store', 'shopping_product AS detail_product_id', 'shopping_deta_ammount AS detail_stock','shopping_details.id AS detail_id'])->selectRaw("'old' AS detail_type, IF(? = 'PEN', shopping_deta_price, shopping_deta_price_usd) AS datail_price_unit",[$shopping->buy_type_money])->where('shopping_id', $store_shopping)->get()
         ]);
     }
     public function mapDetailsShopping(array $item)

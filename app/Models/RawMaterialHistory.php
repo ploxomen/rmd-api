@@ -40,6 +40,21 @@ class RawMaterialHistory extends Model
             })
             ->where('raw_material_id', $idRawMaterial)->orderBy('id', 'desc');
     }
+    public static function reportEntry(string $dateInitial, string $dateFinaly)
+    {
+        return RawMaterialHistory::select('product_name', 'product_code', 'material_hist_amount AS stock', 'material_hist_money AS type_money', 'material_hist_total_type_change AS type_change_money', 'material_hist_price_buy AS price_unit_pen')
+            ->selectRaw('material_hist_date AS date, "MATERIA PRIMA" AS store, "COMPRA" AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, material_hist_guide AS number_guide, material_hist_total_buy_pen AS cost_total_pen, IF(imported_coefficient IS NOT NULL, material_hist_price_buy * material_hist_amount * imported_coefficient, material_hist_total_buy_pen) AS valorization')
+            ->leftJoin('products', 'products.id', '=', 'product_id')
+            ->leftJoin('provider', 'raw_provider', '=', 'provider.id')
+            ->leftJoin('shopping_details', function ($join) {
+                $join->on('shopping_details.id', '=', 'shopping_detail_id')
+                    ->leftJoin('shopping_imported', function ($subJoin) {
+                        $subJoin->on('shopping_imported.shopping_id', '=', 'shopping_details.shopping_id');
+                    });
+            })
+            // ->whereBetween('material_hist_date',[$dateInitial,$dateFinaly])->where('raw_hist_type','ENTRADA');
+            ->where('raw_hist_type', 'ENTRADA');
+    }
     public function rawMaterial()
     {
         return $this->belongsTo(RawMaterial::class, 'raw_material_id');

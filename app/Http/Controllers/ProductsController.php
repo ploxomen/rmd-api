@@ -132,7 +132,7 @@ class ProductsController extends Controller
         }
         try {
             $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
-            if ($request->type_money == 'USD' && empty($money)) {
+            if (!$request->has('product_service') && empty($money)) {
                 return response()->json([
                     'redirect' => null,
                     'error' => true,
@@ -156,12 +156,16 @@ class ProductsController extends Controller
             $dataProduct['product_status'] = 1;
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
-            ProductStockInitial::create([
-                'product_id' => $product->id,
-                'stock_initial' => $request->stock_initial,
-                'type_money' => $request->type_money,
-                'type_change_money' => $money->change_soles ?? 0
-            ]);
+            if (!$request->has('product_service')) {
+                ProductStockInitial::create([
+                    'product_id' => $product->id,
+                    'stock_initial' => $request->stock_initial,
+                    'type_money' => $request->type_money,
+                    'price_unit_usd' => $request->type_money == 'USD' ? $request->product_buy : $request->product_buy / $money->change_soles,
+                    'price_unit_pen' => $request->type_money == 'PEN' ? $request->product_buy : $request->product_buy * $money->change_soles,
+                    'type_change_money' => $money->change_soles
+                ]);
+            }
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::create([
                     'product_id' => $product->id,
@@ -243,7 +247,7 @@ class ProductsController extends Controller
             $product = Products::find($product);
             if ($this->updateStockInitial($product)) {
                 $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
-                if ($request->type_money == 'USD' && empty($money)) {
+                if (empty($money)) {
                     return response()->json([
                         'redirect' => null,
                         'error' => true,
@@ -255,7 +259,9 @@ class ProductsController extends Controller
                 ], [
                     'stock_initial' => $request->stock_initial,
                     'type_money' => $request->type_money,
-                    'type_change_money' => $money->change_soles ?? 0
+                    'type_change_money' => $money->change_soles,
+                    'price_unit_usd' => $request->type_money == 'USD' ? $request->product_buy : $request->product_buy / $money->change_soles,
+                    'price_unit_pen' => $request->type_money == 'PEN' ? $request->product_buy : $request->product_buy * $money->change_soles,
                 ]);
             }
             if ($request->has('delete_img') && File::exists($product->product_img)) {

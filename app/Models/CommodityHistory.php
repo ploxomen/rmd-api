@@ -38,6 +38,21 @@ class CommodityHistory extends Model
     {
         return $this->belongsTo(Commodity::class,'commodi_id');
     }
+    public static function reportEntry(string $dateInitial, string $dateFinaly)
+    {
+        return CommodityHistory::select('product_name', 'product_code', 'commodi_hist_amount AS stock', 'commodi_hist_money AS type_money', 'commodi_hist_type_change AS type_change_money', 'commodi_hist_price_buy AS price_unit_pen')
+            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, "COMPRA" AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, commodi_hist_guide AS number_guide, commodi_hist_total_buy AS cost_total_pen, IF(imported_coefficient IS NOT NULL, commodi_hist_price_buy * commodi_hist_amount * imported_coefficient, commodi_hist_total_buy) AS valorization')
+            ->leftJoin('products', 'products.id', '=', 'product_id')
+            ->leftJoin('provider', 'commodity_provider', '=', 'provider.id')
+            ->leftJoin('shopping_details', function ($join) {
+                $join->on('shopping_details.id', '=', 'shopping_detail_id')
+                    ->leftJoin('shopping_imported', function ($subJoin) {
+                        $subJoin->on('shopping_imported.shopping_id', '=', 'shopping_details.shopping_id');
+                    });
+            })
+            // ->whereBetween('material_hist_date',[$dateInitial,$dateFinaly])->where('raw_hist_type','ENTRADA');
+            ->where('commodi_hist_type', 'ENTRADA');
+    }
     public static function getHistory(int $commodity, string $search)
     {
         return CommodityHistory::select('commodity_histories.id','commodi_hist_date', 'commodi_hist_bill', 'commodi_hist_amount', 'commodi_hist_price_buy', 'commodi_hist_money','commodi_hist_type','commodi_hist_bala_amou','commodi_hist_bala_cost','commodi_hist_prom_weig', 'commodi_hist_total_buy', 'commodi_hist_total_buy_usd', 'commodi_hist_type_change', 'guide_refer_id')

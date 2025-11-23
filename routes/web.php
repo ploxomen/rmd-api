@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
+use App\Http\Controllers\ReportTransactionController;
 use App\Http\Controllers\StoresController;
 use App\Http\Controllers\UserController;
 use App\Models\Products;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);
+Route::get('entry-exit',[ReportTransactionController::class,'reportEntry']);
 Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
 Route::post('login',[AuthController::class,'login']);
 Route::get('/ordenes/{order}', [OrdersController::class,'getReportPdf']);

@@ -19,6 +19,16 @@ class ProductFinalyAssembled extends Model
     public function product(){
         return $this->belongsToMany(Products::class,'product_finaly_assem_deta','product_assembled_id','product_id')->using(ProductFinalAssemDeta::class)->withPivot('product_finaly_stock','product_finaly_subtotal','product_finaly_price_unit','product_finaly_type','id')->withTimestamps();
     }
+    public static function reportEntry(string $dateInitial,string $dateFinaly)
+    {
+        return ProductFinalyAssembled::select('product_name','product_code','product_finaly_amount AS stock')
+        ->selectRaw('"PEN" AS type_money, "" AS type_change_money')
+        ->addSelect('product_finaly_total AS price_unit_pen')
+        ->selectRaw('product_finaly_created AS date, "PRODUCTO TERMINADO" AS store, "ENSAMBLE" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, (product_finaly_total * product_finaly_amount) AS cost_total_pen, (product_finaly_total * product_finaly_amount) AS valorization')
+        ->leftJoin('products','products.id','=','product_finaly_id')
+        // ->whereBetween('product_finaly_created',[$dateInitial,$dateFinaly])->where('prod_prog_hist_type','ENTRADA');
+        ;
+    }
     public function scopeGetActive($query,$productFinalyId) {
         return $query->select("product_finaly_assembleds.id","guide_refer_id","product_unit_measurement","product_finaly_amount","product_finaly_description","product_finaly_total")
         ->selectRaw("DATE_FORMAT(product_finaly_created, '%d/%m/%Y') as product_finaly_created, CONCAT(user_name,' ',user_last_name) as user_name")
