@@ -25,10 +25,10 @@ class ProductFinalyAssembled extends Model
         return ProductFinalyAssembled::select('product_name', 'product_code', 'product_finaly_amount AS stock')
             ->selectRaw('"PEN" AS type_money, prod_fina_type_change AS type_change_money')
             ->addSelect('product_finaly_total AS price_unit_pen')
-            ->selectRaw('product_finaly_created AS date, "PRODUCTO TERMINADO" AS store, "ENSAMBLE" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, (product_finaly_total * product_finaly_amount) AS cost_total_pen, (product_finaly_total * product_finaly_amount) AS valorization')
+            ->selectRaw('product_finaly_created AS date, "PRODUCTO TERMINADO" AS store, "ENSAMBLE" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, (product_finaly_total * product_finaly_amount) AS cost_total_pen, product_finaly_total AS valorization_unit, (product_finaly_total * product_finaly_amount) AS valorization_total')
             ->leftJoin('products', 'products.id', '=', 'product_finaly_id')
             ->where('product_finaly_amount', '>=', 0)
-            // ->whereBetween('product_finaly_created',[$dateInitial,$dateFinaly])->where('prod_prog_hist_type','ENTRADA');
+            ->whereBetween('product_finaly_created',[$dateInitial,$dateFinaly]);
         ;
     }
     public static function reportExit(string $dateInitial, string $dateFinaly)
@@ -36,7 +36,7 @@ class ProductFinalyAssembled extends Model
         return ProductFinalyAssembled::select('product_name', 'product_code', 'product_finaly_amount AS stock')
             ->selectRaw('"PEN" AS type_money, prod_fina_type_change AS type_change_money')
             ->addSelect('product_finaly_total AS price_unit_pen')
-            ->selectRaw('product_finaly_created AS date, "PRODUCTO TERMINADO" AS store, guide_type_motion AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, guide_issue_number AS number_guide, (product_finaly_total * product_finaly_amount) AS cost_total_pen, (product_finaly_total * product_finaly_amount) AS valorization')
+            ->selectRaw('product_finaly_created AS date, "PRODUCTO TERMINADO" AS store, guide_type_motion AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, guide_issue_number AS number_guide, (product_finaly_total * product_finaly_amount) AS cost_total_pen, product_finaly_total AS valorization_unit, (product_finaly_total * product_finaly_amount) AS valorization_total')
             ->leftJoin('products', 'products.id', '=', 'product_finaly_id')
             ->leftJoin('guides_referral_details', function ($join) {
                 $join->on('guides_referral_details.id', '=', 'guide_refer_id')
@@ -46,7 +46,7 @@ class ProductFinalyAssembled extends Model
                     });
             })
             ->where('product_finaly_amount', '<', 0)
-            // ->whereBetween('product_finaly_created',[$dateInitial,$dateFinaly])->where('prod_prog_hist_type','ENTRADA');
+            ->whereBetween('product_finaly_created',[$dateInitial,$dateFinaly]);
         ;
     }
     public function scopeGetActive($query, $productFinalyId)

@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\ReportTransactionController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\ShoppingController;
 use App\Http\Controllers\StoresController;
@@ -76,7 +77,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::apiResource('quotation',QuotationsController::class);
     Route::apiResource('store-shopping',ShoppingController::class);
-    Route::get('shopping-export',[ShoppingController::class,'exportShopping']);
+    Route::get('shopping-export',[ReportTransactionController::class,'reportShopping']);
+    Route::get('entry-export',[ReportTransactionController::class,'reportEntry']);
+    Route::get('exit-export',[ReportTransactionController::class,'reportExit']);
+
     Route::apiResource('store-commodity',CommodityController::class);
     Route::get('store-commodity/histories/{commodity}',[CommodityController::class,'historiesCommodities']);
     Route::delete('store-commodity/history-one/{commodityHistory}',[CommodityController::class,'historyCommodityDelete']);

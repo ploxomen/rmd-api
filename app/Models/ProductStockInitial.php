@@ -13,9 +13,9 @@ class ProductStockInitial extends Model
     public static function reportEntry(string $dateInitial, string $dateFinaly)
     {
         return ProductStockInitial::select('product_name','product_code','stock_initial AS stock', 'type_money', 'type_change_money','price_unit_pen')
-        ->selectRaw('DATE(product_stock_initial.updated_at) AS date, "ALMACEN" AS store, "INVENTARIO INICIAL" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, (stock_initial * price_unit_pen) AS cost_total_pen, (stock_initial * price_unit_pen) AS valorization')
+        ->selectRaw('DATE(product_stock_initial.updated_at) AS date, "ALMACEN" AS store, "INVENTARIO INICIAL" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, (stock_initial * price_unit_pen) AS cost_total_pen, price_unit_pen AS valorization_unit, (stock_initial * price_unit_pen) AS valorization_total')
         ->leftJoin('products','products.id','=','product_id')
-        // ->whereRaw('DATE(product_stock_initial.updated_at) BETWEEN ? AND ?',[$dateInitial,$dateFinaly])->get();
+        ->whereRaw('DATE(product_stock_initial.updated_at) BETWEEN ? AND ?',[$dateInitial,$dateFinaly]);
         ;
     }
 

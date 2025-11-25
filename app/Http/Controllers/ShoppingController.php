@@ -32,12 +32,7 @@ class ShoppingController extends Controller
             'data' => $shopping->skip($skip)->take($show)->get()
         ]);
     }
-    public function exportShopping(Request $request)
-    {
-        $search = $request->has('search') ? $request->search : '';
-        $shopping = Shopping::select("buy_date_invoice", "provider_name", "provider_number_document", "buy_number_invoice", "buy_type_change","imported_expenses_cost","buy_total","imported_flete_cost","imported_insurance_cost","imported_destination_cost","user_name","user_last_name")->providers()->typeImported()->users()->list($search)->get();
-        return Excel::download(new ShoppingExport($shopping),'compras.xlsx');
-    }
+    
     public function store(Request $request)
     {
         $request->validate([
