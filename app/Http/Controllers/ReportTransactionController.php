@@ -30,6 +30,17 @@ class ReportTransactionController extends Controller
     }
     public function reportExit(Request $request)
     {
-        // code...
+        $dateInitial = $request->input('dateInitial',today()->toDateString());
+        $dateFinaly = $request->input('dateFinaly',today()->toDateString());
+        $rawMaterialReport = RawMaterialHistory::reportExit($dateInitial,$dateFinaly);
+        $productProgressReport = ProductProgressHistory::reportExit($dateInitial,$dateFinaly);
+        $productFinalyReport = ProductFinalyAssembled::reportExit($dateInitial,$dateFinaly);
+        $commodityReport = CommodityHistory::reportEntry($dateInitial,$dateFinaly);
+        $finalReport = $rawMaterialReport->unionAll($productProgressReport)
+        ->unionAll($productFinalyReport)
+        ->unionAll($commodityReport)
+        ->orderBy('date','DESC')
+        ->get();
+        dd($finalReport);
     }
 }

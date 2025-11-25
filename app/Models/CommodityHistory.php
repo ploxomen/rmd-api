@@ -53,6 +53,23 @@ class CommodityHistory extends Model
             // ->whereBetween('material_hist_date',[$dateInitial,$dateFinaly])->where('raw_hist_type','ENTRADA');
             ->where('commodi_hist_type', 'ENTRADA');
     }
+    public static function reportExit(string $dateInitial, string $dateFinaly)
+    {
+        return CommodityHistory::select('product_name', 'product_code', 'commodi_hist_amount AS stock', 'commodi_hist_money AS type_money', 'commodi_hist_type_change AS type_change_money', 'commodi_hist_price_buy AS price_unit_pen')
+            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, guide_type_motion AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, guide_issue_number AS number_guide, commodi_hist_total_buy AS cost_total_pen, cost_total_pen AS valorization')
+            ->leftJoin('products', 'products.id', '=', 'product_id')
+            ->leftJoin('guides_referral_details', function ($join) {
+                $join->on('guides_referral_details.id', '=', 'guide_refer_id')
+                    ->leftJoin('guides_referral', function ($subJoin) {
+                        $subJoin->on('guides_referral.id', '=', 'guides_referral_details.guide_referral_id')
+                        ->leftJoin('customers','customers.id','=','guides_referral.guide_customer_id');
+                        ;
+                    });
+            })
+            // ->whereBetween('material_hist_date',[$dateInitial,$dateFinaly])->where('raw_hist_type','ENTRADA');
+            ->where('commodi_hist_type', 'SALIDA');
+    }
+    
     public static function getHistory(int $commodity, string $search)
     {
         return CommodityHistory::select('commodity_histories.id','commodi_hist_date', 'commodi_hist_bill', 'commodi_hist_amount', 'commodi_hist_price_buy', 'commodi_hist_money','commodi_hist_type','commodi_hist_bala_amou','commodi_hist_bala_cost','commodi_hist_prom_weig', 'commodi_hist_total_buy', 'commodi_hist_total_buy_usd', 'commodi_hist_type_change', 'guide_refer_id')

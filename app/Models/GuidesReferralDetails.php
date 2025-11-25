@@ -22,4 +22,8 @@ class GuidesReferralDetails extends Pivot
         // Registrar el observer aquí
         static::observe(GuidesReferralDetailsObserver::class);
     }
+    public function guideReferral()
+    {
+        return $this->belongsTo(GuidesReferral::class,'guide_referral_id');
+    }
 }

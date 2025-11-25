@@ -11,22 +11,24 @@ use App\Models\ProductFinalyAssembled;
 use App\Models\ProductFinalyImported;
 use App\Models\RawMaterial;
 use App\Models\RawMaterialHistory;
+use Illuminate\Support\Facades\Log;
 
 class GuidesReferralDetailsObserver
 {
     public function newDetail(GuidesReferralDetails $guideDetail){
         if($guideDetail->guide_product_type == "PRODUCTO TERMINADO"){
-            $productProgres = ProductFinaly::where(['product_id' => $guideDetail->guide_product_id,'product_finaly_status' => 1])->first();
-            if(!empty($productProgres)){
+            $productFinaly = ProductFinaly::where(['product_id' => $guideDetail->guide_product_id,'product_finaly_status' => 1])->first();
+            if(!empty($productFinaly)){
                 $insert = [
-                    'product_finaly_id' => $productProgres->id,
+                    'product_finaly_created' => date('Y-m-d'),
+                    'product_finaly_id' => $productFinaly->id,
+                    'prod_fina_type_change' => $guideDetail->guideReferral->guide_type_change,
                     'guide_refer_id' => $guideDetail->id,
                     'product_finaly_amount' => $guideDetail->guide_product_quantity * -1,
                     'product_finaly_user' => auth()->user()->id
                 ];
-                if($productProgres->assembled()->exists()){
-                    $productProgres->assembled()->create($insert);
-                }
+                $assembled = new ProductFinalyAssembled($insert);
+                $assembled->saveQuietly();
             }
         }else if($guideDetail->guide_product_type == "MATERIA PRIMA"){
             $rawMaterial = RawMaterial::where(['product_id' => $guideDetail->guide_product_id, 'raw_material_status' => 1])->first();

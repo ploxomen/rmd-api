@@ -55,6 +55,23 @@ class RawMaterialHistory extends Model
             // ->whereBetween('material_hist_date',[$dateInitial,$dateFinaly])->where('raw_hist_type','ENTRADA');
             ->where('raw_hist_type', 'ENTRADA');
     }
+    public static function reportExit(string $dateInitial, string $dateFinaly)
+    {
+        return RawMaterialHistory::select('product_name', 'product_code', 'material_hist_amount AS stock', 'material_hist_money AS type_money', 'material_hist_total_type_change AS type_change_money', 'material_hist_price_buy AS price_unit_pen')
+        ->selectRaw('material_hist_date AS date, "MATERIA PRIMA" AS store, IF(raw_materials_history.product_final_assem_id IS NOT NULL OR product_progres_hist_id IS NOT NULL, "ENSAMBLE", guide_type_motion) AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, IF(raw_materials_history.product_final_assem_id IS NOT NULL OR product_progres_hist_id IS NOT NULL, COALESCE(product_progres_hist_id,raw_materials_history.product_final_assem_id), guide_issue_number) AS number_guide, material_hist_total_buy_pen AS cost_total_pen, material_hist_price_buy AS valorization')
+            ->leftJoin('products', 'products.id', '=', 'product_id')
+            ->leftJoin('product_progress_history', 'product_progress_history.id', '=', 'product_progres_hist_id')
+            ->leftJoin('product_finaly_assem_deta', 'product_finaly_assem_deta.id', '=', 'raw_materials_history.product_final_assem_id')
+            ->leftJoin('guides_referral_details', function ($join) {
+                $join->on('guides_referral_details.id', '=', 'guide_refer_id')
+                    ->leftJoin('guides_referral', function ($subJoin) {
+                        $subJoin->on('guides_referral.id', '=', 'guides_referral_details.guide_referral_id')
+                        ->leftJoin('customers','customers.id','=','guides_referral.guide_customer_id');
+                        ;
+                    });
+            })
+            ->where('raw_hist_type', 'SALIDA');
+    }
     public function rawMaterial()
     {
         return $this->belongsTo(RawMaterial::class, 'raw_material_id');
