@@ -24,6 +24,7 @@ class GuidesReferralDetailsObserver
                     'product_finaly_id' => $productFinaly->id,
                     'prod_fina_type_change' => $guideDetail->guideReferral->guide_type_change,
                     'guide_refer_id' => $guideDetail->id,
+                    'type_motion' => $guideDetail->guideReferral->guide_type_motion,
                     'product_finaly_amount' => $guideDetail->guide_product_quantity * -1,
                     'product_finaly_user' => auth()->user()->id
                 ];
@@ -41,6 +42,7 @@ class GuidesReferralDetailsObserver
                     'product_id' => $guideDetail->guide_product_id,
                     'material_hist_total_type_change' => $guides->guide_type_change,
                     'material_hist_money' => 'PEN',
+                    'type_motion' => $guideDetail->guideReferral->guide_type_motion,
                     'material_hist_date' => $guides->guide_issue_date,
                     'material_hist_amount' => $amount,
                     'material_hist_total_buy_pen' => $subtotal,
@@ -61,6 +63,7 @@ class GuidesReferralDetailsObserver
                     'product_id' => $guideDetail->guide_product_id,
                     'commodi_hist_date' => $guides->guide_issue_date,
                     'commodi_hist_bill' => "",
+                    'type_motion' => $guideDetail->guideReferral->guide_type_motion,
                     'commodi_hist_guide' => $guides->guide_issue_number,
                     'commodi_hist_type_change' => $guides->guide_type_change,
                     'commodi_hist_money' => 'PEN',

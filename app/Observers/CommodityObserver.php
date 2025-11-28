@@ -18,7 +18,7 @@ class CommodityObserver
         $products = Products::find($commodity->product_id);
         $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_money_initial, 2);
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
-        $totalBuyUSD = round($totalBuyPEN / $products->type_change_initial, 2);
+        $totalBuyUSD = $products->type_change_initial > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
         $commodity->history()->create([
             'product_id' => $products->id,
             'commodi_hist_user' => auth()->user()->id,
@@ -32,42 +32,5 @@ class CommodityObserver
             'commodi_hist_total_buy' => $totalBuyPEN,
             'commodi_hist_total_buy_usd' => $totalBuyUSD
         ]);
-    }
-    public function updated(Commodity $commodity)
-    {
-        //
-    }
-
-    /**
-     * Handle the Commodity "deleted" event.
-     *
-     * @param  \App\Models\Commodity  $commodity
-     * @return void
-     */
-    public function deleted(Commodity $commodity)
-    {
-        //
-    }
-
-    /**
-     * Handle the Commodity "restored" event.
-     *
-     * @param  \App\Models\Commodity  $commodity
-     * @return void
-     */
-    public function restored(Commodity $commodity)
-    {
-        //
-    }
-
-    /**
-     * Handle the Commodity "force deleted" event.
-     *
-     * @param  \App\Models\Commodity  $commodity
-     * @return void
-     */
-    public function forceDeleted(Commodity $commodity)
-    {
-        //
     }
 }

@@ -248,6 +248,7 @@ class ProductsController extends Controller
                         'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                     ]);
                 }
+                 $dataProduct['type_change_initial'] = $money->change_soles;
             }
             if ($request->has('delete_img') && File::exists($product->product_img)) {
                 File::delete($product->product_img);
@@ -273,6 +274,7 @@ class ProductsController extends Controller
             } else if ($product->product_store === 'PRODUCTO MERCADERIA' && $request->product_store !== 'PRODUCTO MERCADERIA') {
                 Commodity::where('product_id', $product->id)->update(['commodi_status' => 0]);
             }
+            $product->update($dataProduct);
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::firstOrCreate(
                     ['product_id' => $product->id, 'raw_material_status' => 1],
@@ -304,7 +306,6 @@ class ProductsController extends Controller
                     ]
                 );
             }
-            $product->update($dataProduct);
             $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
             return response()->json([
                 'redirect' => $redirect,

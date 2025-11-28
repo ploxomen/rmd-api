@@ -27,48 +27,4 @@ class ProductFinalyObserver
             'product_finaly_total' => $totalBuyPEN,
         ]);
     }
-
-    /**
-     * Handle the ProductFinaly "updated" event.
-     *
-     * @param  \App\Models\ProductFinaly  $productFinaly
-     * @return void
-     */
-    public function updated(ProductFinaly $productFinaly)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinaly "deleted" event.
-     *
-     * @param  \App\Models\ProductFinaly  $productFinaly
-     * @return void
-     */
-    public function deleted(ProductFinaly $productFinaly)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinaly "restored" event.
-     *
-     * @param  \App\Models\ProductFinaly  $productFinaly
-     * @return void
-     */
-    public function restored(ProductFinaly $productFinaly)
-    {
-        //
-    }
-
-    /**
-     * Handle the ProductFinaly "force deleted" event.
-     *
-     * @param  \App\Models\ProductFinaly  $productFinaly
-     * @return void
-     */
-    public function forceDeleted(ProductFinaly $productFinaly)
-    {
-        //
-    }
 }
