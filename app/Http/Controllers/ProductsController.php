@@ -12,6 +12,7 @@ use App\Models\Products;
 use App\Models\RawMaterial;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -130,6 +131,7 @@ class ProductsController extends Controller
             return response()->json(['error' => true, 'message' => 'Los campos no estan llenados correctamentes', 'data' => $validator->errors()->all(), 'redirect' => null]);
         }
         try {
+            DB::beginTransaction();
             $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
             if (!$request->has('product_service') && empty($money)) {
                 return response()->json([
@@ -138,7 +140,8 @@ class ProductsController extends Controller
                     'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                 ]);
             }
-            $dataProduct = $request->except('product_service', 'stock_initial', 'product_type_money');
+            $dataProduct = $request->except('product_service');
+            $dataProduct['type_change_initial'] = $money->change_soles;
             if ($request->has('product_img')) {
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
@@ -177,6 +180,7 @@ class ProductsController extends Controller
                     'commodi_price_buy' => 0
                 ]);
             }
+            DB::commit();
             $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
             return response()->json([
                 'redirect' => $redirect,
@@ -185,6 +189,7 @@ class ProductsController extends Controller
                 'data' => $product,
             ]);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'redirect' => null,
                 'error' => true,
@@ -265,8 +270,9 @@ class ProductsController extends Controller
                 RawMaterial::where('product_id', $product->id)->update(['raw_material_status' => 0]);
             } else if ($product->product_store === 'PRODUCTO TERMINADO' && $request->product_store !== 'PRODUCTO TERMINADO') {
                 ProductFinaly::where('product_id', $product->id)->update(['product_finaly_status' => 0]);
+            } else if ($product->product_store === 'PRODUCTO MERCADERIA' && $request->product_store !== 'PRODUCTO MERCADERIA') {
+                Commodity::where('product_id', $product->id)->update(['commodi_status' => 0]);
             }
-            $product->update($dataProduct);
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::firstOrCreate(
                     ['product_id' => $product->id, 'raw_material_status' => 1],
@@ -280,14 +286,25 @@ class ProductsController extends Controller
                 );
             } else if ($request->product_store === 'PRODUCTO TERMINADO') {
                 ProductFinaly::firstOrCreate(
-                    ['product_id' => $product->id, 'product_finaly_status' => 1],
+                    ['product_id' => $product->id, 'commodi_status' => 1],
                     [
                         'product_id' => $product->id,
-                        'product_finaly_stock' => 0,
+                        'commodi_stock' => 0,
                         'product_finaly_price' => 0,
                     ]
                 );
+            } else if ($request->product_store === 'PRODUCTO MERCADERIA') {
+                Commodity::firstOrCreate(
+                    ['product_id' => $product->id, 'commodi_status' => 1],
+                    [
+                        'product_id' => $product->id,
+                        'commodi_stock' => 0,
+                        'commodi_money' => 'PEN',
+                        'commodi_price_buy' => 0
+                    ]
+                );
             }
+            $product->update($dataProduct);
             $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
             return response()->json([
                 'redirect' => $redirect,
@@ -319,8 +336,10 @@ class ProductsController extends Controller
             'product_label',
             'product_unit_measurement',
             'product_code',
+            'stock_initial',
+            'type_money_initial',
             "product_label_2"
-        )->where('products.id', $request->product)->stockInitial()->first();
+        )->where('products.id', $request->product)->first();
         $productCategorie = $product->subcategorie->categorie_id;
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([

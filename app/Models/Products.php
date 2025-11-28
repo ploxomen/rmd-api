@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Observers\ProductsObserver;
 use Illuminate\Database\Eloquent\Model;
 
 class Products extends Model
@@ -21,8 +21,16 @@ class Products extends Model
         'product_label',
         'product_unit_measurement',
         'product_code',
+        'type_change_initial',
+        'type_money_initial',
+        'stock_initial',
         "product_label_2"
     ];
+    protected static function boot()
+    {
+        parent::boot();
+        static::observe(ProductsObserver::class);
+    }
     public static function getCodeProductNew(){
         $product = Products::select('product_code')->orderBy('product_code','desc')->first();
         if(empty($product)){
@@ -38,10 +46,6 @@ class Products extends Model
     public function productProgress()
     {
         return $this->hasOne(ProductProgress::class,'product_id')->where('product_progress_status',self::STATUS_ACTIVE_RELATION);
-    }
-    public function scopeStockInitial($query)
-    {
-        return $query->leftJoin('product_stock_initial','product_stock_initial.product_id','=','products.id')->addSelect('product_stock_initial.stock_initial')->selectRaw('COALESCE(product_stock_initial.type_money,"PEN") AS type_money');
     }
     public function productFinaly()
     {

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Observers\CommodityObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -18,6 +18,11 @@ class Commodity extends Model
         'commodi_prom_weig',
         'commodi_status'
     ];
+    protected static function boot()
+    {
+        parent::boot();
+        static::observe(CommodityObserver::class);
+    }
     public function scopeProducts($query)
     {
         return $query->join('products','products.id','=','product_id')->where('product_status',1);

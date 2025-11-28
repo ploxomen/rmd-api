@@ -26,7 +26,8 @@ class CommodityHistory extends Model
         'commodi_hist_prom_weig',
         'commodi_hist_status',
         'commodi_hist_user',
-        'shopping_detail_id'
+        'shopping_detail_id',
+        'type_motion'
     ];
     protected static function boot()
     {
