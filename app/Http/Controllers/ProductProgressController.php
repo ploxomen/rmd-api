@@ -139,6 +139,7 @@ class ProductProgressController extends Controller
         ProductProgressHistory::create([
             'product_id' => $request->product_id,
             'prod_prog_hist_type' => 'ENTRADA',
+            'type_motion' => 'ENSAMBLE',
             'prod_prog_type_change' => $money->change_soles,
             'product_progress_history_total' => $request->stock * $request->price_unit,
             'product_progress_history_pu' => $request->price_unit,

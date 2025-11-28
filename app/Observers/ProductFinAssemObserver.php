@@ -24,6 +24,7 @@ class ProductFinAssemObserver
                 $productProgres->history()->create([
                     'prod_prog_hist_type' => 'SALIDA',
                     'product_progress_history_pu' => $priceUnit,
+                    'type_motion' => 'ENSAMBLE',
                     'product_progress_history_total' => $subtotal,
                     'product_id' => $productFinalAssemDeta->product_id,
                     'product_progress_history_date' => now()->toDateString(),
@@ -42,6 +43,7 @@ class ProductFinAssemObserver
                 $rawMaterial->history()->create([
                     'product_id' => $productFinalAssemDeta->product_id,
                     'material_hist_amount' => $amount,
+                    'type_motion' => 'ENSAMBLE',
                     'material_hist_total_type_change' => $productAssembled->prod_fina_type_change,
                     'material_hist_money' => 'PEN',
                     'material_hist_date' => $productAssembled->product_finaly_created,

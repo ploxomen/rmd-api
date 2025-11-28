@@ -154,6 +154,7 @@ class ProductFinaliesController extends Controller
             } else if ($productFinaly->products->product_label_2 === "ENSAMBLADO") {
                 $productAssembled = new ProductFinalyAssembled();
                 $productAssembled->product_finaly_id = $productFinaly->id;
+                $productAssembled->type_motion = 'ENSAMBLE';
                 $productAssembled->product_finaly_created = now()->toDateString();
                 $productAssembled->prod_fina_type_change = $money->change_soles;
                 $productAssembled->product_finaly_amount = $request->product_finaly_amount;

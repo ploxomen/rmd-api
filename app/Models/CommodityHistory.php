@@ -42,7 +42,7 @@ class CommodityHistory extends Model
     public static function reportEntry(string $dateInitial, string $dateFinaly)
     {
         return CommodityHistory::select('product_name', 'product_code', 'commodi_hist_amount AS stock', 'commodi_hist_money AS type_money', 'commodi_hist_type_change AS type_change_money', 'commodi_hist_price_buy AS price_unit_pen')
-            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, "COMPRA" AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, commodi_hist_guide AS number_guide, commodi_hist_total_buy AS cost_total_pen, IF(imported_coefficient IS NOT NULL, commodi_hist_price_buy * imported_coefficient, commodi_hist_price_buy) AS valorization_unit,IF(imported_coefficient IS NOT NULL, commodi_hist_price_buy * commodi_hist_amount * imported_coefficient, commodi_hist_total_buy) AS valorization_total')
+            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, commodity_histories.type_motion AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, commodi_hist_guide AS number_guide, commodi_hist_total_buy AS cost_total_pen, IF(imported_coefficient IS NOT NULL, commodi_hist_price_buy * imported_coefficient, commodi_hist_price_buy) AS valorization_unit,IF(imported_coefficient IS NOT NULL, commodi_hist_price_buy * commodi_hist_amount * imported_coefficient, commodi_hist_total_buy) AS valorization_total')
             ->leftJoin('products', 'products.id', '=', 'product_id')
             ->leftJoin('provider', 'commodity_provider', '=', 'provider.id')
             ->leftJoin('shopping_details', function ($join) {
@@ -56,7 +56,7 @@ class CommodityHistory extends Model
     public static function reportExit(string $dateInitial, string $dateFinaly)
     {
         return CommodityHistory::select('product_name', 'product_code', 'commodi_hist_amount AS stock', 'commodi_hist_money AS type_money', 'commodi_hist_type_change AS type_change_money', 'commodi_hist_price_buy AS price_unit_pen')
-            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, guide_type_motion AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, guide_issue_number AS number_guide, commodi_hist_total_buy AS cost_total_pen, commodi_hist_price_buy AS valorization_unit,commodi_hist_total_buy AS valorization_total')
+            ->selectRaw('commodi_hist_date AS date, "ALMACEN MERCADERIA" AS store, COALESCE(guide_type_motion,commodity_histories.type_motion) AS type_mov, COALESCE(customer_number_document, "-") AS number_doc_provider, COALESCE(customer_name, "RMD") as provider, guide_issue_number AS number_guide, commodi_hist_total_buy AS cost_total_pen, commodi_hist_price_buy AS valorization_unit,commodi_hist_total_buy AS valorization_total')
             ->leftJoin('products', 'products.id', '=', 'product_id')
             ->leftJoin('guides_referral_details', function ($join) {
                 $join->on('guides_referral_details.id', '=', 'guide_refer_id')

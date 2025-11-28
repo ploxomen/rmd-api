@@ -30,6 +30,7 @@ class ShoppinDetailObserver
             'material_hist_total_type_change' => $shopping->buy_type_change,
             'material_hist_price_buy' => $shoppingDetail->shopping_deta_price,
             'raw_hist_type' => 'ENTRADA',
+            'type_motion' => 'COMPRA',
             'shopping_detail_id' => $shoppingDetail->id,
             'material_user' => auth()->user()->id,
         ]);
@@ -53,6 +54,7 @@ class ShoppinDetailObserver
             'commodi_hist_type_change' => $shopping->buy_type_change,
             'commodi_hist_price_buy' => $shoppingDetail->shopping_deta_price,
             'commodi_hist_type' => 'ENTRADA',
+            'type_motion' => 'COMPRA',
             'shopping_detail_id' => $shoppingDetail->id,
             'commodi_hist_user' => auth()->user()->id,
         ]);

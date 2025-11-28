@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductProgressHistory extends Model
 {
     protected $table = 'product_progress_history';
-    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_description','product_final_assem_id','product_progress_history_total','product_progress_history_pu','prod_prog_hist_type','prod_prog_hist_bala_amou','prod_prog_hist_bala_cost','prod_prog_hist_prom_weig','prod_prog_type_change'];
+    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_description','product_final_assem_id','product_progress_history_total','product_progress_history_pu','prod_prog_hist_type','prod_prog_hist_bala_amou','prod_prog_hist_bala_cost','prod_prog_hist_prom_weig','prod_prog_type_change','type_motion'];
     protected static function boot()
     {
         parent::boot();
@@ -21,7 +21,7 @@ class ProductProgressHistory extends Model
         return ProductProgressHistory::select('product_name','product_code','product_progress_history_stock AS stock')
         ->selectRaw('"PEN" AS type_money, prod_prog_type_change AS type_change_money')
         ->addSelect('product_progress_history_pu AS price_unit_pen')
-        ->selectRaw('product_progress_history_date AS date, "PRODUCTO EN CURSO" AS store, "COMPOSICION" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, product_progress_history_total AS cost_total_pen, product_progress_history_pu AS valorization_unit, product_progress_history_total AS valorization_total')
+        ->selectRaw('product_progress_history_date AS date, "PRODUCTO EN CURSO" AS store, COALESCE(product_progress_history.type_motion, "ENSAMBLE") AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, product_progress_history_total AS cost_total_pen, product_progress_history_pu AS valorization_unit, product_progress_history_total AS valorization_total')
         ->leftJoin('products','products.id','=','product_id')
         ->whereBetween('product_progress_history_date',[$dateInitial,$dateFinaly])->where('prod_prog_hist_type','ENTRADA');
     }
@@ -30,7 +30,7 @@ class ProductProgressHistory extends Model
         return ProductProgressHistory::select('product_name','product_code','product_progress_history_stock AS stock')
         ->selectRaw('"PEN" AS type_money, prod_prog_type_change AS type_change_money')
         ->addSelect('product_progress_history_pu AS price_unit_pen')
-        ->selectRaw('product_progress_history_date AS date, "PRODUCTO EN CURSO" AS store, "ENSAMBLE" AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, product_progress_history_total AS cost_total_pen, product_progress_history_pu AS valorization_unit, product_progress_history_total AS valorization_total')
+        ->selectRaw('product_progress_history_date AS date, "PRODUCTO EN CURSO" AS store, COALESCE(product_progress_history.type_motion, "ENSAMBLE") AS type_mov, "-" AS number_doc_provider, "RMD" as provider, "-" AS number_guide, product_progress_history_total AS cost_total_pen, product_progress_history_pu AS valorization_unit, product_progress_history_total AS valorization_total')
         ->leftJoin('products','products.id','=','product_id')
         ->whereBetween('product_progress_history_date',[$dateInitial,$dateFinaly])->where('prod_prog_hist_type','SALIDA');
     }
