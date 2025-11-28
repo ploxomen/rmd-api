@@ -9,7 +9,6 @@ use App\Models\Commodity;
 use App\Models\ProductFinaly;
 use App\Models\ProductProgress;
 use App\Models\Products;
-use App\Models\ProductStockInitial;
 use App\Models\RawMaterial;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
@@ -156,16 +155,6 @@ class ProductsController extends Controller
             $dataProduct['product_status'] = 1;
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
-            if (!$request->has('product_service')) {
-                ProductStockInitial::create([
-                    'product_id' => $product->id,
-                    'stock_initial' => $request->stock_initial,
-                    'type_money' => $request->type_money,
-                    'price_unit_usd' => $request->type_money == 'USD' ? $request->product_buy : $request->product_buy / $money->change_soles,
-                    'price_unit_pen' => $request->type_money == 'PEN' ? $request->product_buy : $request->product_buy * $money->change_soles,
-                    'type_change_money' => $money->change_soles
-                ]);
-            }
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::create([
                     'product_id' => $product->id,
@@ -254,15 +243,6 @@ class ProductsController extends Controller
                         'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                     ]);
                 }
-                ProductStockInitial::updateOrCreate([
-                    'product_id' => $product->id
-                ], [
-                    'stock_initial' => $request->stock_initial,
-                    'type_money' => $request->type_money,
-                    'type_change_money' => $money->change_soles,
-                    'price_unit_usd' => $request->type_money == 'USD' ? $request->product_buy : $request->product_buy / $money->change_soles,
-                    'price_unit_pen' => $request->type_money == 'PEN' ? $request->product_buy : $request->product_buy * $money->change_soles,
-                ]);
             }
             if ($request->has('delete_img') && File::exists($product->product_img)) {
                 File::delete($product->product_img);

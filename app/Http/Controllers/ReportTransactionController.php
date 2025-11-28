@@ -7,7 +7,6 @@ use App\Exports\TransactionExport;
 use App\Models\CommodityHistory;
 use App\Models\ProductFinalyAssembled;
 use App\Models\ProductProgressHistory;
-use App\Models\ProductStockInitial;
 use App\Models\RawMaterialHistory;
 use App\Models\Shopping;
 use Illuminate\Http\Request;
@@ -19,13 +18,11 @@ class ReportTransactionController extends Controller
     {
         $dateInitial = $request->input('date_initial',today()->toDateString());
         $dateFinaly = $request->input('date_finaly',today()->toDateString());
-        $stockInitialReport = ProductStockInitial::reportEntry($dateInitial,$dateFinaly);
         $rawMaterialReport = RawMaterialHistory::reportEntry($dateInitial,$dateFinaly);
         $productProgressReport = ProductProgressHistory::reportEntry($dateInitial,$dateFinaly);
         $productFinalyReport = ProductFinalyAssembled::reportEntry($dateInitial,$dateFinaly);
         $commodityReport = CommodityHistory::reportEntry($dateInitial,$dateFinaly);
-        $finalReport = $stockInitialReport->unionAll($rawMaterialReport)
-        ->unionAll($productProgressReport)
+        $finalReport = $rawMaterialReport->unionAll($productProgressReport)
         ->unionAll($productFinalyReport)
         ->unionAll($commodityReport)
         ->orderBy('date','DESC')
