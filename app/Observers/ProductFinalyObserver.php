@@ -16,7 +16,7 @@ class ProductFinalyObserver
     public function created(ProductFinaly $productFinaly)
     {
         $products = Products::find($productFinaly->product_id);
-        $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_money_initial, 2);
+        $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_change_initial, 2);
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
         $productFinaly->assembled()->create([
             'product_finaly_user' => auth()->user()->id,

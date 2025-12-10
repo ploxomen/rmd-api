@@ -192,6 +192,7 @@ class ProductsController extends Controller
             DB::rollBack();
             return response()->json([
                 'redirect' => null,
+                'line' => $th->getLine(),
                 'error' => true,
                 'message' => $th->getMessage(),
                 'data' => [$th->getMessage()]

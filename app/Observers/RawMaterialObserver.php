@@ -7,16 +7,10 @@ use App\Models\RawMaterial;
 
 class RawMaterialObserver
 {
-    /**
-     * Handle the RawMaterial "created" event.
-     *
-     * @param  \App\Models\RawMaterial  $rawMaterial
-     * @return void
-     */
     public function created(RawMaterial $rawMaterial)
     {
         $products = Products::find($rawMaterial->product_id);
-        $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_money_initial, 2);
+        $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_change_initial, 2);
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
         $totalBuyUSD = $products->type_change_initial > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
         $rawMaterial->history()->create([
