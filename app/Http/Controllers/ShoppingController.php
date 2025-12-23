@@ -78,7 +78,7 @@ class ShoppingController extends Controller
                     'imported_flete_cost' => $request->imported_flete_cost,
                     'imported_insurance_cost' => $request->imported_insurance_cost,
                     'imported_destination_cost' => $request->imported_destination_cost,
-                    'imported_coefficient' => ($request->imported_expenses_cost + $request->imported_flete_cost + $request->imported_insurance_cost + $request->imported_destination_cost) / $totals['PEN']
+                    'imported_coefficient' => ($request->imported_expenses_cost + $request->imported_flete_cost + $request->imported_insurance_cost + $request->imported_destination_cost) / $totals['USD']
                 ]);
             }
             foreach ($detailsProducts as $detail) {
@@ -181,7 +181,7 @@ class ShoppingController extends Controller
                     'imported_flete_cost' => $request->imported_flete_cost,
                     'imported_insurance_cost' => $request->imported_insurance_cost,
                     'imported_destination_cost' => $request->imported_destination_cost,
-                    'imported_coefficient' => ($request->imported_expenses_cost + $request->imported_flete_cost + $request->imported_insurance_cost + $request->imported_destination_cost) / $totals['PEN']
+                    'imported_coefficient' => ($request->imported_expenses_cost + $request->imported_flete_cost + $request->imported_insurance_cost + $request->imported_destination_cost) / $totals['USD']
                 ];
                 $store_shopping->imported()->exists() ? $store_shopping->imported()->update($shoppinImportedValues) : $store_shopping->imported()->create($shoppinImportedValues);
             }
