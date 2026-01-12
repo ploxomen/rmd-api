@@ -289,7 +289,7 @@ class ProductsController extends Controller
                 );
             } else if ($request->product_store === 'PRODUCTO TERMINADO') {
                 ProductFinaly::firstOrCreate(
-                    ['product_id' => $product->id, 'commodi_status' => 1],
+                    ['product_id' => $product->id, 'product_finaly_status' => 1],
                     [
                         'product_id' => $product->id,
                         'commodi_stock' => 0,
