@@ -44,7 +44,7 @@ class RawMaterialHistory extends Model
     public static function reportEntry(string $dateInitial, string $dateFinaly)
     {
         return RawMaterialHistory::select('product_name', 'product_code', 'material_hist_amount AS stock', 'material_hist_money AS type_money', 'material_hist_total_type_change AS type_change_money', 'material_hist_price_buy AS price_unit_pen')
-            ->selectRaw('material_hist_date AS date, "MATERIA PRIMA" AS store, raw_materials_history.type_motion AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, material_hist_guide AS number_guide, material_hist_total_buy_pen AS cost_total_pen, IF(imported_coefficient IS NOT NULL, material_hist_price_buy * imported_coefficient, material_hist_price_buy) AS valorization_unit,IF(imported_coefficient IS NOT NULL, material_hist_price_buy * material_hist_amount * imported_coefficient, material_hist_total_buy_pen) AS valorization_total')
+            ->selectRaw('material_hist_date AS date, "MATERIA PRIMA" AS store, raw_materials_history.type_motion AS type_mov, provider_number_document AS number_doc_provider, provider_name as provider, material_hist_guide AS number_guide, material_hist_total_buy_pen AS cost_total_pen, IF(imported_coefficient IS NOT NULL, material_hist_price_buy * (1 + imported_coefficient), material_hist_price_buy) AS valorization_unit,IF(imported_coefficient IS NOT NULL, material_hist_amount * material_hist_price_buy * (1 + imported_coefficient), material_hist_total_buy_pen) AS valorization_total')
             ->leftJoin('products', 'products.id', '=', 'product_id')
             ->leftJoin('provider', 'raw_provider', '=', 'provider.id')
             ->leftJoin('shopping_details', function ($join) {

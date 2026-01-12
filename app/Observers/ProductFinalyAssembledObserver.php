@@ -7,19 +7,25 @@ use App\Models\ProductFinalyAssembled;
 
 class ProductFinalyAssembledObserver
 {
-    public function created(ProductFinalyAssembled $productFinalyAssembled)
+    public function countTotalStockProductFinaly(int $productFinalyId)
     {
-        $productFinaly = ProductFinaly::find($productFinalyAssembled->product_finaly_id);
+        $productFinaly = ProductFinaly::find($productFinalyId);
         $totalStock = $productFinaly->assembled()->sum('product_finaly_amount');
         $productFinaly->product_finaly_stock = $totalStock;
         $productFinaly->save();
+    }
+    public function created(ProductFinalyAssembled $productFinalyAssembled)
+    {
+        $this->countTotalStockProductFinaly($productFinalyAssembled->product_finaly_id);
+    }
+    public function updated(ProductFinalyAssembled $productFinalyAssembled)
+    {
+        if ($productFinalyAssembled->wasChanged('product_finaly_amount')) {
+            $this->countTotalStockProductFinaly($productFinalyAssembled->product_finaly_id);
+        }
     }
     public function deleted(ProductFinalyAssembled $productFinalyAssembled)
     {
-        $productFinaly = ProductFinaly::find($productFinalyAssembled->product_finaly_id);
-        $totalStock = $productFinaly->assembled()->sum('product_finaly_amount');
-        $productFinaly->product_finaly_stock = $totalStock;
-        $productFinaly->save();
+        $this->countTotalStockProductFinaly($productFinalyAssembled->product_finaly_id);
     }
-    
 }
