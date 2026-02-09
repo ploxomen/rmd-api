@@ -12,7 +12,7 @@ class RawMaterialObserver
         $products = Products::find($rawMaterial->product_id);
         $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_change_initial, 2);
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
-        $totalBuyUSD = $products->type_change_initial > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
+        $totalBuyUSD = $products->type_change_initial > 0 && $totalBuyPEN > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
         $rawMaterial->history()->create([
             'product_id' => $products->id,
             'material_user' => auth()->user()->id,

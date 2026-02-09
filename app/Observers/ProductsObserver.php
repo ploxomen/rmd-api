@@ -30,7 +30,7 @@ class ProductsObserver
             $store = $products->product_store;
             $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_money_initial, 2);
             $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
-            $totalBuyUSD = $products->type_change_initial > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
+            $totalBuyUSD = $products->type_change_initial > 0 && $totalBuyPEN > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
             if ($store === "PRODUCTO MERCADERIA") {
                 $commodity = Commodity::where('product_id', $products->id)->active()->first();
                 if ($commodity) {

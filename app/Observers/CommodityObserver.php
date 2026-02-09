@@ -12,7 +12,7 @@ class CommodityObserver
         $products = Products::find($commodity->product_id);
         $priceUnitPEN = $products->type_money_initial == 'PEN' ? $products->product_buy : round($products->product_buy * $products->type_change_initial, 2);
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
-        $totalBuyUSD = $products->type_change_initial > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
+        $totalBuyUSD = $products->type_change_initial > 0 && $totalBuyPEN > 0 ? round($totalBuyPEN / $products->type_change_initial, 2) : 0;
         $commodity->history()->create([
             'product_id' => $products->id,
             'commodi_hist_user' => auth()->user()->id,

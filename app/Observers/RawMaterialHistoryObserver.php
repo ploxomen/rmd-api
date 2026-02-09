@@ -23,7 +23,7 @@ class RawMaterialHistoryObserver
         $rawMaterial = RawMaterial::find($idRawMaterial);
         $amount = $rawMaterialHistory->material_hist_amount + $rawMaterial->raw_hist_bala_amou;
         $total = $rawMaterialHistory->material_hist_total_buy_pen + $rawMaterial->raw_hist_bala_cost;
-        $avg = round($total / $amount,2);
+        $avg = $total > 0 ? round($total / $amount,2) : 0;
         $rawMaterialHistory->raw_hist_bala_amou = $amount;
         $rawMaterialHistory->raw_hist_bala_cost = $total;
         $rawMaterialHistory->raw_hist_prom_weig = $avg;

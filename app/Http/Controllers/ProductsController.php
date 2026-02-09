@@ -195,6 +195,7 @@ class ProductsController extends Controller
                 'line' => $th->getLine(),
                 'error' => true,
                 'message' => $th->getMessage(),
+                'file'     => $th->getFile(),
                 'data' => [$th->getMessage()]
             ], 500);
         }
@@ -249,7 +250,7 @@ class ProductsController extends Controller
                         'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                     ]);
                 }
-                 $dataProduct['type_change_initial'] = $money->change_soles;
+                $dataProduct['type_change_initial'] = $money->change_soles;
             }
             if ($request->has('delete_img') && File::exists($product->product_img)) {
                 File::delete($product->product_img);
