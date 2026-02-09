@@ -22,7 +22,7 @@ class GuidesReferralController extends Controller
         $search = $request->has('search') ? $request->search : '';
         $customer = $request->input('customer', '');
         $skip = ($request->page - 1) * $request->show;
-        $guidesReferral = GuidesReferral::withCustomer()->search($search);
+        $guidesReferral = GuidesReferral::withCustomer()->search($search)->orderBy('guides_referral.created_at','desc');
         if (!empty($customer)) {
             $guidesReferral->where('guide_customer_id', $customer);
         }

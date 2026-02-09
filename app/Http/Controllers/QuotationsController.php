@@ -39,20 +39,20 @@ class QuotationsController extends Controller
                 'message' => 'Acceso denegado'
             ]);
         }
+        $quotations = Quotation::getQuotationsReport($request->startDate,$request->finalDate,$request->order)->orderByRaw('YEAR(quotation_date_issue) DESC')->orderByDesc('quotation_number');
         switch ($request->typeInformation) {
             case 'excel':
-                return Excel::download(new QuotationsExport(Quotation::getQuotationsReport($request->startDate,$request->finalDate,$request->order)->get(),'reports.quotation'),'cotizizaciones.xlsx');
+                return Excel::download(new QuotationsExport($quotations->get(),'reports.quotation'),'cotizizaciones.xlsx');
             break;
             default:
                 $show = $request->show;
                 $skip = ($request->page - 1) * $show;
-                $quotations = Quotation::getQuotationsReport($request->startDate,$request->finalDate,$request->order);
                 return response()->json([
                     'redirect' => null,
                     'error' => false,
                     'message' => 'Datos obtenidos correctamente',
-                    'data' => $quotations->skip($skip)->take($show)->get(),
-                    'totalQuotations' => $quotations->count()
+                    'data' => (clone $quotations)->skip($skip)->take($show)->get(),
+                    'totalQuotations' => $quotations->get()->count()
                 ]);
             break;
         }
