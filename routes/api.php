@@ -39,8 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::put('role-module/{role}',[RolesController::class,'updateModules']);
     Route::apiResource('role',RolesController::class);
-    Route::get('money/change',[ChangeMoneyController::class,'index']);
-    Route::post('money/change',[ChangeMoneyController::class,'store']);
+    Route::apiResource('money/change',ChangeMoneyController::class);
     Route::apiResource('order',OrdersController::class);
     Route::apiResource('store',StoresController::class);
     Route::apiResource('module',ModulesController::class);
