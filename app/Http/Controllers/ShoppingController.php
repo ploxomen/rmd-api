@@ -23,7 +23,7 @@ class ShoppingController extends Controller
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $shopping = Shopping::select("shopping.id", "buy_date", "provider_name", "buy_total_usd", "buy_number_invoice", "buy_number_guide", "buy_type", "buy_total", "buy_type_money")->providers()->list($search)->orderBy('buy_date','DESC');
+        $shopping = Shopping::select("shopping.id", "buy_date", "provider_name", "buy_total_usd", "buy_number_invoice", "buy_number_guide", "buy_type", "buy_total", "buy_type_money")->providers()->list($search)->orderBy('buy_date', 'DESC');
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -32,13 +32,13 @@ class ShoppingController extends Controller
             'data' => $shopping->skip($skip)->take($show)->get()
         ]);
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
             'shopping_details' => 'required|array',
             'buy_provider' => 'required'
-        ],[],['shopping_details' => 'detalle de producto', 'buy_provider' => 'proveedor']);
+        ], [], ['shopping_details' => 'detalle de producto', 'buy_provider' => 'proveedor']);
         $priceChange = 0;
         $money = ChangeMoney::select('change_soles')->where('change_day', $request->buy_date_invoice)->first();
         if (empty($money)) {
@@ -51,9 +51,10 @@ class ShoppingController extends Controller
         DB::beginTransaction();
         try {
             $shopping = new Shopping();
-            $shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice','buy_details', 'buy_number_guide', 'buy_type', 'buy_type_money']));
+            $shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_details', 'buy_number_guide', 'buy_type', 'buy_type_money']));
             $shopping->buy_type_change = $priceChange;
             $shopping->buy_user = $request->user()->id;
+            $shopping->created_at = $request->buy_date . " " . date("H:i:s");
             $shopping->save();
             $detailsProducts = ProductHelper::unionOfProducts($request->shopping_details);
             $totals = [
@@ -84,6 +85,7 @@ class ShoppingController extends Controller
             foreach ($detailsProducts as $detail) {
                 $shopping->products()->attach($detail['product_id'], [
                     'shopping_deta_store' => $detail['detail_store'],
+                    'created_at' => $shopping->created_at,
                     'shopping_deta_ammount' => $detail['stock'],
                     'shopping_deta_price' => $detail['shopping_deta_price'],
                     'shopping_deta_price_usd' => $detail['shopping_deta_price_usd'],
@@ -125,26 +127,27 @@ class ShoppingController extends Controller
     public function show($store_shopping, Request $request)
     {
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
-        $shopping = Shopping::select('buy_date', 'shopping.id','buy_details', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money', 'imported_nro_dam', 'imported_expenses_cost', 'imported_flete_cost', 'imported_insurance_cost', 'imported_destination_cost')->typeImported()->where('shopping.id', $store_shopping)->first();
+        $shopping = Shopping::select('buy_date', 'shopping.id', 'buy_details', 'buy_date_invoice', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money', 'imported_nro_dam', 'imported_expenses_cost', 'imported_flete_cost', 'imported_insurance_cost', 'imported_destination_cost')->typeImported()->where('shopping.id', $store_shopping)->first();
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
             'message' => 'compras obtenidos correctamente',
             'compra' => $shopping,
-            'compra_details' => ShoppingDetail::select(['shopping_deta_store AS detail_store', 'shopping_product AS detail_product_id', 'shopping_deta_ammount AS detail_stock','shopping_details.id AS detail_id'])->selectRaw("'old' AS detail_type, IF(? = 'PEN', shopping_deta_price, shopping_deta_price_usd) AS datail_price_unit",[$shopping->buy_type_money])->where('shopping_id', $store_shopping)->get()
+            'compra_details' => ShoppingDetail::select(['shopping_deta_store AS detail_store', 'shopping_product AS detail_product_id', 'shopping_deta_ammount AS detail_stock', 'shopping_details.id AS detail_id'])->selectRaw("'old' AS detail_type, IF(? = 'PEN', shopping_deta_price, shopping_deta_price_usd) AS datail_price_unit", [$shopping->buy_type_money])->where('shopping_id', $store_shopping)->get()
         ]);
     }
     public function mapDetailsShopping(array $item)
     {
         return [
             $item['product_id'] => [
-            'shopping_deta_store' => $item['detail_store'],
-            'shopping_deta_ammount' => $item['stock'],
-            'shopping_deta_price' => $item['shopping_deta_price'],
-            'shopping_deta_price_usd' => $item['shopping_deta_price_usd'],
-            'shopping_deta_subtotal' => $item['shopping_deta_subtotal'],
-            'shopping_deta_subtotal_usd' => $item['shopping_deta_subtotal_usd']
-        ]];
+                'shopping_deta_store' => $item['detail_store'],
+                'shopping_deta_ammount' => $item['stock'],
+                'shopping_deta_price' => $item['shopping_deta_price'],
+                'shopping_deta_price_usd' => $item['shopping_deta_price_usd'],
+                'shopping_deta_subtotal' => $item['shopping_deta_subtotal'],
+                'shopping_deta_subtotal_usd' => $item['shopping_deta_subtotal_usd']
+            ]
+        ];
     }
     public function update(Shopping $store_shopping, Request $request)
     {
@@ -152,10 +155,11 @@ class ShoppingController extends Controller
         $request->validate([
             'shopping_details' => 'required|array',
             'buy_provider' => 'required'
-        ],[],['shopping_details' => 'detalle de producto','buy_provider' => 'proveedor']);
+        ], [], ['shopping_details' => 'detalle de producto', 'buy_provider' => 'proveedor']);
         try {
             $priceChange = $store_shopping->buy_type_change ?? 1;
-            $store_shopping->fill($request->only(['buy_date', 'buy_date_invoice','buy_details', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
+            $store_shopping->fill($request->only(['buy_date', 'buy_date_invoice', 'buy_details', 'buy_provider', 'buy_number_invoice', 'buy_number_guide', 'buy_type', 'buy_type_money']));
+            $store_shopping->created_at = $request->buy_date . " " . date("H:i:s");
             $detailsProducts = ProductHelper::unionOfProducts($request->shopping_details);
             $totals = [
                 'USD' => 0,
@@ -168,6 +172,7 @@ class ShoppingController extends Controller
                 $totals['USD'] += $priceUnitUSD * $detail['stock'];
                 $detailsProducts[$keyDetail]['shopping_deta_price'] = $priceUnitPEN;
                 $detailsProducts[$keyDetail]['shopping_deta_price_usd'] = $priceUnitUSD;
+                $detailsProducts[$keyDetail]['created_at'] = $store_shopping->created_at;
                 $detailsProducts[$keyDetail]['shopping_deta_subtotal'] = $priceUnitPEN * $detail['stock'];
                 $detailsProducts[$keyDetail]['shopping_deta_subtotal_usd'] = $priceUnitUSD * $detail['stock'];
             }
@@ -185,8 +190,8 @@ class ShoppingController extends Controller
                 ];
                 $store_shopping->imported()->exists() ? $store_shopping->imported()->update($shoppinImportedValues) : $store_shopping->imported()->create($shoppinImportedValues);
             }
-            $sync = collect($detailsProducts)->filter(fn($row) => $row['detail_type'] == 'old')->mapWithKeys([$this,'mapDetailsShopping']);
-            $attach = collect($detailsProducts)->filter(fn($row) => $row['detail_type'] == 'new')->mapWithKeys([$this,'mapDetailsShopping']);
+            $sync = collect($detailsProducts)->filter(fn($row) => $row['detail_type'] == 'old')->mapWithKeys([$this, 'mapDetailsShopping']);
+            $attach = collect($detailsProducts)->filter(fn($row) => $row['detail_type'] == 'new')->mapWithKeys([$this, 'mapDetailsShopping']);
             $store_shopping->products()->sync($sync);
             $store_shopping->products()->attach($attach);
             $store_shopping->buy_total = $totals['PEN'];

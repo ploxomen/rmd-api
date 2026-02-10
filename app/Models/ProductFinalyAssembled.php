@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductFinalyAssembled extends Model
 {
     protected $table = "product_finaly_assembleds";
-    protected $fillable = ['product_finaly_amount', 'product_finaly_id', 'guide_refer_id', 'product_finaly_created', 'prod_fina_type_change', 'product_finaly_description', 'product_finaly_user', 'product_finaly_total', 'type_motion'];
+    protected $fillable = ['product_finaly_amount', 'product_finaly_id', 'guide_refer_id', 'product_finaly_created', 'prod_fina_type_change', 'product_finaly_description', 'product_finaly_user', 'product_finaly_total', 'type_motion', 'created_at'];
     protected static function boot()
     {
         parent::boot();

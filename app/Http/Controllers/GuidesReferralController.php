@@ -22,7 +22,7 @@ class GuidesReferralController extends Controller
         $search = $request->has('search') ? $request->search : '';
         $customer = $request->input('customer', '');
         $skip = ($request->page - 1) * $request->show;
-        $guidesReferral = GuidesReferral::withCustomer()->search($search)->orderBy('guides_referral.created_at','desc');
+        $guidesReferral = GuidesReferral::withCustomer()->search($search)->orderBy('guides_referral.created_at', 'desc');
         if (!empty($customer)) {
             $guidesReferral->where('guide_customer_id', $customer);
         }
@@ -128,9 +128,10 @@ class GuidesReferralController extends Controller
             $guideReferral->fill($request->except(['details']));
             $guideReferral->guide_user_id = $request->user()->id;
             $guideReferral->guide_type_change = $money->change_soles;
+            $guideReferral->created_at = $request->guide_issue_date . " " . date("H:i:s");
             $guideReferral->save();
             foreach ($request->details as $product) {
-                $guideReferral->product()->attach($product['detail_product_id'], ['guide_product_quantity' => $product['detail_stock'], 'guide_product_type' => $product['detail_store']]);
+                $guideReferral->product()->attach($product['detail_product_id'], ['guide_product_quantity' => $product['detail_stock'], 'created_at' => $guideReferral->created_at, 'guide_product_type' => $product['detail_store']]);
             }
             DB::commit();
             return response()->json(['redirect' => null, 'error' => false, 'message' => 'Historial generado correctamente']);
@@ -165,6 +166,7 @@ class GuidesReferralController extends Controller
         DB::beginTransaction();
         try {
             $guide_referral->fill($request->except(['details']));
+            $guide_referral->created_at = $request->guide_issue_date . " " . date("H:i:s");
             $guide_referral->save();
             $idsUpdates = [];
             $attach = [];
@@ -173,7 +175,8 @@ class GuidesReferralController extends Controller
                     GuidesReferralDetails::find($product['detail_id'])->update([
                         'guide_product_quantity' => $product['detail_stock'],
                         'guide_product_id' => $product['detail_product_id'],
-                        'guide_product_type' => $product['detail_store']
+                        'guide_product_type' => $product['detail_store'],
+                        'created_at' => $guide_referral->created_at
                     ]);
                     $idsUpdates[] = $product['detail_id'];
                     continue;

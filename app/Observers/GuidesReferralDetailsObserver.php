@@ -26,6 +26,7 @@ class GuidesReferralDetailsObserver
                     'guide_refer_id' => $guideDetail->id,
                     'type_motion' => $guideDetail->guideReferral->guide_type_motion,
                     'product_finaly_amount' => $guideDetail->guide_product_quantity * -1,
+                    'created_at' => $guideDetail->created_at,
                     'product_finaly_user' => auth()->user()->id
                 ];
                 $assembled = new ProductFinalyAssembled($insert);
@@ -47,6 +48,7 @@ class GuidesReferralDetailsObserver
                     'material_hist_amount' => $amount,
                     'material_hist_total_buy_pen' => $subtotal,
                     'material_hist_price_buy' => $priceUnit,
+                    'created_at' => $guideDetail->created_at,
                     'raw_hist_type' => 'SALIDA',
                     'guide_refer_id' => $guideDetail->id,
                     'material_user' => auth()->user()->id,
@@ -68,6 +70,7 @@ class GuidesReferralDetailsObserver
                     'commodi_hist_type_change' => $guides->guide_type_change,
                     'commodi_hist_money' => 'PEN',
                     'commodi_hist_type' => 'SALIDA',
+                    'created_at' => $guideDetail->created_at,
                     'commodi_hist_amount' => $amount,
                     'commodi_hist_price_buy' => $priceUnit,
                     'commodi_hist_total_buy' => $subtotal,

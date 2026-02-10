@@ -26,6 +26,7 @@ class ShoppinDetailObserver
             'material_hist_money' => $shopping->buy_type_money,
             'material_hist_amount' => $shoppingDetail->shopping_deta_ammount,
             'material_hist_total_buy_pen' => $shoppingDetail->shopping_deta_subtotal,
+            'created_at' => $shoppingDetail->created_at,
             'material_hist_total_buy_usd' => $shoppingDetail->shopping_deta_subtotal_usd,
             'material_hist_total_type_change' => $shopping->buy_type_change,
             'material_hist_price_buy' => $shoppingDetail->shopping_deta_price,
@@ -55,6 +56,7 @@ class ShoppinDetailObserver
             'commodi_hist_price_buy' => $shoppingDetail->shopping_deta_price,
             'commodi_hist_type' => 'ENTRADA',
             'type_motion' => 'COMPRA',
+            'created_at' => $shoppingDetail->created_at,
             'shopping_detail_id' => $shoppingDetail->id,
             'commodi_hist_user' => auth()->user()->id,
         ]);

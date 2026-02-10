@@ -12,7 +12,8 @@ class GuidesReferralDetails extends Pivot
         'guide_referral_id',
         'guide_product_quantity',
         'guide_product_id',
-        'guide_product_type'
+        'guide_product_type',
+        'created_at'
     ];
     public $incrementing = true; // Indica que tiene una clave primaria auto-incremental
     protected $primaryKey = "id";

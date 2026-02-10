@@ -10,7 +10,7 @@ class ShoppingDetail extends Pivot
     protected $table = 'shopping_details';
     public $incrementing = true;
     protected $primaryKey = "id";
-    protected $fillable = ['shopping_deta_store', 'shopping_id', 'shopping_product', 'shopping_deta_ammount', 'shopping_deta_price', 'shopping_deta_price_usd', 'shopping_deta_subtotal', 'shopping_deta_subtotal_usd'];
+    protected $fillable = ['shopping_deta_store', 'shopping_id', 'shopping_product', 'shopping_deta_ammount', 'shopping_deta_price', 'shopping_deta_price_usd', 'shopping_deta_subtotal', 'shopping_deta_subtotal_usd', 'created_at'];
     protected static function boot()
     {
         parent::boot();

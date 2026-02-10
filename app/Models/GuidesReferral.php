@@ -20,7 +20,8 @@ class GuidesReferral extends Model
         'guide_type_motion',
         'guide_justification',
         'guide_user_id',
-        'guite_total'
+        'guite_total',
+        'created_at'
     ];
     protected function casts() : array {
         return [
