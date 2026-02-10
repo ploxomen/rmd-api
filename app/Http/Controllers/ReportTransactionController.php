@@ -25,7 +25,7 @@ class ReportTransactionController extends Controller
         $finalReport = $rawMaterialReport->unionAll($productProgressReport)
         ->unionAll($productFinalyReport)
         ->unionAll($commodityReport)
-        ->orderBy('date','DESC')
+        ->orderBy('created_at','DESC')
         ->get();
         return Excel::download(new TransactionExport($finalReport, 'REPORTE DE ENTRADAS'),'reporte_entradas.xlsx');
     }
