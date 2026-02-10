@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductProgressHistory extends Model
 {
     protected $table = 'product_progress_history';
-    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_description','product_final_assem_id','product_progress_history_total','product_progress_history_pu','prod_prog_hist_type','prod_prog_hist_bala_amou','prod_prog_hist_bala_cost','prod_prog_hist_prom_weig','prod_prog_type_change','type_motion'];
+    protected $fillable = ['product_id','product_progress_id','product_progress_history_date','product_progress_history_stock','product_progress_history_description','product_final_assem_id','product_progress_history_total','product_progress_history_pu','prod_prog_hist_type','prod_prog_hist_bala_amou','prod_prog_hist_bala_cost','prod_prog_hist_prom_weig','prod_prog_type_change','type_motion','created_at'];
     protected static function boot()
     {
         parent::boot();

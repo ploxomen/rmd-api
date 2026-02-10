@@ -28,6 +28,7 @@ class ProductProgresDetaObserver
                     'product_id' => $productProgressHistory->product_id,
                     'material_hist_total_type_change' => $productProgressHistory->prod_prog_type_change,
                     'material_hist_money' => 'PEN',
+                    'created_at' => $productProgressHistory->created_at,
                     'type_motion' => 'ENSAMBLE',
                     'material_hist_date' => $productProgressHistory->product_progress_history_date,
                     'material_hist_amount' => $amount,

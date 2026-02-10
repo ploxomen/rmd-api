@@ -63,6 +63,7 @@ class ProductProgressController extends Controller
         }
         $historyProgress->update([
             'product_progress_history_date' => $request->date,
+            'created_at' => $request->date . " " . date('H:i:s'),
             'product_progress_history_stock' => $request->stock,
             'product_progress_history_description' => $request->details
         ]);
@@ -140,6 +141,7 @@ class ProductProgressController extends Controller
             'product_id' => $request->product_id,
             'prod_prog_hist_type' => 'ENTRADA',
             'type_motion' => 'ENSAMBLE',
+            'created_at' => $request->date . " " . date('H:i:s'),
             'prod_prog_type_change' => $money->change_soles,
             'product_progress_history_total' => $request->stock * $request->price_unit,
             'product_progress_history_pu' => $request->price_unit,

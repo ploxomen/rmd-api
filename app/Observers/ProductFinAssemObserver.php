@@ -25,9 +25,10 @@ class ProductFinAssemObserver
                     'prod_prog_hist_type' => 'SALIDA',
                     'product_progress_history_pu' => $priceUnit,
                     'type_motion' => 'ENSAMBLE',
+                    'created_at' => $productFinalAssemDeta->created_at,
                     'product_progress_history_total' => $subtotal,
                     'product_id' => $productFinalAssemDeta->product_id,
-                    'product_progress_history_date' => now()->toDateString(),
+                    'product_progress_history_date' => $productFinalAssemDeta->productFinalyAssem->product_finaly_created,
                     'product_progress_history_stock' => $amount,
                     'product_final_assem_id' => $productFinalAssemDeta->id
                 ]);
@@ -49,6 +50,7 @@ class ProductFinAssemObserver
                     'material_hist_date' => $productAssembled->product_finaly_created,
                     'material_hist_total_buy_pen' => $subtotal,
                     'material_hist_price_buy' => $priceUnit,
+                    'created_at' => $productFinalAssemDeta->created_at,
                     'raw_hist_type' => 'SALIDA',
                     'product_final_assem_id' => $productFinalAssemDeta->id,
                     'material_user' => auth()->user()->id,

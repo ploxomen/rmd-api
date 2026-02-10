@@ -155,16 +155,18 @@ class ProductFinaliesController extends Controller
                 $productAssembled = new ProductFinalyAssembled();
                 $productAssembled->product_finaly_id = $productFinaly->id;
                 $productAssembled->type_motion = 'ENSAMBLE';
-                $productAssembled->product_finaly_created = now()->toDateString();
+                $productAssembled->product_finaly_created = $request->product_finaly_created;
                 $productAssembled->prod_fina_type_change = $money->change_soles;
                 $productAssembled->product_finaly_amount = $request->product_finaly_amount;
                 $productAssembled->product_finaly_description = $request->product_finaly_description;
                 $productAssembled->product_finaly_user = $request->user()->id;
+                $productAssembled->created_at = $request->product_finaly_created . " " . date('H:i:s');
                 $productAssembled->save();
                 foreach ($request->details as $product) {
                     $productAssembled->product()->attach($product['detail_product_id'], [
                         'product_finaly_stock' => $product['detail_stock'], 
                         'product_finaly_type' => $product['detail_store'],
+                        'created_at' =>  $productAssembled->created_at
                     ]);
                 }
             }
