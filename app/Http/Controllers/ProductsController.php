@@ -140,7 +140,7 @@ class ProductsController extends Controller
                     'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                 ]);
             }
-            $dataProduct = $request->except('product_service');
+            $dataProduct = $request->except('product_service','date_issue');
             $dataProduct['type_change_initial'] = $money->change_soles;
             if ($request->has('product_img')) {
                 $file = $request->file('product_img');
@@ -156,6 +156,7 @@ class ProductsController extends Controller
                 $dataProduct['product_distributor'] = 0;
             }
             $dataProduct['product_status'] = 1;
+            $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
             if ($request->product_store === 'MATERIA PRIMA') {
@@ -202,7 +203,7 @@ class ProductsController extends Controller
     }
     public function update(Request $request, $product)
     {
-        $dataProduct = $request->except("id", "product_img", "product_categorie");
+        $dataProduct = $request->except("id", "product_img", "product_categorie","date_issue");
         $validator = Validator::make($dataProduct, [
             'product_name' => [
                 'required',
@@ -276,6 +277,7 @@ class ProductsController extends Controller
             } else if ($product->product_store === 'PRODUCTO MERCADERIA' && $request->product_store !== 'PRODUCTO MERCADERIA') {
                 Commodity::where('product_id', $product->id)->update(['commodi_status' => 0]);
             }
+            $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $product->update($dataProduct);
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::firstOrCreate(
@@ -342,7 +344,7 @@ class ProductsController extends Controller
             'stock_initial',
             'type_money_initial',
             "product_label_2"
-        )->where('products.id', $request->product)->first();
+        )->selectRaw('DATE(created_at) AS date_issue')->where('products.id', $request->product)->first();
         $productCategorie = $product->subcategorie->categorie_id;
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([

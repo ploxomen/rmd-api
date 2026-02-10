@@ -16,12 +16,13 @@ class CommodityObserver
         $commodity->history()->create([
             'product_id' => $products->id,
             'commodi_hist_user' => auth()->user()->id,
-            'commodi_hist_date' => today()->toDateString(),
+            'commodi_hist_date' => $products->created_at->toDateString(),
             'commodi_hist_amount' => $products->stock_initial,
             'commodi_hist_type' => 'ENTRADA',
             'commodi_hist_money' => $products->type_money_initial,
             'commodi_hist_type_change' => $products->type_change_initial,
             'type_motion' => 'INVENTARIO INICIAL',
+            'created_at' => $products->created_at,
             'commodi_hist_price_buy' => $priceUnitPEN,
             'commodi_hist_total_buy' => $totalBuyPEN,
             'commodi_hist_total_buy_usd' => $totalBuyUSD

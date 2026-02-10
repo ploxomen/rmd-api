@@ -20,8 +20,9 @@ class ProductFinalyObserver
         $totalBuyPEN = $priceUnitPEN * $products->stock_initial;
         $productFinaly->assembled()->create([
             'product_finaly_user' => auth()->user()->id,
-            'product_finaly_created' => today()->toDateString(),
+            'product_finaly_created' => $products->created_at->toDateString(),
             'product_finaly_amount' => $products->stock_initial,
+            'created_at' => $products->created_at,
             'prod_fina_type_change' => $products->type_change_initial,
             'type_motion' => 'INVENTARIO INICIAL',
             'product_finaly_total' => $totalBuyPEN,

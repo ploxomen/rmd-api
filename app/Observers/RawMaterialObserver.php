@@ -16,10 +16,11 @@ class RawMaterialObserver
         $rawMaterial->history()->create([
             'product_id' => $products->id,
             'material_user' => auth()->user()->id,
-            'material_hist_date' => today()->toDateString(),
+            'material_hist_date' => $products->created_at->toDateString(),
             'material_hist_amount' => $products->stock_initial,
             'raw_hist_type' => 'ENTRADA',
             'material_hist_money' => $products->type_money_initial,
+            'created_at' => $products->created_at,
             'material_hist_total_type_change' => $products->type_change_initial,
             'type_motion' => 'INVENTARIO INICIAL',
             'material_hist_price_buy' => $priceUnitPEN,

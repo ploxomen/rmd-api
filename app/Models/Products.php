@@ -24,7 +24,8 @@ class Products extends Model
         'type_change_initial',
         'type_money_initial',
         'stock_initial',
-        "product_label_2"
+        "product_label_2",
+        'created_at'
     ];
     protected static function boot()
     {
