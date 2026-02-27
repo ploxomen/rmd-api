@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000','https://demormd.herramientaswp.com','https://sandboxapi.erprmdperu.com'],
+    'allowed_origins' => ['http://localhost:3000','https://demormd.herramientaswp.com','https://sandbox.erprmdperu.com'],
 
     'allowed_origins_patterns' => [],
 
