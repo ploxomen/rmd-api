@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('modules-roles',[UserController::class,'userModules']);
         Route::get('change-role/{role}',[AuthController::class,'changeRole']);
     });
+    Route::get('customer/export/{typeExport}',[CustomersController::class,'export']);
     Route::prefix('calculator')->group(function () {
         Route::get('configuration',[CalculatorController::class,'getConfiguration']);
         Route::put('configuration',[CalculatorController::class,'updateConfiguration']);

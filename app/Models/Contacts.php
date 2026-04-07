@@ -15,4 +15,6 @@ class Contacts extends Model
         'contact_number',
         'contact_status'
     ];
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 0;
 }

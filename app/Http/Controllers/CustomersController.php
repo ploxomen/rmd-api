@@ -2,33 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CustomerExport;
 use App\Models\Contacts;
 use App\Models\Customers;
 use App\Models\Districts;
 use App\Models\Provinces;
 use App\Models\Quotation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomersController extends Controller
 {
     private $urlModule = '/customers';
-    public function index(Request $request) {
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+    public function index(Request $request)
+    {
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         $show = $request->show;
         $search = $request->has('search') ? $request->search : '';
         $skip = ($request->page - 1) * $request->show;
-        $customers = Customers::select("customers.id","customer_number_document","customer_name","document_name","departament_name")
-        ->selectRaw("CONCAT(users.user_name,' ',users.user_last_name) AS user_creator")
-        ->join('type_documents','customer_type_document','=','type_documents.id')
-        ->leftJoin('districts', 'customers.customer_district', '=', 'districts.id')
-        ->leftJoin('departaments', 'districts.district_departament', '=', 'departaments.id')
-        ->leftJoin('users','users.id','=','user_create')
-        ->where('customer_status','>',0)->where(function($query)use($search){
-            $query->where('customer_name','like','%'.$search.'%')
-            ->orWhere('customer_number_document','like','%'.$search.'%')
-            ->orWhere('departament_name','like','%'.$search.'%');
-        });
+        $customers = Customers::select("customers.id", "customer_number_document", "customer_name", "document_name", "departament_name")
+            ->selectRaw("CONCAT(users.user_name,' ',users.user_last_name) AS user_creator")
+            ->join('type_documents', 'customer_type_document', '=', 'type_documents.id')
+            ->leftJoin('districts', 'customers.customer_district', '=', 'districts.id')
+            ->leftJoin('departaments', 'districts.district_departament', '=', 'departaments.id')
+            ->leftJoin('users', 'users.id', '=', 'user_create')
+            ->where('customer_status', '>', 0)->where(function ($query) use ($search) {
+                $query->where('customer_name', 'like', '%' . $search . '%')
+                    ->orWhere('customer_number_document', 'like', '%' . $search . '%')
+                    ->orWhere('departament_name', 'like', '%' . $search . '%');
+            });
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
@@ -37,47 +41,72 @@ class CustomersController extends Controller
             'data' => $customers->skip($skip)->take($show)->get()
         ]);
     }
-    public function deleteContact(Request $request) {
-        if(Quotation::where('quotation_customer_contact',$request->contact)->count() > 0){
+    public function deleteContact(Request $request)
+    {
+        if (Quotation::where('quotation_customer_contact', $request->contact)->count() > 0) {
             return response()->json([
                 'error' => true,
                 'message' => 'No se puede eliminar el contacto porque está presente en una o varias cotizaciones',
             ]);
         }
         Contacts::find($request->contact)->delete();
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,
             'message' => 'Contacto eliminado correctamente'
         ]);
     }
-    public function show(Request $request) {
-        $customer = Customers::find($request->customer)->makeHidden(['created_at','updated_at','customer_status']);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+    public function dataExport(?string $search = '')
+    {
+        return Customers::select('id', 'customer_name', 'customer_number_document', 'customer_type_document', 'customer_district', 'customer_address')->with('contacts', 'typeDocument', 'district.province', 'district.departament')->active()->search($search)->searchDistrict($search)->limit(2)->get();
+    }
+    public function totalDataExport($data) {
+        $totalCount = 0;
+        foreach ($data as $customer) {
+            $totalCount += $customer->contacts->count() === 0 ? 1 : $customer->contacts->count();
+        }
+        return $totalCount;
+    }
+    public function export(string $typeExport, Request $request)
+    {
+        $search = $request->has('search') ? $request->search : '';
+        $data = $this->dataExport($search);
+        switch ($typeExport) {
+            case 'pdf':
+                return Pdf::loadView('reports.customers-pdf', ['customers' => $data])->setPaper('a4','landscape')->stream('customers.pdf');
+            case 'excel':
+                return Excel::download(new CustomerExport($data, $this->totalDataExport($data)), 'customers.xlsx');
+        }
+    }
+    public function show(Request $request)
+    {
+        $customer = Customers::find($request->customer)->makeHidden(['created_at', 'updated_at', 'customer_status']);
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         $provinces = [];
         $districts = [];
-        if(!empty($customer->customer_district)){
+        if (!empty($customer->customer_district)) {
             $district = Districts::find($customer->customer_district);
-            $provinces = Provinces::where('province_departament',$district->district_departament)->get();
-            $districts = Districts::where('district_province',$district->district_province)->get();
+            $provinces = Provinces::where('province_departament', $district->district_departament)->get();
+            $districts = Districts::where('district_province', $district->district_province)->get();
             $customer->customer_departament = $district->district_departament;
             $customer->customer_province = $district->district_province;
         }
         return response()->json([
             'redirect' => $redirect,
-            'error' => false, 
-            'message' => 'Cliente obtenido correctamente', 
+            'error' => false,
+            'message' => 'Cliente obtenido correctamente',
             'data' => [
                 'customer' => $customer,
                 'districts' => $districts,
                 'provinces' => $provinces,
-                'contacts' => $customer->contacts()->select("id","contact_name","contact_number","contact_email","contact_position")->selectRaw("'old' AS type")->get()
+                'contacts' => $customer->contacts()->select("id", "contact_name", "contact_number", "contact_email", "contact_position")->selectRaw("'old' AS type")->get()
             ]
         ]);
     }
-    public function store(Request $request) {        
-        $validator = Validator::make($request->all(),[
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'customer_name' => 'required|string|max:250|unique:customers,customer_name',
             'customer_email' => 'nullable|string|max:250',
             'customer_phone' => 'nullable|string',
@@ -91,8 +120,8 @@ class CustomersController extends Controller
             'customer_cell_phone' => 'celular',
             'customer_address' => 'dirección',
         ]);
-        if($validator->fails()){
-            return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true, 'message' => 'Los campos no estan llenados correctamentes', 'data' => $validator->errors()]);
         }
         $customer = Customers::create([
             'customer_type_document' => $request->customer_type_document,
@@ -119,17 +148,18 @@ class CustomersController extends Controller
             ];
         }
         $customer->contacts()->createMany($contacts);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([
             'redirect' => $redirect,
-            'error' => false, 
-            'message' => 'Cliente creado correctamente', 
+            'error' => false,
+            'message' => 'Cliente creado correctamente',
             'data' => $customer,
         ]);
     }
-    public function update(Request $request) {        
-        $validator = Validator::make($request->all(),[
-            'customer_name' => 'required|string|max:250|unique:customers,customer_name,'.$request->customer,
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'customer_name' => 'required|string|max:250|unique:customers,customer_name,' . $request->customer,
             'customer_email' => 'nullable|string|max:250',
             'customer_phone' => 'nullable|string',
             'customer_cell_phone' => 'nullable|string',
@@ -142,8 +172,8 @@ class CustomersController extends Controller
             'customer_cell_phone' => 'celular',
             'customer_address' => 'dirección',
         ]);
-        if($validator->fails()){
-            return response()->json(['error' => true, 'message'=>'Los campos no estan llenados correctamentes','data' => $validator->errors()]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true, 'message' => 'Los campos no estan llenados correctamentes', 'data' => $validator->errors()]);
         }
         $customer = Customers::find($request->customer);
         $customer->update([
@@ -166,25 +196,26 @@ class CustomersController extends Controller
                 'contact_email' => $contact['contact_email'],
                 'contact_position' => $contact['contact_position']
             ];
-            if($contact['type'] == 'new'){
+            if ($contact['type'] == 'new') {
                 $contactNew['contact_status'] = 1;
                 $contactsCreate[] = $contactNew;
-            }else{
-                Contacts::where(['customer_id' => $request->customer,'id' => $contact['id']])->update($contactNew);
+            } else {
+                Contacts::where(['customer_id' => $request->customer, 'id' => $contact['id']])->update($contactNew);
             }
         }
         $customer->contacts()->createMany($contactsCreate);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([
             'redirect' => $redirect,
-            'error' => false, 
-            'message' => 'Cliente modificado correctamente', 
+            'error' => false,
+            'message' => 'Cliente modificado correctamente',
             'data' => $customer,
         ]);
     }
-    public function destroy(Request $request) {
+    public function destroy(Request $request)
+    {
         Customers::find($request->customer)->update(['customer_status' => 0]);
-        $redirect = (new AuthController)->userRestrict($request->user(),$this->urlModule);
+        $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([
             'redirect' => $redirect,
             'error' => false,

@@ -1,13 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\OrdersController;
-use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\ReportTransactionController;
 use App\Http\Controllers\StoresController;
-use App\Http\Controllers\UserController;
-use App\Models\Products;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('customer/export/{typeExport}',[CustomersController::class,'export']);
 Route::get('quotation/{quotation}',[QuotationsController::class,'getReportPdf']);
 Route::get('entry-exit',[ReportTransactionController::class,'reportExit']);
 Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
