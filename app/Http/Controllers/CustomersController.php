@@ -59,7 +59,7 @@ class CustomersController extends Controller
     }
     public function dataExport(?string $search = '')
     {
-        return Customers::select('id', 'customer_name', 'customer_number_document', 'customer_type_document', 'customer_district', 'customer_address')->with('contacts', 'typeDocument', 'district.province', 'district.departament')->active()->search($search)->searchDistrict($search)->limit(2)->get();
+        return Customers::select('id', 'customer_name', 'customer_number_document', 'customer_type_document', 'customer_district', 'customer_address')->with('contacts', 'typeDocument', 'district.province', 'district.departament')->active()->search($search)->searchDistrict($search)->get();
     }
     public function totalDataExport($data) {
         $totalCount = 0;
