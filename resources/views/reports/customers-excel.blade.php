@@ -1,4 +1,14 @@
-<table>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel</title>
+</head>
+
+<body>
+    <table>
         <tr></tr>
         <tr>
             <td></td>
@@ -24,23 +34,26 @@
             </tr>
         </thead>
         <tbody>
-        @foreach ($customers as $customer)
-            @foreach ($customer->contacts as $contact)
-                <tr>
-                    <td>{{ str_pad($customer->id, 3, '0', STR_PAD_LEFT) }}</td>
-                    <td>{{ $customer->customer_name }}</td>
-                    <td>{{ $customer->typeDocument->document_name }}</td>
-                    <td>{{ $customer->customer_number_document }}</td>
-                    <td>{{ $contact->contact_name }}</td>
-                    <td>{{ $contact->contact_number }}</td>
-                    <td>{{ $contact->contact_email }}</td>
-                    <td>{{ $contact->contact_position }}</td>
-                    <td>{{ $customer->district?->departament->departament_name }}</td>
-                    <td>{{ $customer->district?->province->province_name }}</td>
-                    <td>{{ $customer->district?->district_name }}</td>
-                    <td>{{ $customer->customer_address }}</td>
-                </tr>
+            @foreach ($customers as $customer)
+                @foreach ($customer->contacts as $contact)
+                    <tr>
+                        <td>{{ str_pad($customer->id, 3, '0', STR_PAD_LEFT) }}</td>
+                        <td>{{ $customer->customer_name }}</td>
+                        <td>{{ $customer->typeDocument->document_name }}</td>
+                        <td>{{ $customer->customer_number_document }}</td>
+                        <td>{{ $contact->contact_name }}</td>
+                        <td>{{ $contact->contact_number }}</td>
+                        <td>{{ $contact->contact_email }}</td>
+                        <td>{{ $contact->contact_position }}</td>
+                        <td>{{ $customer->district?->departament->departament_name }}</td>
+                        <td>{{ $customer->district?->province->province_name }}</td>
+                        <td>{{ $customer->district?->district_name }}</td>
+                        <td>{{ preg_replace('/[^A-Za-z0-9\-\. ]/', ' ', $customer->customer_address) }}</td>
+                    </tr>
+                @endforeach
             @endforeach
-        @endforeach
         </tbody>
     </table>
+</body>
+
+</html>
