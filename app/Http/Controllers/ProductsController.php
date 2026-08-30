@@ -7,6 +7,7 @@ use App\Models\Categories;
 use App\Models\ChangeMoney;
 use App\Models\Commodity;
 use App\Models\ProductFinaly;
+use App\Models\ProductLabel;
 use App\Models\ProductProgress;
 use App\Models\Products;
 use App\Models\RawMaterial;
@@ -34,6 +35,12 @@ class ProductsController extends Controller
             'message' => 'Productos obtenidos correctamente',
             'totalProducts' => $products->count(),
             'data' => $products->skip($skip)->take($show)->get()
+        ]);
+    }
+    public function labels()
+    {
+        return response()->json([
+            'data' => ProductLabel::select("id", "name")->get(),
         ]);
     }
     public function getProductRawMaterialAndProcess(Request $request)

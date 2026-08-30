@@ -122,6 +122,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('quotation/contacts/{customer}',[QuotationsController::class,'getContactsActive']);
     Route::get('product-categorie',[ProductsController::class,'categorie']);
+    Route::get('product-labels',[ProductsController::class,'labels']);
+
     Route::get('product-export',[ProductsController::class,'exportProductsExcel']);
     Route::get('product-subcategorie/{categorie}',[ProductsController::class,'subcategorie']);
     Route::put('users-reset/{user}',[AuthController::class,'resetPassword']);
