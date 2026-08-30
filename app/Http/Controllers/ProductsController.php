@@ -166,8 +166,8 @@ class ProductsController extends Controller
             $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
-            if ($request->has('list_labels')) {
-                foreach (json_decode($request->list_labels, true) as $label) {
+            if ($request->has('labels')) {
+                foreach (json_decode($request->labels, true) as $label) {
                     $product->labels()->attach($label['id'], [
                         'time_origin_minute' => $label['time_origin_minute'],
                         'time_origin_hours' => $label['time_origin_hours'],
@@ -294,6 +294,16 @@ class ProductsController extends Controller
             }
             $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $product->update($dataProduct);
+            if ($request->has('labels')) {
+                $datosProduccion = [];
+                foreach (json_decode($request->labels, true) as $label) {
+                    $datosProduccion[$label['id']] = [
+                        'time_origin_minute' => $label['time_origin_minute'],
+                        'time_origin_hours' => $label['time_origin_hours'],
+                    ];
+                }
+                $product->labels()->sync($datosProduccion);
+            }
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::firstOrCreate(
                     ['product_id' => $product->id, 'raw_material_status' => 1],
@@ -360,6 +370,7 @@ class ProductsController extends Controller
             'type_money_initial',
             "product_label_2"
         )->selectRaw('DATE(created_at) AS date_issue')->where('products.id', $request->product)->first();
+        $product->list_labels = $product->listOfLabels();
         $productCategorie = $product->subcategorie->categorie_id;
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
         return response()->json([
