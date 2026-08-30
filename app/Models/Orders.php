@@ -48,6 +48,17 @@ class Orders extends Model
     {
         return $this->hasMany(Quotation::class,'order_id');
     }
+    public static function listOrdersProduction()
+    {
+        return Quotation::query()->select(["orders.id","order_code", "order_date_issue", "customer_name", "customers.id as customer_id"])
+        ->join('orders', 'orders.id', '=', 'quotations.order_id')
+        ->join('customers', 'customers.id', '=', 'orders.customer_id')
+        ->leftJoin('quotations_details', 'quotations_details.quotation_id', '=', 'quotations.id')
+        ->leftJoin('order_productions_details', 'quotation_detail_id', '=', 'quotations_details.id')
+        ->whereNull('order_productions_details.id')
+        ->groupBy("order_code")
+        ->get();
+    }
     public static function quotationsNew($contactName,$contactNumber,$contactEmail,$nameProyect,$clientId,$igv,$money){
         return Quotation::select('quotations.id AS value','quotation_code AS label')
         ->join('contacts','quotation_customer_contact','=','contacts.id')

@@ -7,6 +7,7 @@ use App\Http\Controllers\CommodityController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\GuidesReferralController;
 use App\Http\Controllers\ModulesController;
+use App\Http\Controllers\OrderProductionController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductFinaliesController;
 use App\Http\Controllers\ProductProgressController;
@@ -33,6 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('configuration',[CalculatorController::class,'getConfiguration']);
         Route::put('configuration',[CalculatorController::class,'updateConfiguration']);
         // Route::get('change-role/{role}',[AuthController::class,'changeRole']);
+    });
+    Route::prefix('order/production')->group(function () {
+        Route::get('shortages',[OrderProductionController::class,'getShortages']);
+        Route::get('product/{orderId}',[OrderProductionController::class,'getQuotationForOrderId']);
+
+
     });
     Route::get('role-module/{role}',[RolesController::class,'getModules']);
     Route::get('my-business',[UserController::class,'getBusiness']);
