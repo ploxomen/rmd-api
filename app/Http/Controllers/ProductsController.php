@@ -147,7 +147,7 @@ class ProductsController extends Controller
                     'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
                 ]);
             }
-            $dataProduct = $request->except('product_service','date_issue');
+            $dataProduct = $request->except('product_service', 'date_issue');
             $dataProduct['type_change_initial'] = $money->change_soles;
             if ($request->has('product_img')) {
                 $file = $request->file('product_img');
@@ -166,6 +166,14 @@ class ProductsController extends Controller
             $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $dataProduct['product_code'] = Products::getCodeProductNew();
             $product = Products::create($dataProduct);
+            if ($request->has('list_labels')) {
+                foreach (json_decode($request->list_labels, true) as $label) {
+                    $product->labels()->attach($label['id'], [
+                        'time_origin_minute' => $label['time_origin_minute'],
+                        'time_origin_hours' => $label['time_origin_hours'],
+                    ]);
+                }
+            }
             if ($request->product_store === 'MATERIA PRIMA') {
                 RawMaterial::create([
                     'product_id' => $product->id,
@@ -210,7 +218,7 @@ class ProductsController extends Controller
     }
     public function update(Request $request, $product)
     {
-        $dataProduct = $request->except("id", "product_img", "product_categorie","date_issue");
+        $dataProduct = $request->except("id", "product_img", "product_categorie", "date_issue");
         $validator = Validator::make($dataProduct, [
             'product_name' => [
                 'required',

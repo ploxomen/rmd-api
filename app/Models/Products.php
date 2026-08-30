@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\ProductsObserver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Products extends Model
 {
@@ -31,6 +32,18 @@ class Products extends Model
     {
         parent::boot();
         static::observe(ProductsObserver::class);
+    }
+    public function labels(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductLabel::class,
+            'product_product_labels',
+            'product_id',
+            'product_label_id'
+        )->withPivot([
+            'time_origin_minute',
+            'time_origin_hours',
+        ])->withTimestamps();
     }
     public static function getCodeProductNew(){
         $product = Products::select('product_code')->orderBy('product_code','desc')->first();
