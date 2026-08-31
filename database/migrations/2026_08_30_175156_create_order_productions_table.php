@@ -26,7 +26,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_production_id');
             $table->unsignedBigInteger('quotation_detail_id');
-            $table->unsignedBigInteger('product_label_id');
+            $table->unsignedBigInteger('product_label_id')->nullable();
             $table->integer('amount');
             $table->decimal('product_label_hr', 10, 2)->nullable();
             $table->decimal('product_label_total', 10, 2)->nullable();

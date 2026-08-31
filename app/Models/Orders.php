@@ -18,6 +18,7 @@ class Orders extends Model
         'order_total',
         'order_status',
         'order_district',
+        'order_details',
         'order_conditions_pay',
         'order_conditions_delivery',
         'order_address',
