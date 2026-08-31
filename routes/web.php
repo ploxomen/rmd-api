@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\OrderProductionController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\QuotationsController;
 use App\Http\Controllers\ReportTransactionController;
@@ -24,4 +25,6 @@ Route::get('entry-exit',[ReportTransactionController::class,'reportExit']);
 Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
 Route::post('login',[AuthController::class,'login']);
 Route::get('/ordenes/{order}', [OrdersController::class,'getReportPdf']);
+Route::get('/orders/production/{orderId}', [OrderProductionController::class,'viewReportPdf']);
+
 Route::post('/user/logout',[AuthController::class,'logout']);

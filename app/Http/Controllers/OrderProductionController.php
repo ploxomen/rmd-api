@@ -7,6 +7,7 @@ use App\Models\OrderProductionDetail;
 use App\Models\Orders;
 use App\Models\ProductLabel;
 use App\Models\QuotationDetails;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -114,6 +115,24 @@ class OrderProductionController extends Controller
             'data' => $orderProductionModel,
             'products' => $products
         ]);
+    }
+    public function viewReportPdf(int $orderId)
+    {
+        $order = OrderProduction::with(['customer'])->where('id', $orderId)->first();
+        $details = QuotationDetails::getQuotationDetailOld($orderId);
+        foreach ($details as $detail) {
+            $labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours", "product_labels.name as product_label_name"])
+                ->leftJoin('product_labels', 'product_labels.id', '=', 'product_label_id')->where([
+                    'order_production_id' => $orderId,
+                    'quotation_detail_id' => $detail->quota_deta_id,
+                    'order_id' => $detail->order_id
+                ])->whereNotNull('product_label_id')->get();
+            $detail->list_labels = $labels;
+            $detail->subtotal = $labels->sum(function ($item) use ($detail) {
+                return $detail->amount * $item->time_origin_hours;
+            });
+        }
+        return Pdf::loadView('reports.order-production', compact('order', 'details'))->stream("order.pdf");
     }
     public function getQuotationForOrderId(int $orderId)
     {
