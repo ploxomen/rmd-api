@@ -15,7 +15,8 @@ class OrderProduction extends Model
         'order_produc_date_issue',
         'order_produc_date_delive',
         'order_produc_address',
-        'order_production_customer'
+        'order_production_customer',
+        'order_produc_total'
     ];
     protected static function booted()
     {

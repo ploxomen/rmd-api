@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('order/production')->group(function () {
         Route::get('shortages',[OrderProductionController::class,'getShortages']);
         Route::get('product/{orderId}',[OrderProductionController::class,'getQuotationForOrderId']);
+        Route::get('all',[OrderProductionController::class,'index']);
         Route::post('generate',[OrderProductionController::class,'store']);
     });
     Route::get('role-module/{role}',[RolesController::class,'getModules']);

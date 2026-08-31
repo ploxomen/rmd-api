@@ -14,6 +14,7 @@ class OrderProductionDetail extends Model
         'product_label_id',
         'amount',
         'product_label_hr',
+        'order_id',
         'product_label_total'
     ];
 }
