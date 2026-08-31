@@ -54,6 +54,17 @@ class OrderProductionController extends Controller
             'data' => $orderProductions->skip($skip)->take($show)->get()
         ]);
     }
+    public function destroy(OrderProduction $orderProduction)
+    {
+        $orderProduction->details()->delete();
+        $orderProduction->delete();
+        return response()->json([
+            'redirect' => null,
+            'error' => false,
+            'message' => 'Orden de produccion eliminado correctamente',
+            'success' => true
+        ]);
+    }
     public function getShortages()
     {
         return response()->json([
