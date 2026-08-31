@@ -41,6 +41,17 @@ class QuotationDetails extends Model
             ->groupBy('order_id', 'quotation_detail_id')
             ->get();
     }
+    public static function productNotLabel(int $orderId)
+    {
+        return Quotation::query()->select("product_name")
+        ->join('quotations_details', 'quotations_details.quotation_id', '=', 'quotations.id')
+        ->leftJoin('product_product_labels', 'product_product_labels.product_id', '=', 'quotations_details.product_id')
+        ->leftJoin('products', 'products.id', '=', 'quotations_details.product_id')
+        ->where('order_id', $orderId)
+        ->whereNull('product_product_labels.id')
+        ->groupBy('products.id')
+        ->get();
+    }
     public static function getQuotationDetail(int $orderId)
     {
         return Quotation::query()->select(["orders.id as order_id", "quotations_details.id as quota_deta_id", "product_name", "order_code", "products.id as product_id"])->selectRaw(" quotations_details.detail_quantity as 'amount'")

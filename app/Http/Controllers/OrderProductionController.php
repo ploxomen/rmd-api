@@ -117,6 +117,13 @@ class OrderProductionController extends Controller
     }
     public function getQuotationForOrderId(int $orderId)
     {
+        $productNotLabel = QuotationDetails::productNotLabel($orderId);
+        if ($productNotLabel->isNotEmpty()) {
+            return response()->json([
+                'data' => $productNotLabel,
+                'alert' => 'Los siguientes productos no cuentan con los datos de producción:'
+            ]);
+        }
         $products = QuotationDetails::getQuotationDetail($orderId);
         $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id'])->where('id', $orderId)->first();
         foreach ($products as $product) {
