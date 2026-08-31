@@ -22,7 +22,7 @@ class ProductsObserver
             } else if ($originalStore === "MATERIA PRIMA") {
                 RawMaterialHistory::where(['type_motion' => 'INVENTARIO INICIAL', 'product_id' => $products->id])->get()->each(fn($row) => $row->delete());
             } else if ($originalStore === "PRODUCTO TERMINADO") {
-                $productFinaly = ProductFinaly::where('product_id', $products->id)->productExist()->first();
+                $productFinaly = ProductFinaly::where('product_id', $products->id)->joinProducts()->productExist()->first();
                 ProductFinalyAssembled::where(['type_motion' => 'INVENTARIO INICIAL', 'product_finaly_id' => $productFinaly->id])->get()->each(fn($row) => $row->delete());
             }
         }
@@ -64,7 +64,7 @@ class ProductsObserver
                     ]);
                 }
             } else if ($store === "PRODUCTO TERMINADO") {
-                $productFinaly = ProductFinaly::where('product_id', $products->id)->productExist()->first();
+                $productFinaly = ProductFinaly::where('product_id', $products->id)->joinProducts()->productExist()->first();
                 if ($productFinaly) {
                     ProductFinalyAssembled::updateOrCreate(['type_motion' => 'INVENTARIO INICIAL', 'product_finaly_id' => $productFinaly->id], [
                         'product_finaly_user' => auth()->user()->id,
