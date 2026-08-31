@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderProduction;
+use App\Models\OrderProductionDetail;
 use App\Models\Orders;
 use App\Models\ProductLabel;
 use App\Models\QuotationDetails;
@@ -12,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 class OrderProductionController extends Controller
 {
     private $urlModule = "/order/production/list";
-
     public function index(Request $request)
     {
         $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
@@ -99,7 +99,23 @@ class OrderProductionController extends Controller
             'redirect' => null
         ]);
     }
-    public function getQuotationForOrderId($orderId)
+    public function show(int $orderProduction)
+    {
+        $orderProductionModel = OrderProduction::with('customer')->where('id', $orderProduction)->first();
+        $products = QuotationDetails::getQuotationDetailOld($orderProduction);
+        foreach ($products as $product) {
+            $product->list_labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours"])->where([
+                'order_production_id' => $orderProduction,
+                'quotation_detail_id' => $product->quota_deta_id,
+                'order_id' => $product->order_id
+            ])->whereNotNull('product_label_id')->get();
+        }
+        return response()->json([
+            'data' => $orderProductionModel,
+            'products' => $products
+        ]);
+    }
+    public function getQuotationForOrderId(int $orderId)
     {
         $products = QuotationDetails::getQuotationDetail($orderId);
         $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id'])->where('id', $orderId)->first();
@@ -109,6 +125,57 @@ class OrderProductionController extends Controller
         return response()->json([
             'data' => $products,
             'details' => $details
+        ]);
+    }
+    public function update(OrderProduction $orderProduction, Request $request)
+    {
+        $orderProduction->update([
+            'order_production_detail' => $request->observations,
+            'order_produc_date_issue' => $request->date_issue,
+            'order_produc_date_delive' => $request->date_delivery,
+            'order_produc_address' => $request->address,
+            'order_production_customer' => $request->cod_client,
+        ]);
+        $details = json_decode($request->input('details', '[]'), true);
+        $idDetails = array_column($details, 'quotation_detail_id');
+        $orderProduction->details()->whereNotIn('quotation_detail_id', $idDetails)->delete();
+        $totalHr = 0;
+        foreach ($details as $detail) {
+            $columnDiferent = [
+                'order_production_id' => $orderProduction->id,
+                'order_id' => $detail['order_id'],
+                'quotation_detail_id' => $detail['quota_deta_id'],
+            ];
+            if (empty($detail['list_labels'])) {
+                OrderProductionDetail::updateOrCreate(
+                    $columnDiferent,
+                    [
+                        'amount' => $detail['amount'],
+                        'product_label_hr' => 0,
+                        'product_label_total' => 0
+                    ]
+                );
+                continue;
+            }
+            foreach ($detail['list_labels'] as $label) {
+                $columnDiferent['product_label_id'] = $label['id'];
+                $subtotalHr = round($detail['amount'] * $label['time_origin_hours'], 2);
+                OrderProductionDetail::updateOrCreate(
+                    $columnDiferent,
+                    [
+                        'amount' => $detail['amount'],
+                        'product_label_hr' => $label['time_origin_hours'],
+                        'product_label_total' => $subtotalHr
+                    ]
+                );
+                $totalHr += $subtotalHr;
+            }
+        }
+        $orderProduction->update(['order_produc_total' => $totalHr]);
+        return response()->json([
+            'message' => 'Orden de producción actualizada correctamente',
+            'success' => true,
+            'redirect' => null
         ]);
     }
 }

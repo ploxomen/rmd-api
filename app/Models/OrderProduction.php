@@ -36,6 +36,10 @@ class OrderProduction extends Model
             $model->order_production_code = "OP-PV{$paddedNumber}{$shortYear}";
         });
     }
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'order_production_customer');
+    }
     public function details() : HasMany
     {
         return $this->hasMany(OrderProductionDetail::class, 'order_production_id');

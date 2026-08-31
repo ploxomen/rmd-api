@@ -39,7 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('shortages',[OrderProductionController::class,'getShortages']);
         Route::get('product/{orderId}',[OrderProductionController::class,'getQuotationForOrderId']);
         Route::get('all',[OrderProductionController::class,'index']);
+        Route::get('show/{orderProduction}',[OrderProductionController::class,'show']);
         Route::post('generate',[OrderProductionController::class,'store']);
+        Route::put('update/{orderProduction}',[OrderProductionController::class,'update']);
+
     });
     Route::get('role-module/{role}',[RolesController::class,'getModules']);
     Route::get('my-business',[UserController::class,'getBusiness']);
