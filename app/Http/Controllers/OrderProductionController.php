@@ -65,6 +65,31 @@ class OrderProductionController extends Controller
             'success' => true
         ]);
     }
+    function formatOrderCodes(array $ordersCollection): string
+    {
+        $codes = collect($ordersCollection)
+            ->pluck('order_code')
+            ->filter()
+            ->unique()
+            ->values();
+        if ($codes->isEmpty()) {
+            return '';
+        }
+        $numbers = [];
+        $years = [];
+        $prefix = 'PV'; // Prefijo por defecto
+        foreach ($codes as $code) {
+            $prefix = substr($code, 0, 2);
+            $year   = substr($code, -2);
+            $middle = substr($code, 2, -2);
+            $numbers[] = $middle;
+            $years[]   = $year;
+        }
+        sort($numbers, SORT_STRING);
+        $minYear = min($years);
+        $joinedNumbers = implode('-', $numbers);
+        return "OP-{$prefix}{$joinedNumbers}-{$minYear}";
+    }
     public function getShortages()
     {
         return response()->json([
@@ -73,14 +98,21 @@ class OrderProductionController extends Controller
     }
     public function store(Request $request)
     {
+        $details = json_decode($request->input('details', '[]'), true);
+        $orderCode = $this->formatOrderCodes($details);
+        if (OrderProduction::where('order_production_code', $orderCode)->exists()) {
+            return response()->json([
+                'message' => "El código {$orderCode} ya se encuentra registrado"
+            ], 422);
+        }
         $orderProduction = OrderProduction::create([
+            'order_production_code' => $orderCode,
             'order_production_detail' => $request->observations,
             'order_produc_date_issue' => $request->date_issue,
             'order_produc_date_delive' => $request->date_delivery,
             'order_produc_address' => $request->address,
             'order_production_customer' => $request->cod_client,
         ]);
-        $details = json_decode($request->input('details', '[]'), true);
         $totalHr = 0;
         foreach ($details as $detail) {
             $detailFillable = [
@@ -166,14 +198,21 @@ class OrderProductionController extends Controller
     }
     public function update(OrderProduction $orderProduction, Request $request)
     {
+        $details = json_decode($request->input('details', '[]'), true);
+        $orderCode = $this->formatOrderCodes($details);
+        if (OrderProduction::where('order_production_code', $orderCode)->where('id', '!=', $orderProduction->id)->exists()) {
+            return response()->json([
+                'message' => "El código {$orderCode} ya se encuentra registrado"
+            ], 422);
+        }
         $orderProduction->update([
+            'order_production_code' => $orderCode,
             'order_production_detail' => $request->observations,
             'order_produc_date_issue' => $request->date_issue,
             'order_produc_date_delive' => $request->date_delivery,
             'order_produc_address' => $request->address,
             'order_production_customer' => $request->cod_client,
         ]);
-        $details = json_decode($request->input('details', '[]'), true);
         $idDetails = array_column($details, 'quotation_detail_id');
         $orderProduction->details()->whereNotIn('quotation_detail_id', $idDetails)->delete();
         $totalHr = 0;
