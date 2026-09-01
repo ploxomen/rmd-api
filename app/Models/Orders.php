@@ -76,7 +76,7 @@ class Orders extends Model
         ])->get();
     }
     public static function getOrder($id) {
-        return  Orders::select("orders.id","order_retaining_customer","order_date_issue","order_igv","order_money","order_status","customer_id","order_conditions_pay","order_conditions_delivery","order_address","order_project","order_contact_email","order_contact_telephone","order_contact_name","order_file_name","order_district","district_province AS order_province","district_departament AS order_departament")
+        return  Orders::select("orders.id","order_retaining_customer", "order_details","order_date_issue","order_igv","order_money","order_status","customer_id","order_conditions_pay","order_conditions_delivery","order_address","order_project","order_contact_email","order_contact_telephone","order_contact_name","order_file_name","order_district","district_province AS order_province","district_departament AS order_departament")
         ->selectRaw("COUNT(quotations.order_id) AS quotations_total")
         ->leftJoin("quotations","quotations.order_id","=","orders.id")
         ->join("districts","districts.id","=","orders.order_district")

@@ -73,6 +73,7 @@ class OrdersController extends Controller
             $order = Orders::create([
                 'order_date_issue' => $request->order_date_issue,
                 'order_district' => $request->order_district,
+                'order_details' => $request->order_details,
                 'customer_id' => $request->customer_id,
                 'order_conditions_pay' => $request->order_conditions_pay,
                 'order_igv' => $request->order_igv,
@@ -321,6 +322,7 @@ class OrdersController extends Controller
                 'order_conditions_pay' => $request->order_conditions_pay,
                 'order_conditions_delivery' => $request->order_conditions_delivery,
                 'order_address' => $request->order_address,
+                'order_details' => $request->order_details,
                 'customer_id' => $request->customer_id,
                 'order_igv' => $request->order_igv,
                 'order_money' => $request->order_money,
