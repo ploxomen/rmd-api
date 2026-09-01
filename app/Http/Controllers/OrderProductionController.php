@@ -187,7 +187,7 @@ class OrderProductionController extends Controller
             ]);
         }
         $products = QuotationDetails::getQuotationDetail($orderId);
-        $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id'])->where('id', $orderId)->first();
+        $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id', 'order_date_issue','order_address'])->where('id', $orderId)->first();
         foreach ($products as $product) {
             $product->list_labels = ProductLabel::query()->select(["product_labels.id", "time_origin_hours"])->leftJoin('product_product_labels', 'product_product_labels.product_label_id', '=', 'product_labels.id')->where('product_id', $product->product_id)->get();
         }

@@ -112,6 +112,7 @@
         .title-user {
             font-size: 14px;
         }
+
         /* header{
             position: fixed;
             left: 0px;
@@ -119,7 +120,7 @@
             height: 150px;
             margin-top: -150px;
         } */
-        footer{
+        footer {
             position: fixed;
             left: 35%;
             right: 0px;
@@ -298,9 +299,12 @@
             </td>
             <td></td>
         </tr>
+
+    </table>
+    <table class="mb table-detalle">
         <tr>
             <td>
-                {{ $order->order_details }}
+                {{ $order->order_details ?? 'No hay observaciones' }}
             </td>
         </tr>
     </table>
@@ -350,8 +354,7 @@
         <tr>
             <td>
                 <span>Asesor comercial</span><br>
-                <span
-                    class="title-user">{{ $order->user->user_name . ' ' . $order->user->user_last_name }}</span>
+                <span class="title-user">{{ $order->user->user_name . ' ' . $order->user->user_last_name }}</span>
             </td>
         </tr>
         <tr>
