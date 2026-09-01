@@ -294,6 +294,19 @@
     <table class="mb-2">
         <tr>
             <td class="bg-secondary subtitulo">
+                OBSERVACIONES
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                {{ $order->order_details }}
+            </td>
+        </tr>
+    </table>
+    <table class="mb-2">
+        <tr>
+            <td class="bg-secondary subtitulo">
                 DETALLES
             </td>
             <td></td>
