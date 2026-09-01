@@ -43,7 +43,7 @@ class QuotationDetails extends Model
     }
     public static function productNotLabel(int $orderId)
     {
-        return Quotation::query()->select("product_name")
+        return Quotation::query()->select(["product_name", "products.id as product_id"])
         ->join('quotations_details', 'quotations_details.quotation_id', '=', 'quotations.id')
         ->leftJoin('product_product_labels', 'product_product_labels.product_id', '=', 'quotations_details.product_id')
         ->leftJoin('products', 'products.id', '=', 'quotations_details.product_id')
