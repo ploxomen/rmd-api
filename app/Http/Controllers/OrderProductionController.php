@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrderProductionExport;
 use App\Models\OrderProduction;
 use App\Models\OrderProductionDetail;
 use App\Models\Orders;
@@ -10,6 +11,7 @@ use App\Models\QuotationDetails;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderProductionController extends Controller
 {
@@ -65,6 +67,24 @@ class OrderProductionController extends Controller
             'success' => true
         ]);
     }
+    public function viewReportExcel(int $orderId)
+    {
+        $order = OrderProduction::with(['customer'])->where('id', $orderId)->first();
+        $details = QuotationDetails::getQuotationDetailOld($orderId);
+        foreach ($details as $detail) {
+            $labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours", "product_labels.name as product_label_name"])
+                ->leftJoin('product_labels', 'product_labels.id', '=', 'product_label_id')->where([
+                    'order_production_id' => $orderId,
+                    'quotation_detail_id' => $detail->quota_deta_id,
+                    'order_id' => $detail->order_id
+                ])->whereNotNull('product_label_id')->get();
+            $detail->list_labels = $labels;
+            $detail->subtotal = $labels->sum(function ($item) use ($detail) {
+                return $detail->amount * $item->time_origin_hours;
+            });
+        }
+        return Excel::download(new OrderProductionExport($order, $details), 'orden-produccion-' . $order->order_production_code . '.xlsx');
+    }
     function formatOrderCodes(array $ordersCollection): string
     {
         $codes = collect($ordersCollection)
@@ -88,7 +108,7 @@ class OrderProductionController extends Controller
         sort($numbers, SORT_STRING);
         $minYear = min($years);
         $joinedNumbers = implode('-', $numbers);
-        return "OP-{$prefix}{$joinedNumbers}-{$minYear}";
+        return "OP-{$prefix}{$joinedNumbers}{$minYear}";
     }
     public function getShortages()
     {
@@ -187,7 +207,7 @@ class OrderProductionController extends Controller
             ]);
         }
         $products = QuotationDetails::getQuotationDetail($orderId);
-        $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id', 'order_date_issue','order_address'])->where('id', $orderId)->first();
+        $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id', 'order_date_issue', 'order_address'])->where('id', $orderId)->first();
         foreach ($products as $product) {
             $product->list_labels = ProductLabel::query()->select(["product_labels.id", "time_origin_hours"])->leftJoin('product_product_labels', 'product_product_labels.product_label_id', '=', 'product_labels.id')->where('product_id', $product->product_id)->get();
         }

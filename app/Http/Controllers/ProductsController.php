@@ -139,16 +139,17 @@ class ProductsController extends Controller
         }
         try {
             DB::beginTransaction();
-            $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
-            if (!$request->has('product_service') && empty($money)) {
-                return response()->json([
-                    'redirect' => null,
-                    'error' => true,
-                    'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
-                ]);
-            }
+            // $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
+            // if (!$request->has('product_service') && empty($money)) {
+            //     return response()->json([
+            //         'redirect' => null,
+            //         'error' => true,
+            //         'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
+            //     ]);
+            // }
             $dataProduct = $request->except('product_service', 'date_issue');
-            $dataProduct['type_change_initial'] = $money->change_soles;
+            // $dataProduct['type_change_initial'] = $money->change_soles;
+
             if ($request->has('product_img')) {
                 $file = $request->file('product_img');
                 $fileName = time() . "_" . $file->getClientOriginalName();
@@ -174,28 +175,28 @@ class ProductsController extends Controller
                     ]);
                 }
             }
-            if ($request->product_store === 'MATERIA PRIMA') {
-                RawMaterial::create([
-                    'product_id' => $product->id,
-                    'raw_material_stock' => 0,
-                    'raw_material_price_buy' => 0,
-                    'raw_material_status' => 1,
-                    'raw_material_money' => 'PEN'
-                ]);
-            } else if ($request->product_store === 'PRODUCTO TERMINADO') {
-                ProductFinaly::create([
-                    'product_id' => $product->id,
-                    'product_finaly_stock' => 0,
-                    'product_finaly_price' => 0,
-                ]);
-            } else if ($request->product_store === 'PRODUCTO MERCADERIA') {
-                Commodity::create([
-                    'product_id' => $product->id,
-                    'commodi_stock' => 0,
-                    'commodi_money' => 'PEN',
-                    'commodi_price_buy' => 0
-                ]);
-            }
+            // if ($request->product_store === 'MATERIA PRIMA') {
+            //     RawMaterial::create([
+            //         'product_id' => $product->id,
+            //         'raw_material_stock' => 0,
+            //         'raw_material_price_buy' => 0,
+            //         'raw_material_status' => 1,
+            //         'raw_material_money' => 'PEN'
+            //     ]);
+            // } else if ($request->product_store === 'PRODUCTO TERMINADO') {
+            //     ProductFinaly::create([
+            //         'product_id' => $product->id,
+            //         'product_finaly_stock' => 0,
+            //         'product_finaly_price' => 0,
+            //     ]);
+            // } else if ($request->product_store === 'PRODUCTO MERCADERIA') {
+            //     Commodity::create([
+            //         'product_id' => $product->id,
+            //         'commodi_stock' => 0,
+            //         'commodi_money' => 'PEN',
+            //         'commodi_price_buy' => 0
+            //     ]);
+            // }
             DB::commit();
             $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
             return response()->json([
@@ -258,15 +259,15 @@ class ProductsController extends Controller
         try {
             $product = Products::find($product);
             if ($this->updateStockInitial($product)) {
-                $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
-                if (empty($money)) {
-                    return response()->json([
-                        'redirect' => null,
-                        'error' => true,
-                        'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
-                    ]);
-                }
-                $dataProduct['type_change_initial'] = $money->change_soles;
+                // $money = ChangeMoney::select('change_soles')->where('change_day', date('Y-m-d'))->first();
+                // if (empty($money)) {
+                //     return response()->json([
+                //         'redirect' => null,
+                //         'error' => true,
+                //         'message' => 'No se ha establecido un tipo de cambio para el dia ' . date('d/m/Y'),
+                //     ]);
+                // }
+                // $dataProduct['type_change_initial'] = $money->change_soles;
             }
             if ($request->has('delete_img') && File::exists($product->product_img)) {
                 File::delete($product->product_img);
@@ -285,13 +286,13 @@ class ProductsController extends Controller
                 $file->move(public_path('storage/products'), $fileName);
                 $dataProduct['product_img'] = 'storage/products/' . $fileName;
             }
-            if ($product->product_store === 'MATERIA PRIMA' && $request->product_store !== 'MATERIA PRIMA') {
-                RawMaterial::where('product_id', $product->id)->update(['raw_material_status' => 0]);
-            } else if ($product->product_store === 'PRODUCTO TERMINADO' && $request->product_store !== 'PRODUCTO TERMINADO') {
-                ProductFinaly::where('product_id', $product->id)->update(['product_finaly_status' => 0]);
-            } else if ($product->product_store === 'PRODUCTO MERCADERIA' && $request->product_store !== 'PRODUCTO MERCADERIA') {
-                Commodity::where('product_id', $product->id)->update(['commodi_status' => 0]);
-            }
+            // if ($product->product_store === 'MATERIA PRIMA' && $request->product_store !== 'MATERIA PRIMA') {
+            //     RawMaterial::where('product_id', $product->id)->update(['raw_material_status' => 0]);
+            // } else if ($product->product_store === 'PRODUCTO TERMINADO' && $request->product_store !== 'PRODUCTO TERMINADO') {
+            //     ProductFinaly::where('product_id', $product->id)->update(['product_finaly_status' => 0]);
+            // } else if ($product->product_store === 'PRODUCTO MERCADERIA' && $request->product_store !== 'PRODUCTO MERCADERIA') {
+            //     Commodity::where('product_id', $product->id)->update(['commodi_status' => 0]);
+            // }
             $dataProduct['created_at'] = $request->date_issue . " " . date('H:i:s');
             $product->update($dataProduct);
             if ($request->has('labels')) {
@@ -304,37 +305,37 @@ class ProductsController extends Controller
                 }
                 $product->labels()->sync($datosProduccion);
             }
-            if ($request->product_store === 'MATERIA PRIMA') {
-                RawMaterial::firstOrCreate(
-                    ['product_id' => $product->id, 'raw_material_status' => 1],
-                    [
-                        'product_id' => $product->id,
-                        'raw_material_stock' => 0,
-                        'raw_material_price_buy' => 0,
-                        'raw_material_status' => 1,
-                        'raw_material_money' => 'PEN'
-                    ]
-                );
-            } else if ($request->product_store === 'PRODUCTO TERMINADO') {
-                ProductFinaly::firstOrCreate(
-                    ['product_id' => $product->id, 'product_finaly_status' => 1],
-                    [
-                        'product_id' => $product->id,
-                        'commodi_stock' => 0,
-                        'product_finaly_price' => 0,
-                    ]
-                );
-            } else if ($request->product_store === 'PRODUCTO MERCADERIA') {
-                Commodity::firstOrCreate(
-                    ['product_id' => $product->id, 'commodi_status' => 1],
-                    [
-                        'product_id' => $product->id,
-                        'commodi_stock' => 0,
-                        'commodi_money' => 'PEN',
-                        'commodi_price_buy' => 0
-                    ]
-                );
-            }
+            // if ($request->product_store === 'MATERIA PRIMA') {
+            //     RawMaterial::firstOrCreate(
+            //         ['product_id' => $product->id, 'raw_material_status' => 1],
+            //         [
+            //             'product_id' => $product->id,
+            //             'raw_material_stock' => 0,
+            //             'raw_material_price_buy' => 0,
+            //             'raw_material_status' => 1,
+            //             'raw_material_money' => 'PEN'
+            //         ]
+            //     );
+            // } else if ($request->product_store === 'PRODUCTO TERMINADO') {
+            //     ProductFinaly::firstOrCreate(
+            //         ['product_id' => $product->id, 'product_finaly_status' => 1],
+            //         [
+            //             'product_id' => $product->id,
+            //             'commodi_stock' => 0,
+            //             'product_finaly_price' => 0,
+            //         ]
+            //     );
+            // } else if ($request->product_store === 'PRODUCTO MERCADERIA') {
+            //     Commodity::firstOrCreate(
+            //         ['product_id' => $product->id, 'commodi_status' => 1],
+            //         [
+            //             'product_id' => $product->id,
+            //             'commodi_stock' => 0,
+            //             'commodi_money' => 'PEN',
+            //             'commodi_price_buy' => 0
+            //         ]
+            //     );
+            // }
             $redirect = (new AuthController)->userRestrict($request->user(), $this->urlModule);
             return response()->json([
                 'redirect' => $redirect,

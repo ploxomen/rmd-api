@@ -33,18 +33,23 @@
             margin-bottom: 12px;
         }
 
-        
-        .seccion-information{
-            padding: 4px 8px; font-size: 14px;
-        }   
-        .table-information{
+
+        .seccion-information {
+            padding: 4px 8px;
+            font-size: 14px;
+        }
+
+        .table-information {
             font-size: 12px;
             vertical-align: middle;
         }
-        .table-information td, .table-information th{
+
+        .table-information td,
+        .table-information th {
             border: 1px solid rgb(94, 92, 92);
             padding: 2px 6px;
         }
+
         footer {
             position: fixed;
             left: 35%;
@@ -78,6 +83,10 @@
     <footer>
         <img src="{{ public_path('img/logo-footer.png') }}" alt="Logo" width="200px">
     </footer>
+    <div class="bg-primary mb"
+        style="font-size: 16px; padding: 4px; text-align: center; font-weight: 700; line-height: 1">
+        <span>ORDEN DE PRODUCCIÓN Nº - {{ $order->order_production_code }}</span>
+    </div>
     <div class="seccion-information bg-primary mb-2">
         <span>INFORMACIÓN GENERAL</span>
     </div>
@@ -163,15 +172,15 @@
                     <td rowspan="{{ $rowSpan }}" style="text-align: center;">{{ $detail->subtotal }}h</td>
                     @foreach ($detail->list_labels as $key => $label)
                         @if ($key > 0)
-                            <tr>
-                        @endif
-                        <td style="text-align: center;">{{ $label->product_label_name }}</td>
-                        <td>{{ $label->time_origin_hours }}h</td>
-                        </tr>
-                    @endforeach
-                @php
-                    $total += $detail->subtotal;
-                @endphp
+                <tr>
+            @endif
+            <td style="text-align: center;">{{ $label->product_label_name }}</td>
+            <td>{{ $label->time_origin_hours }}h</td>
+            </tr>
+            @endforeach
+            @php
+                $total += $detail->subtotal;
+            @endphp
             @endforeach
         </tbody>
         <tfoot>

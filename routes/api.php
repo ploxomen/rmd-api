@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('all',[OrderProductionController::class,'index']);
         Route::get('show/{orderProduction}',[OrderProductionController::class,'show']);
         Route::get('report/pdf/{orderId}',[OrderProductionController::class,'viewReportPdf']);
+        Route::get('report/excel/{orderId}',[OrderProductionController::class,'viewReportExcel']);
         Route::post('generate',[OrderProductionController::class,'store']);
         Route::put('update/{orderProduction}',[OrderProductionController::class,'update']);
         Route::delete('delete/{orderProduction}',[OrderProductionController::class,'destroy']);
