@@ -25,6 +25,6 @@ Route::get('entry-exit',[ReportTransactionController::class,'reportExit']);
 Route::get('modules-roles',[StoresController::class,'getStoresAndSubStoresSelect']);
 Route::post('login',[AuthController::class,'login']);
 Route::get('/ordenes/{order}', [OrdersController::class,'getReportPdf']);
-Route::get('/orders/production/{orderId}', [OrderProductionController::class,'viewReportExcel']);
+Route::get('/orders/production/{orderId}', [OrderProductionController::class,'viewReportPdf']);
 
 Route::post('/user/logout',[AuthController::class,'logout']);

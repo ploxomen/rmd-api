@@ -17,6 +17,10 @@ class OrderProduction extends Model
         'order_production_customer',
         'order_produc_total'
     ];
+    protected $casts = [
+        'order_produc_date_issue' => 'date',
+        'order_produc_date_delive' => 'date',
+    ];
     public function customer()
     {
         return $this->belongsTo(Customers::class, 'order_production_customer');

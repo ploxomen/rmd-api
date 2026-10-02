@@ -13,13 +13,15 @@ class ProductProductLabel extends Model
     protected $fillable = [
         'product_id',
         'product_label_id',
-        'time_origin_minute',
-        'time_origin_hours',
+        'group_work_time_hours',
+        'work_time_hours',
+        'group_work_number',
     ];
 
     protected $casts = [
-        'time_origin_minute' => 'integer',
-        'time_origin_hours' => 'decimal:2',
+        'work_time_hours' => 'decimal:3',
+        'group_work_number' => 'integer',
+        'group_work_time_hours' => 'decimal:3',
     ];
 
     public function product(): BelongsTo

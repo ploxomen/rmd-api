@@ -123,7 +123,11 @@
             <td class="bg-primary">
                 FECHA EMISIÓN
             </td>
-            <td>{{ $order->order_produc_date_issue }}</td>
+            <td>
+                <strong>
+                    {{ $order->order_produc_date_issue->format('d/m/Y') }}
+                </strong>
+            </td>
         </tr>
         <tr>
             <td class="bg-primary">
@@ -133,7 +137,11 @@
             <td class="bg-primary">
                 FECHA ENTREGA
             </td>
-            <td>{{ $order->order_produc_date_delive }}</td>
+            <td>
+                <strong>
+                    {{ $order->order_produc_date_delive->format('d/m/Y') }}
+                </strong>
+            </td>
         </tr>
         <tr>
             <td class="bg-primary">
@@ -141,7 +149,7 @@
             </td>
             <td>{{ $ordersDetails['order_contact_telephone'] }}</td>
             <td class="bg-primary">
-                CONDICIONES Y DIRECCIÓN DE ENTREGA
+                DIRECCIÓN DE ENTREGA
             </td>
             <td>{{ $order->order_produc_address }}</td>
         </tr>

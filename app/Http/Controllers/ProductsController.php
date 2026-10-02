@@ -170,8 +170,9 @@ class ProductsController extends Controller
             if ($request->has('labels')) {
                 foreach (json_decode($request->labels, true) as $label) {
                     $product->labels()->attach($label['id'], [
-                        'time_origin_minute' => $label['time_origin_minute'],
-                        'time_origin_hours' => $label['time_origin_hours'],
+                        'work_time_hours' => $label['work_time_hours'],
+                        'group_work_number' => $label['group_work_number'],
+                        'group_work_time_hours' => $label['work_time_hours'] * $label['group_work_number'],
                     ]);
                 }
             }
@@ -299,8 +300,9 @@ class ProductsController extends Controller
                 $datosProduccion = [];
                 foreach (json_decode($request->labels, true) as $label) {
                     $datosProduccion[$label['id']] = [
-                        'time_origin_minute' => $label['time_origin_minute'],
-                        'time_origin_hours' => $label['time_origin_hours'],
+                        'work_time_hours' => $label['work_time_hours'],
+                        'group_work_number' => $label['group_work_number'],
+                        'group_work_time_hours' => $label['work_time_hours'] * $label['group_work_number'],
                     ];
                 }
                 $product->labels()->sync($datosProduccion);

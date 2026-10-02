@@ -42,8 +42,9 @@ class Products extends Model
             'product_id',
             'product_label_id'
         )->withPivot([
-            'time_origin_minute',
-            'time_origin_hours',
+            'work_time_hours',
+            'group_work_number',
+            'group_work_time_hours',
         ])->withTimestamps();
     }
     public function listOfLabels()
@@ -54,8 +55,9 @@ class Products extends Model
         })->select(
             'product_labels.id',
             'product_labels.name',
-            DB::raw('COALESCE(product_product_labels.time_origin_minute, "") as time_origin_minute'),
-            DB::raw('COALESCE(product_product_labels.time_origin_hours, "") as time_origin_hours'),
+            DB::raw('COALESCE(product_product_labels.work_time_hours, "") as work_time_hours'),
+            DB::raw('COALESCE(product_product_labels.group_work_number, "") as group_work_number'),
+            DB::raw('COALESCE(product_product_labels.group_work_time_hours, "") as group_work_time_hours')
         )->get();
     }
     public static function getCodeProductNew()

@@ -76,7 +76,9 @@
         <td>FECHA EMISIÓN</td>
 
         <td colspan="2">
-            {{ $order->order_produc_date_issue }}
+            <strong>
+                {{ $order->order_produc_date_issue->format('d/m/Y') }}
+            </strong>
         </td>
 
     </tr>
@@ -92,7 +94,9 @@
         <td>FECHA ENTREGA</td>
 
         <td colspan="2">
-            {{ $order->order_produc_date_delive }}
+            <strong>
+                {{ $order->order_produc_date_delive->format('d/m/Y') }}
+            </strong>
         </td>
 
     </tr>
@@ -152,9 +156,7 @@
     ====================================================== --}}
 
     @foreach ($details as $detail)
-
         @forelse ($detail->list_labels as $label)
-
             <tr>
 
                 <td>
@@ -208,9 +210,7 @@
                 <td></td>
 
             </tr>
-
         @endforelse
-
     @endforeach
 
     {{-- =====================================================
@@ -252,7 +252,7 @@
     {{-- =====================================================
         FIRMAS
     ====================================================== --}}
-    
+
     <tr>
 
         <td colspan="2">

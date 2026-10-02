@@ -18,8 +18,9 @@ class ProductLabel extends Model
             Products::class,
             'product_product_labels'
         )->withPivot([
-            'time_origin_minute',
-            'time_origin_hours',
+            'group_work_time_hours',
+            'work_time_hours',
+            'group_work_number',
         ])->withTimestamps();
     }
 }
