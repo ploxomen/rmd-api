@@ -182,7 +182,9 @@ class OrderProductionController extends Controller
         $products = QuotationDetails::getQuotationDetailOld($orderProduction);
         foreach ($products as $product) {
             $product->img_url = $request->root() . '/' . $product->product_img;
-            $product->list_labels = OrderProductionDetail::query()->select(["product_label_id as id", "pro_group_work_time_hours as group_work_time_hours"])->where([
+            $product->list_labels = OrderProductionDetail::query()->select(["product_label_id as id", "pro_group_work_time_hours as group_work_time_hours", "name AS area"])
+            ->leftJoin('product_labels', 'order_productions_details.product_label_id', '=', 'product_labels.id')
+            ->where([
                 'order_production_id' => $orderProduction,
                 'quotation_detail_id' => $product->quota_deta_id,
                 'order_id' => $product->order_id
