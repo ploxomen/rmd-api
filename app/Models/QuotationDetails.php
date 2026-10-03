@@ -54,7 +54,7 @@ class QuotationDetails extends Model
     }
     public static function getQuotationDetail(int $orderId)
     {
-        return Quotation::query()->select(["orders.id as order_id", "quotations_details.id as quota_deta_id", "product_name", "order_code", "products.id as product_id"])->selectRaw(" quotations_details.detail_quantity as 'amount'")
+        return Quotation::query()->select(["orders.id as order_id", "quotations_details.id as quota_deta_id", "product_img", "product_name", "order_code", "products.id as product_id"])->selectRaw(" quotations_details.detail_quantity as 'amount'")
             ->leftJoin('orders', 'orders.id', '=', 'quotations.order_id')
             ->leftJoin('quotations_details', 'quotations_details.quotation_id', '=', 'quotations.id')
             ->leftJoin('products', 'products.id', '=', 'quotations_details.product_id')

@@ -197,7 +197,7 @@ class OrderProductionController extends Controller
         }
         return Pdf::loadView('reports.order-production', compact('order', 'details'))->stream("order.pdf");
     }
-    public function getQuotationForOrderId(int $orderId)
+    public function getQuotationForOrderId(int $orderId, Request $request)
     {
         $productNotLabel = QuotationDetails::productNotLabel($orderId);
         if ($productNotLabel->isNotEmpty()) {
@@ -209,7 +209,8 @@ class OrderProductionController extends Controller
         $products = QuotationDetails::getQuotationDetail($orderId);
         $details = Orders::query()->select(['order_details', 'order_code', 'id as order_id', 'order_date_issue', 'order_address'])->selectRaw("DATE_FORMAT(orders.created_at, '%Y-%m-%d') as order_date_created")->where('id', $orderId)->first();
         foreach ($products as $product) {
-            $product->list_labels = ProductLabel::query()->select(["product_labels.id", "time_origin_hours"])->leftJoin('product_product_labels', 'product_product_labels.product_label_id', '=', 'product_labels.id')->where('product_id', $product->product_id)->get();
+            $product->img_url = $request->root() . '/' . $product->product_img;
+            $product->list_labels = ProductLabel::query()->select(["product_labels.id", "group_work_time_hours", "name AS area"])->leftJoin('product_product_labels', 'product_product_labels.product_label_id', '=', 'product_labels.id')->where('product_id', $product->product_id)->get();
         }
         return response()->json([
             'data' => $products,
