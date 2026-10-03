@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithDrawings;
@@ -26,10 +27,13 @@ class OrderProductionExport implements
 
     protected $details;
 
-    public function __construct($order, $details)
+    protected $userName;
+
+    public function __construct($order, $details, $userName)
     {
         $this->order = $order;
         $this->details = $details;
+        $this->userName = $userName;
     }
 
     /**
@@ -50,6 +54,7 @@ class OrderProductionExport implements
             'details' => $this->details,
             'ordersDetails' => $ordersDetails,
             'total' => $total,
+            'userName' => $this->userName,
         ]);
     }
 
@@ -59,15 +64,51 @@ class OrderProductionExport implements
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
+            'A' => 15,
             'B' => 40,
             'C' => 12,
             'D' => 23,
             'E' => 25,
             'F' => 20,
+            'G' => 20,
+            'H' => 18,
         ];
     }
+    // public function drawings()
+    // {
+    //     $drawings = [];
+    //     $currentRow = 12; // Fila inicial del detalle (A12)
 
+    //     foreach ($this->details as $detail) {
+    //         $pathImg = $detail->product_img;
+    //         $rowSpan = max(1, $detail->list_labels->count());
+
+    //         // Validar que exista la ruta y el archivo físico
+    //         if (!empty($pathImg) && File::exists(public_path($pathImg))) {
+    //             $drawing = new Drawing();
+    //             $drawing->setName('Imagen Producto');
+    //             $drawing->setDescription($detail->product_name ?? 'Producto');
+    //             $drawing->setPath(public_path($pathImg));
+                
+    //             // Dimensiones de la imagen dentro de la celda
+    //             $drawing->setHeight(100); 
+                
+    //             // Asignar la coordenada dinámica (A12, A15, etc.)
+    //             $drawing->setCoordinates('A' . $currentRow);
+                
+    //             // Centrado manual dentro de la celda
+    //             $drawing->setOffsetX(10);
+    //             $drawing->setOffsetY(5);
+
+    //             $drawings[] = $drawing;
+    //         }
+
+    //         // Avanzamos el puntero de filas según el alto de las etiquetas (rowSpan)
+    //         $currentRow += $rowSpan;
+    //     }
+
+    //     return $drawings;
+    // }
     /**
      * Logos.
      */
@@ -147,7 +188,7 @@ class OrderProductionExport implements
     public function styles(Worksheet $sheet)
     {
         return [
-            'A:F' => [
+            'A:H' => [
                 'font' => [
                     'name' => 'Arial',
                     'size' => 10,
@@ -191,7 +232,7 @@ class OrderProductionExport implements
             |--------------------------------------------------------------------------
             */
 
-            'A3:F3' => [
+            'A3:H3' => [
                 'font' => [
                     'name' => 'Arial',
                     'size' => 16,
@@ -229,7 +270,7 @@ class OrderProductionExport implements
 
                 $green = '4CA746';
                 $white = 'FFFFFF';
-                $gray = 'F2F2F2';
+                $yellow = "FFCFAF";
                 $borderColor = '5E5C5C';
 
                 /*
@@ -241,29 +282,29 @@ class OrderProductionExport implements
                 // Frase superior
 
                 // Título
-                $sheet->mergeCells('A3:F3');
+                $sheet->mergeCells('A3:H3');
 
                 // Información general
-                $sheet->mergeCells('A4:F4');
+                $sheet->mergeCells('A4:H4');
 
                 // Información
-                $sheet->mergeCells('B5:C5');
-                $sheet->mergeCells('E5:F5');
+                $sheet->mergeCells('B5:D5');
+                $sheet->mergeCells('F5:H5');
 
-                $sheet->mergeCells('B6:C6');
-                $sheet->mergeCells('E6:F6');
+                $sheet->mergeCells('B6:D6');
+                $sheet->mergeCells('F6:H6');
 
-                $sheet->mergeCells('B7:C7');
-                $sheet->mergeCells('E7:F7');
+                $sheet->mergeCells('B7:D7');
+                $sheet->mergeCells('F7:H7');
 
-                $sheet->mergeCells('B8:C8');
-                $sheet->mergeCells('E8:F8');
+                $sheet->mergeCells('B8:D8');
+                $sheet->mergeCells('F8:H8');
 
-                $sheet->mergeCells('B9:C9');
-                $sheet->mergeCells('E9:F9');
+                $sheet->mergeCells('B9:D9');
+                $sheet->mergeCells('F9:H9');
 
                 // Detalle producción
-                $sheet->mergeCells('A10:F10');
+                $sheet->mergeCells('A10:H10');
 
                 /*
                 |--------------------------------------------------------------------------
@@ -272,9 +313,9 @@ class OrderProductionExport implements
                 */
 
                 $sectionRanges = [
-                    'A3:F3',
-                    'A4:F4',
-                    'A10:F10',
+                    'A3:H3',
+                    'A4:H4',
+                    'A10:H10',
                 ];
 
                 foreach ($sectionRanges as $range) {
@@ -306,15 +347,15 @@ class OrderProductionExport implements
 
                 $labels = [
                     'A5',
-                    'D5',
+                    'E5',
                     'A6',
-                    'D6',
+                    'E6',
                     'A7',
-                    'D7',
+                    'E7',
                     'A8',
-                    'D8',
+                    'E8',
                     'A9',
-                    'D9',
+                    'E9',
                 ];
 
                 foreach ($labels as $cell) {
@@ -350,7 +391,7 @@ class OrderProductionExport implements
                 |--------------------------------------------------------------------------
                 */
 
-                $sheet->getStyle('A5:F9')->applyFromArray([
+                $sheet->getStyle('A5:H9')->applyFromArray([
 
                     'borders' => [
 
@@ -374,7 +415,7 @@ class OrderProductionExport implements
                 $detailHeaderRow = 11;
 
                 $sheet->getStyle(
-                    "A{$detailHeaderRow}:F{$detailHeaderRow}"
+                    "A{$detailHeaderRow}:H{$detailHeaderRow}"
                 )->applyFromArray([
 
                     'fill' => [
@@ -419,9 +460,7 @@ class OrderProductionExport implements
                 $detailRows = 0;
 
                 foreach ($this->details as $detail) {
-
                     $labelsCount = $detail->list_labels->count();
-
                     $detailRows += max(1, $labelsCount);
                 }
 
@@ -438,7 +477,7 @@ class OrderProductionExport implements
                 if ($detailRows > 0) {
 
                     $sheet->getStyle(
-                        "A{$detailStartRow}:F{$detailEndRow}"
+                        "A{$detailStartRow}:H{$detailEndRow}"
                     )->applyFromArray([
 
                         'borders' => [
@@ -471,7 +510,24 @@ class OrderProductionExport implements
                     $currentRow = $detailStartRow;
 
                     foreach ($this->details as $detail) {
+                        $pathImg = $detail->product_img;
 
+                        if (!empty($pathImg) && File::exists(public_path($pathImg))) {
+                            $drawing = new Drawing();
+                            $drawing->setName('Foto Producto');
+                            $drawing->setPath(public_path($pathImg));
+                            $drawing->setCoordinates('A' . $currentRow);
+                            // --- HACE QUE LA IMAGEM SE COMPORTE COMO PARTE DE LA CELDA ---
+                            // 'oneCell' / 'twoCell' hace que al mover o redimensionar la celda, la imagen se ajuste con ella.
+                            $drawing->setEditAs(\PhpOffice\PhpSpreadsheet\Worksheet\Drawing::EDIT_AS_ONECELL);
+
+                            // Ajustes de tamaño y offsets
+                            $drawing->setHeight(60);
+                            $drawing->setOffsetX(20);
+                            $drawing->setOffsetY(5);
+
+                            $drawing->setWorksheet($sheet);
+                        }
                         $rowSpan = max(
                             1,
                             $detail->list_labels->count()
@@ -496,6 +552,9 @@ class OrderProductionExport implements
                             $sheet->mergeCells(
                                 "D{$currentRow}:D{$lastRow}"
                             );
+                            $sheet->mergeCells(
+                                "H{$currentRow}:H{$lastRow}"
+                            );
                         }
 
                         $currentRow += $rowSpan;
@@ -506,46 +565,16 @@ class OrderProductionExport implements
                     | ALINEACIÓN PRODUCTOS
                     |--------------------------------------------------------------------------
                     */
-
-                    $sheet->getStyle(
-                        "A{$detailStartRow}:A{$detailEndRow}"
-                    )
-                        ->getAlignment()
-                        ->setHorizontal(
-                            Alignment::HORIZONTAL_CENTER
-                        );
-
-                    $sheet->getStyle(
-                        "C{$detailStartRow}:C{$detailEndRow}"
-                    )
-                        ->getAlignment()
-                        ->setHorizontal(
-                            Alignment::HORIZONTAL_CENTER
-                        );
-
-                    $sheet->getStyle(
-                        "D{$detailStartRow}:D{$detailEndRow}"
-                    )
-                        ->getAlignment()
-                        ->setHorizontal(
-                            Alignment::HORIZONTAL_CENTER
-                        );
-
-                    $sheet->getStyle(
-                        "E{$detailStartRow}:E{$detailEndRow}"
-                    )
-                        ->getAlignment()
-                        ->setHorizontal(
-                            Alignment::HORIZONTAL_CENTER
-                        );
-
-                    $sheet->getStyle(
-                        "F{$detailStartRow}:F{$detailEndRow}"
-                    )
-                        ->getAlignment()
-                        ->setHorizontal(
-                            Alignment::HORIZONTAL_CENTER
-                        );
+                    $colums = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                    foreach ($colums as $column) {
+                        $sheet->getStyle(
+                            "{$column}{$detailStartRow}:{$column}{$detailEndRow}"
+                        )
+                            ->getAlignment()
+                            ->setVertical(
+                                Alignment::VERTICAL_CENTER
+                            );
+                    }
                 }
 
                 /*
@@ -557,32 +586,29 @@ class OrderProductionExport implements
                 $totalRow = $detailEndRow + 1;
 
                 $sheet->mergeCells(
-                    "A{$totalRow}:E{$totalRow}"
-                );
-
-                $sheet->getStyle(
                     "A{$totalRow}:F{$totalRow}"
+                );
+                $sheet->mergeCells(
+                    "G{$totalRow}:H{$totalRow}"
+                );
+                $sheet->getStyle(
+                    "A{$totalRow}:H{$totalRow}"
                 )->applyFromArray([
-
                     'font' => [
                         'bold' => true,
                     ],
-
                     'borders' => [
-
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
                             'color' => [
                                 'rgb' => $borderColor,
                             ],
                         ],
-
                     ],
-
                 ]);
 
                 $sheet->getStyle(
-                    "A{$totalRow}:E{$totalRow}"
+                    "A{$totalRow}:F{$totalRow}"
                 )
                     ->getAlignment()
                     ->setHorizontal(
@@ -600,52 +626,45 @@ class OrderProductionExport implements
                 $observationRow = $totalRow + 2;
 
                 $sheet->mergeCells(
-                    "A{$observationHeaderRow}:F{$observationHeaderRow}"
+                    "A{$observationHeaderRow}:H{$observationHeaderRow}"
                 );
 
                 $sheet->mergeCells(
-                    "A{$observationRow}:F{$observationRow}"
+                    "A{$observationRow}:H{$observationRow}"
                 );
 
                 $sheet->getStyle(
-                    "A{$observationHeaderRow}:F{$observationHeaderRow}"
+                    "A{$observationHeaderRow}:H{$observationHeaderRow}"
                 )->applyFromArray([
-
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
                         'startColor' => [
                             'rgb' => $green,
                         ],
                     ],
-
                     'font' => [
                         'color' => [
                             'rgb' => $white,
                         ],
                         'bold' => true,
                     ],
-
                 ]);
 
                 $sheet->getStyle(
-                    "A{$observationHeaderRow}:F{$observationRow}"
+                    "A{$observationHeaderRow}:H{$observationRow}"
                 )->applyFromArray([
-
                     'borders' => [
-
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
                             'color' => [
                                 'rgb' => $borderColor,
                             ],
                         ],
-
                     ],
-
                 ]);
 
                 $sheet->getStyle(
-                    "A{$observationRow}:F{$observationRow}"
+                    "A{$observationRow}:H{$observationRow}"
                 )
                     ->getAlignment()
                     ->setWrapText(true);
@@ -667,51 +686,59 @@ class OrderProductionExport implements
                 );
 
                 $sheet->mergeCells(
-                    "D{$signatureRow}:E{$signatureRow}"
+                    "F{$signatureRow}:G{$signatureRow}"
                 );
 
                 $sheet->getStyle(
                     "A{$signatureRow}:B{$signatureRow}"
                 )->applyFromArray([
-
                     'borders' => [
-
                         'top' => [
                             'borderStyle' => Border::BORDER_THIN,
                         ],
-
                     ],
-
                     'alignment' => [
-
                         'horizontal' =>
-                            Alignment::HORIZONTAL_CENTER,
-
+                        Alignment::HORIZONTAL_CENTER,
                     ],
-
                 ]);
 
                 $sheet->getStyle(
-                    "D{$signatureRow}:E{$signatureRow}"
+                    "F{$signatureRow}:G{$signatureRow}"
                 )->applyFromArray([
-
                     'borders' => [
-
                         'top' => [
                             'borderStyle' => Border::BORDER_THIN,
                         ],
-
                     ],
-
                     'alignment' => [
-
                         'horizontal' =>
-                            Alignment::HORIZONTAL_CENTER,
-
+                        Alignment::HORIZONTAL_CENTER,
                     ],
-
                 ]);
+                $comercialRow = $signatureRow + 1;
+                $sheet->mergeCells(
+                    "A{$comercialRow}:B{$comercialRow}"
+                );
 
+                $sheet->mergeCells(
+                    "F{$comercialRow}:G{$comercialRow}"
+                );
+
+                $sheet->getStyle(
+                    "A{$comercialRow}:H{$comercialRow}"
+                )->applyFromArray([
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => [
+                            'rgb' => $yellow,
+                        ],
+                    ],
+                    'alignment' => [
+                        'horizontal' =>
+                        Alignment::HORIZONTAL_CENTER,
+                    ],
+                ]);
                 /*
                 |--------------------------------------------------------------------------
                 | ALTURAS

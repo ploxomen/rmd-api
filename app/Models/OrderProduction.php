@@ -18,8 +18,8 @@ class OrderProduction extends Model
         'order_produc_total'
     ];
     protected $casts = [
-        'order_produc_date_issue' => 'date',
-        'order_produc_date_delive' => 'date',
+        'order_produc_date_issue' => 'date:Y-m-d',
+        'order_produc_date_delive' => 'date:Y-m-d',
     ];
     public function customer()
     {

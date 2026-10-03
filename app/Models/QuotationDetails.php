@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class QuotationDetails extends Model
 {
@@ -32,7 +30,9 @@ class QuotationDetails extends Model
             "product_name",
             "order_code",
             "products.id as product_id", 
-            "order_productions_details.amount"
+            "order_productions_details.amount",
+            "product_description",
+            "product_img"
         ])
             ->leftJoin('orders', 'orders.id', '=', 'order_productions_details.order_id')
             ->leftJoin('quotations_details', 'quotations_details.id', '=', 'quotation_detail_id')

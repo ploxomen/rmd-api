@@ -67,12 +67,13 @@ class OrderProductionController extends Controller
             'success' => true
         ]);
     }
-    public function viewReportExcel(int $orderId)
+    public function customQuery(int $orderId)
     {
         $order = OrderProduction::with(['customer'])->where('id', $orderId)->first();
+        $userName = $order->details()->first()->order->user->full_name ?? '';
         $details = QuotationDetails::getQuotationDetailOld($orderId);
         foreach ($details as $detail) {
-            $labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours", "product_labels.name as product_label_name"])
+            $labels = OrderProductionDetail::query()->select(["product_label_id as id", "pro_group_work_time_hours as time_origin_hours", "pro_escandallo_total", "product_labels.name as product_label_name"])
                 ->leftJoin('product_labels', 'product_labels.id', '=', 'product_label_id')->where([
                     'order_production_id' => $orderId,
                     'quotation_detail_id' => $detail->quota_deta_id,
@@ -83,7 +84,19 @@ class OrderProductionController extends Controller
                 return $detail->amount * $item->time_origin_hours;
             });
         }
-        return Excel::download(new OrderProductionExport($order, $details), 'orden-produccion-' . $order->order_production_code . '.xlsx');
+        return (object) [
+            'order' => $order,
+            'details' => $details,
+            'userName' => $userName
+        ];
+    }
+    public function viewReportExcel(int $orderId)
+    {
+        $query = $this->customQuery($orderId);
+        $order = $query->order;
+        $details = $query->details;
+        $userName = $query->userName;
+        return Excel::download(new OrderProductionExport($order, $details, $userName), 'orden-produccion-' . $query->order->order_production_code . '.xlsx');
     }
     function formatOrderCodes(array $ordersCollection): string
     {
@@ -140,18 +153,18 @@ class OrderProductionController extends Controller
                 'order_id' => $detail['order_id'],
                 'product_label_id' => null,
                 'amount' => $detail['amount'],
-                'product_label_hr' => 0,
-                'product_label_total' => 0
+                'pro_group_work_time_hours' => 0,
+                'pro_escandallo_total' => 0
             ];
             if (empty($detail['list_labels'])) {
                 $orderProduction->details()->create($detailFillable);
                 continue;
             }
             foreach ($detail['list_labels'] as $label) {
-                $subtotalHr = round($detail['amount'] * $label['time_origin_hours'], 2);
+                $subtotalHr = round($detail['amount'] * $label['group_work_time_hours'], 3);
                 $detailFillable['product_label_id'] = $label['id'];
-                $detailFillable['product_label_hr'] = $label['time_origin_hours'];
-                $detailFillable['product_label_total'] = $subtotalHr;
+                $detailFillable['pro_group_work_time_hours'] = $label['group_work_time_hours'];
+                $detailFillable['pro_escandallo_total'] = $subtotalHr;
                 $orderProduction->details()->create($detailFillable);
                 $totalHr += $subtotalHr;
             }
@@ -163,12 +176,13 @@ class OrderProductionController extends Controller
             'redirect' => null
         ]);
     }
-    public function show(int $orderProduction)
+    public function show(int $orderProduction, Request $request)
     {
         $orderProductionModel = OrderProduction::with('customer')->where('id', $orderProduction)->first();
         $products = QuotationDetails::getQuotationDetailOld($orderProduction);
         foreach ($products as $product) {
-            $product->list_labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours"])->where([
+            $product->img_url = $request->root() . '/' . $product->product_img;
+            $product->list_labels = OrderProductionDetail::query()->select(["product_label_id as id", "pro_group_work_time_hours as group_work_time_hours"])->where([
                 'order_production_id' => $orderProduction,
                 'quotation_detail_id' => $product->quota_deta_id,
                 'order_id' => $product->order_id
@@ -181,21 +195,11 @@ class OrderProductionController extends Controller
     }
     public function viewReportPdf(int $orderId)
     {
-        $order = OrderProduction::with(['customer'])->where('id', $orderId)->first();
-        $details = QuotationDetails::getQuotationDetailOld($orderId);
-        foreach ($details as $detail) {
-            $labels = OrderProductionDetail::query()->select(["product_label_id as id", "product_label_hr as time_origin_hours", "product_labels.name as product_label_name"])
-                ->leftJoin('product_labels', 'product_labels.id', '=', 'product_label_id')->where([
-                    'order_production_id' => $orderId,
-                    'quotation_detail_id' => $detail->quota_deta_id,
-                    'order_id' => $detail->order_id
-                ])->whereNotNull('product_label_id')->get();
-            $detail->list_labels = $labels;
-            $detail->subtotal = $labels->sum(function ($item) use ($detail) {
-                return $detail->amount * $item->time_origin_hours;
-            });
-        }
-        return Pdf::loadView('reports.order-production', compact('order', 'details'))->stream("order.pdf");
+        $query = $this->customQuery($orderId);
+        $order = $query->order;
+        $details = $query->details;
+        $userName = $query->userName;
+        return Pdf::loadView('reports.order-production', compact('order', 'details','userName'))->stream("order.pdf");
     }
     public function getQuotationForOrderId(int $orderId, Request $request)
     {
@@ -248,21 +252,21 @@ class OrderProductionController extends Controller
                     $columnDiferent,
                     [
                         'amount' => $detail['amount'],
-                        'product_label_hr' => 0,
-                        'product_label_total' => 0
+                        'pro_group_work_time_hours' => 0,
+                        'pro_escandallo_total' => 0
                     ]
                 );
                 continue;
             }
             foreach ($detail['list_labels'] as $label) {
                 $columnDiferent['product_label_id'] = $label['id'];
-                $subtotalHr = round($detail['amount'] * $label['time_origin_hours'], 2);
+                $subtotalHr = round($detail['amount'] * $label['group_work_time_hours'], 3);
                 OrderProductionDetail::updateOrCreate(
                     $columnDiferent,
                     [
                         'amount' => $detail['amount'],
-                        'product_label_hr' => $label['time_origin_hours'],
-                        'product_label_total' => $subtotalHr
+                        'pro_group_work_time_hours' => $label['group_work_time_hours'],
+                        'pro_escandallo_total' => $subtotalHr
                     ]
                 );
                 $totalHr += $subtotalHr;

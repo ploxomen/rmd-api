@@ -160,59 +160,88 @@
     <table class="table-information mb">
         <thead>
             <tr class="bg-primary">
-                <th>COT.</th>
-                <th>PRODUCTO / DESCRIPCIÓN.</th>
+                <th>IMAGEN REF.</th>
+                <th>PRODUCTO / DESCRIPCIÓN</th>
                 <th>CANT.</th>
+                <th>UND.</th>
                 <th>HR. TOT. ESCANDALLO.</th>
-                <th>SECCIÓN</th>
-                <th>HORAS SECCIÓN</th>
+                <th>ÁREAS</th>
+                <th>HH/UND.</th>
+                <th>TOTAL HH</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach ($details as $detail)
+        <tbody style="font-size: 10px;">
+            @foreach ($details as $keyDetail => $detail)
                 @php
+                    $pathImg = $detail->product_img;
                     $rowSpan = $detail->list_labels->count();
+                    $urlImage = empty($pathImg) || !\File::exists($pathImg) ? null : $pathImg;
                 @endphp
-                <tr>
-                    <td rowspan="{{ $rowSpan }}" style="text-align: center;">{{ $detail->order_code }}</td>
-                    <td rowspan="{{ $rowSpan }}">{{ $detail->product_name }}</td>
+                @foreach ($detail->list_labels as $key => $label)
+                    <tr>
+                        @if ($key === 0)
+                            <td rowspan="{{ $rowSpan }}" style="text-align: center;">
+                            @empty(!$urlImage)
+                                <img src="{{ public_path($urlImage) }}" alt="Imagen de productos" width="40px"
+                                    height="40px">
+                            @endempty
+                        </td>
+                        <td rowspan="{{ $rowSpan }}" style="line-height:0.8; font-size: 11px;">
+                            {{ $detail->product_name }}
+                        @empty(!$detail->product_description)
+                            {!! $detail->product_description !!}
+                        @endempty
+                    </td>
                     <td rowspan="{{ $rowSpan }}" style="text-align: center;">{{ $detail->amount }}</td>
-                    <td rowspan="{{ $rowSpan }}" style="text-align: center;">{{ $detail->subtotal }}h</td>
-                    @foreach ($detail->list_labels as $key => $label)
-                        @if ($key > 0)
-                <tr>
-            @endif
-            <td style="text-align: center;">{{ $label->product_label_name }}</td>
-            <td>{{ $label->time_origin_hours }}h</td>
+                    <td rowspan="{{ $rowSpan }}" style="text-align: center;">Unidad</td>
+                @endif
+                {{-- Celdas repetidas por cada subítem/label --}}
+                <td style="text-align: center;">{{ $label->pro_escandallo_total }} HH</td>
+                <td style="text-align: center;">{{ $label->product_label_name }}</td>
+                <td style="text-align: center;">{{ $label->time_origin_hours }} HH</td>
+                {{-- Celda acumulada con rowSpan en la última columna --}}
+                @if ($key === 0)
+                    <td rowspan="{{ $rowSpan }}" style="text-align: center;">{{ $detail->subtotal }} HH
+                    </td>
+                @endif
             </tr>
-            @endforeach
-            @php
-                $total += $detail->subtotal;
-            @endphp
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="5" style="text-align: right;">TOTAL HORAS PREVISTAS</th>
-                <th style="text-align: left;">{{ $total }}h</th>
-            </tr>
-        </tfoot>
-    </table>
-    <table class="table-information" style="margin-bottom: 100px;">
-        <tr class="bg-primary">
-            <td>OBSERVACIONES</td>
-        </tr>
-        <tr>
-            <td>{{ $order->order_production_detail }}</td>
-        </tr>
-    </table>
-    <table class="mb" style="text-align: center; font-size: 12px;">
-        <tr>
-            <td style="padding-top: 4px; border-top: 1px solid black;">Responsable de Producción</td>
-            <td style="width: 250px;"></td>
-            <td style="padding-top: 4px; border-top: 1px solid black;">Responsable Arquitectura</td>
-        </tr>
-    </table>
+        @endforeach
+        @php
+            $total += $detail->subtotal;
+        @endphp
+    @endforeach
+
+</tbody>
+<tfoot>
+    <tr>
+        <th colspan="5" style="text-align: right;">TOTAL HH</th>
+        <th colspan="3" style="text-align: left;">{{ $total }} HH</th>
+    </tr>
+</tfoot>
+</table>
+<table class="table-information" style="margin-bottom: 100px;">
+<tr class="bg-primary">
+    <td>OBSERVACIONES</td>
+</tr>
+<tr>
+    <td>{{ $order->order_production_detail }}</td>
+</tr>
+</table>
+<table class="mb" style="text-align: center; font-size: 12px;">
+<tr>
+    <td style="padding-top: 4px; border-top: 1px solid black;">Responsable de Producción</td>
+    <td style="width: 250px;"></td>
+    <td style="padding-top: 4px; border-top: 1px solid black;">Responsable Arquitectura</td>
+</tr>
+<td>
+    <td colspan="3" style="width: 100%; height: 30px;"></td>
+</td>
+<tr style="background-color: #ffcfaf;">
+    <td style="padding: 4px; text-align: right;">COMERCIAL:</td>
+    <td style="width: 250px;"></td>
+    <td style="padding: 4px;">{{ $userName }}</td>
+</tr>
+</table>
 </body>
 
 </html>

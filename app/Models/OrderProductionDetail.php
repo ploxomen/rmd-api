@@ -13,8 +13,12 @@ class OrderProductionDetail extends Model
         'quotation_detail_id',
         'product_label_id',
         'amount',
-        'product_label_hr',
+        'pro_group_work_time_hours',
         'order_id',
-        'product_label_total'
+        'pro_escandallo_total'
     ];
+    public function order()
+    {
+        return $this->belongsTo(Orders::class, 'order_id');
+    }
 }

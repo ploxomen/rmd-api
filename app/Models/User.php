@@ -34,7 +34,11 @@ class User extends Authenticatable
         'user_avatar',
         'user_address'
     ];
-
+    protected $appends = ['full_name'];
+    public function getFullNameAttribute(): string
+    {
+        return $this->user_name . ' ' . $this->user_last_name;
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -45,9 +49,9 @@ class User extends Authenticatable
         'created_at',
         'updated_at'
     ];
-    
+
     public function roles()
     {
-        return $this->belongsToMany(Roles::class,'users_roles','user','role')->withPivot('active')->withTimestamps();
+        return $this->belongsToMany(Roles::class, 'users_roles', 'user', 'role')->withPivot('active')->withTimestamps();
     }
 }
