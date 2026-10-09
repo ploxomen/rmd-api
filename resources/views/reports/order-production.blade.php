@@ -164,7 +164,7 @@
                 <th>PRODUCTO / DESCRIPCIÓN</th>
                 <th>CANT.</th>
                 <th>UND.</th>
-                <th>HR. TOT. ESCANDALLO.</th>
+                <th>HH. TOT. ESCANDALLO</th>
                 <th>ÁREAS</th>
                 <th>HH/UND.</th>
                 <th>TOTAL HH</th>

@@ -89,8 +89,7 @@
         <th>
             UND.
         </th>
-
-        <th>HR. TOT. ESCANDALLO</th>
+        <th>HH. TOT. ESCANDALLO</th>
         <th>
             ÁREAS
         </th>
